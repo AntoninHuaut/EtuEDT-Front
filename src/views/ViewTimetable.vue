@@ -1,16 +1,16 @@
 <template>
   <div class="home">
-    <SelectTimetable />
+    <ViewTimetable />
   </div>
 </template>
 
 <script>
-import SelectTimetable from "@/components/SelectTimetable.vue";
+import ViewTimetable from "@/components/ViewTimetable.vue";
 
 export default {
   name: "Home",
   components: {
-    SelectTimetable
+    ViewTimetable
   }
 };
 </script>

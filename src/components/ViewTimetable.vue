@@ -118,12 +118,14 @@ export default {
       this.colors.colorsList.push(color + " lighten-3")
     );
 
-    fetch(`https://maner.fr:3008/${localStorage.edtId}`)
+    const edtId = this.$route.params.edtId || localStorage.edtId;
+
+    fetch(`https://maner.fr:3008/${edtId}`)
       .then(res => res.json())
       .then(res => (this.edt = res))
       .catch(() => this.$root.$emit("error", true));
 
-    fetch(`https://maner.fr:3008/${localStorage.edtId}/json`)
+    fetch(`https://maner.fr:3008/${edtId}/json`)
       .then(res => res.json())
       .then(res => {
         res = res.map(item => {

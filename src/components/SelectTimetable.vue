@@ -7,8 +7,8 @@
       </v-snackbar>
 
       <v-col
-        :cols="$vuetify.breakpoint.xs || $vuetify.breakpoint.sm ? '': '6'"
         class="mx-auto mb-5"
+        :cols="$vuetify.breakpoint.xs || $vuetify.breakpoint.sm ? '': '6'"
       >
         <span class="display-1">Veuillez sélectionner un emploi du temps :</span>
 

@@ -26,6 +26,7 @@
                     x-large
                     :class="{'subtitle-1 pt-6 pb-6 pl-12 pr-12': $vuetify.breakpoint.lg || $vuetify.breakpoint.xl}"
                     :color="colorList[i]"
+                    @click="selectEDT(edt.edtId)"
                     dark
                   >{{edt.edtName}}</v-btn>
                 </router-link>
@@ -40,10 +41,6 @@
 
 <script>
 export default {
-  props: {
-    name: String,
-    type: String
-  },
   data() {
     return {
       loading: true,
@@ -58,6 +55,11 @@ export default {
         "orange lighten-1"
       ]
     };
+  },
+  methods: {
+    selectEDT(edtId) {
+      localStorage.edtId = edtId;
+    }
   },
   mounted() {
     fetch(`https://edt.maner.fr/data/`)

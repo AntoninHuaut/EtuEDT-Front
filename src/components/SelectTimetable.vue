@@ -59,6 +59,10 @@ export default {
   methods: {
     selectEDT(edtId) {
       localStorage.edtId = edtId;
+      this.$root.$emit("updateStorage", {
+        path: "edtId",
+        value: edtId
+      });
     }
   },
   mounted() {

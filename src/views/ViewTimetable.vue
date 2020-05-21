@@ -1,22 +1,30 @@
 <template>
   <div>
     <Error />
+
+    <Timetable>
+      <template v-slot:calendar>
+        <Calendar />
+      </template>
+    </Timetable>
+
     <Loader />
-    <ViewTimetable />
   </div>
 </template>
 
 <script>
-import Error from "@/components/Error.vue";
-import Loader from "@/components/Loader.vue";
-import ViewTimetable from "@/components/ViewTimetable.vue";
+import Error from "@/components/tools/Error.vue";
+import Calendar from "@/components/timetable/Calendar.vue";
+import Loader from "@/components/tools/Loader.vue";
+import Timetable from "@/components/timetable/Timetable.vue";
 
 export default {
-  name: "Home",
+  name: "ViewTimeTable",
   components: {
     Error,
+    Calendar,
     Loader,
-    ViewTimetable
+    Timetable
   }
 };
 </script>

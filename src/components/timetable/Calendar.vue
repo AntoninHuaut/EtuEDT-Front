@@ -1,67 +1,44 @@
 <template>
-  <v-container fluid>
-    <v-row justify="space-between">
-      <v-col :cols="$vuetify.breakpoint.lg || $vuetify.breakpoint.xl ? '6': '12'">
-        <v-row justify="center" align="center">
-          <v-btn outlined color="grey darken-2" class="mr-5" @click="setToday">Aujourd'hui</v-btn>
-          <v-toolbar-title>{{edt ? edt.edtName : ''}}</v-toolbar-title>
-          <v-btn fab text small color="grey darken-2" @click="prev">
-            <v-icon small>mdi-chevron-left</v-icon>
-          </v-btn>
-          <v-btn fab text small color="grey darken-2" @click="next">
-            <v-icon small>mdi-chevron-right</v-icon>
-          </v-btn>
+  <v-calendar
+    v-if="!loading"
+    ref="calendar"
+    v-model="focus"
+    :value="today"
+    :events="events"
+    :locale="locale"
+    :short-weekdays="shortWeekdays"
+    :weekdays="weekdays"
+    :max-days="maxDays"
+    :first-interval="firstInterval"
+    :event-color="getEventColor"
+    :type="type"
+    :now="today"
+    @click:date="clickDay"
+    @click:time="clickDay"
+  >
+    <template v-slot:event="{event}">
+      <div class="pr-1 pl-1 black--text">
+        <v-row>
+          <v-col class="pt-0 pb-0">
+            <span class="font-weight-medium">{{ event.title }}</span>
+          </v-col>
+          <v-col class="pt-0 pb-0 text-right">
+            <span class="caption">{{ event.location }}</span>
+          </v-col>
         </v-row>
-      </v-col>
-
-      <v-col
-        :class="'text-center ' + ($vuetify.breakpoint.lg || $vuetify.breakpoint.xl ? '': 'd-none')"
-        :cols="$vuetify.breakpoint.xs || $vuetify.breakpoint.sm ? '12': '6'"
-      >
-        <v-btn-toggle mandatory dense v-model="type" tile color="deep-purple accent-3" group>
-          <v-btn @click="type = 'day'" value="day">Jour</v-btn>
-          <v-btn @click="type = 'week'" value="week">Semaine</v-btn>
-          <v-btn @click="type = 'month'" value="month">Mois</v-btn>
-          <v-btn @click="type = '4day'" value="4day">4 Jours</v-btn>
-        </v-btn-toggle>
-      </v-col>
-    </v-row>
-    <v-calendar
-      ref="calendar"
-      v-model="focus"
-      :value="today"
-      :events="events"
-      :locale="locale"
-      :short-weekdays="shortWeekdays"
-      :weekdays="weekdays"
-      :max-days="maxDays"
-      :first-interval="firstInterval"
-      :event-color="getEventColor"
-      :type="type"
-      :now="today"
-    >
-      <template v-slot:event="{event}">
-        <div class="pr-1 pl-1 black--text">
-          <v-row>
-            <v-col class="pt-0 pb-0">
-              <span class="font-weight-medium">{{ event.title }}</span>
-            </v-col>
-            <v-col class="pt-0 pb-0 text-right">
-              <span class="caption">{{ event.location }}</span>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col class="pt-0 pb-0">
-              <span class="caption">{{ formatDate(event.start) }} - {{ formatDate(event.end) }}</span>
-            </v-col>
-            <v-col class="pt-0 pb-0 text-right">
-              <span bottom class="pr-1 caption font-italic font-weight-light">{{ event.enseignant }}</span>
-            </v-col>
-          </v-row>
-        </div>
-      </template>
-    </v-calendar>
-  </v-container>
+        <v-row>
+          <v-col class="pt-0 pb-0">
+            <span
+              class="caption"
+            >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
+          </v-col>
+          <v-col class="pt-0 pb-0 text-right">
+            <span bottom class="pr-1 caption font-italic font-weight-light">{{ event.enseignant }}</span>
+          </v-col>
+        </v-row>
+      </div>
+    </template>
+  </v-calendar>
 </template>
 
 <script>
@@ -69,8 +46,8 @@ import moment from "moment";
 
 export default {
   data: () => ({
-    edt: undefined,
-    colors: {
+    eventStyle: {
+      matHashCode: {},
       availableColors: [
         "red",
         "pink",
@@ -106,7 +83,7 @@ export default {
     format: "YYYY-MM-DD HH:mm",
 
     loading: true,
-    type: "week",
+    type: undefined,
     focus: "",
     today: undefined,
     events: []
@@ -114,18 +91,13 @@ export default {
   mounted() {
     this.onWindowResize();
 
-    this.colors.availableColors.forEach(color =>
-      this.colors.colorsList.push(color + " lighten-3")
+    this.eventStyle.availableColors.forEach(color =>
+      this.eventStyle.colorsList.push(color + " lighten-3")
     );
 
     const edtId = this.$route.params.edtId || localStorage.edtId;
 
-    fetch(`https://maner.fr:3008/${edtId}`)
-      .then(res => res.json())
-      .then(res => (this.edt = res))
-      .catch(() => this.$root.$emit("error", true));
-
-    fetch(`https://maner.fr:3008/${edtId}/json`)
+    fetch(`https://edtapi.maner.fr/${edtId}/json`)
       .then(res => res.json())
       .then(res => {
         res = res.map(item => {
@@ -141,14 +113,27 @@ export default {
       })
       .catch(() => this.$root.$emit("error", true))
       .finally(() => {
+        this.$root.$emit("loader-update", false);
         this.loading = false;
-        this.$root.$emit("loader", false);
       });
 
     window.addEventListener("resize", this.onWindowResize);
     document.addEventListener("keydown", this.onKeyPress);
     document.addEventListener("touchstart", this.handleTouchStart, false);
     document.addEventListener("touchmove", this.handleTouchMove, false);
+
+    this.$root.$on("calendar-update", get => {
+      switch (get.type) {
+        case "setToday":
+          return this.setToday();
+        case "prev":
+          return this.prev();
+        case "next":
+          return this.next();
+        case "updateViewType":
+          return (this.type = get.value);
+      }
+    });
   },
   methods: {
     setToday() {
@@ -163,25 +148,37 @@ export default {
     getEventColor(event) {
       return event.color;
     },
+    clickDay(event) {
+      this.setViewType("day");
+      this.focus = moment(event.date).format(this.format);
+    },
+    setViewType(viewType) {
+      this.type = viewType;
+      this.$root.$emit("timetable-update", {
+        type: "updateViewType",
+        value: viewType
+      });
+    },
     getColorMatiere(mat) {
       mat = mat.replace(/ /g, "");
       ["TD", "TP", "CM", "CC", "CTP"].forEach(
         get => (mat = mat.replace(get, ""))
       );
 
-      if (!this.colors.mats[mat]) {
-        if (this.colors.mats.increment >= this.colors.colorsList.length)
-          this.colors.mats.increment = 0;
+      if (!this.eventStyle.matHashCode[mat]) {
+        const matHashCode = mat
+          .split("")
+          .reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0);
 
-        this.colors.mats[mat] = this.colors.colorsList[
-          this.colors.mats.increment++
-        ];
+        this.eventStyle.matHashCode[mat] = {
+          index: Math.abs(matHashCode) % this.eventStyle.colorsList.length
+        };
       }
 
-      return this.colors.mats[mat];
+      return this.eventStyle.colorsList[this.eventStyle.matHashCode[mat].index];
     },
-    formatDate(date) {
-      return moment(date).format("HH[h]mm");
+    formatDate(date, format) {
+      return moment(date).format(format);
     },
     onKeyPress(key) {
       switch (key.keyCode) {
@@ -198,8 +195,13 @@ export default {
           break;
       }
     },
+    emitTimetableUpdate(type, value = undefined) {
+      this.$root.$emit("timetable-update", {
+        type: type,
+        value: value
+      });
+    },
     onWindowResize() {
-      console.log("resize", this.$vuetify.breakpoint.name);
       if (["xs", "sm", "md"].includes(this.$vuetify.breakpoint.name))
         this.type = "day";
     },

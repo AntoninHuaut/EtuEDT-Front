@@ -13,7 +13,7 @@ export default {
     loading: true
   }),
   mounted: function() {
-    this.$root.$on("loader", boolean => (this.loading = boolean));
+    this.$root.$on("loader-update", boolean => (this.loading = boolean));
   }
 };
 </script>

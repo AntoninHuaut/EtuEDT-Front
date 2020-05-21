@@ -1,8 +1,8 @@
 <template>
   <v-container fluid>
     <v-row justify="space-between">
-      <v-col :cols="$vuetify.breakpoint.lg || $vuetify.breakpoint.xl ? '6': '12'">
-        <v-row justify="center" align="center">
+      <v-col :cols="isMobile() ? '12': '6'">
+        <v-row class="ml-0" justify="left" align="center">
           <v-btn
             outlined
             color="grey darken-2"
@@ -20,14 +20,13 @@
       </v-col>
 
       <v-col
-        :class="'text-center ' + ($vuetify.breakpoint.lg || $vuetify.breakpoint.xl ? '': 'd-none')"
-        :cols="$vuetify.breakpoint.xs || $vuetify.breakpoint.sm ? '12': '6'"
+        :class="'text-right mr-0 ' + (isMobile() ? 'd-none': '')"
+        :cols="isMobile() ? '12': '6'"
       >
-        <v-btn-toggle mandatory dense v-model="type" tile color="deep-purple accent-3" group>
+        <v-btn-toggle mandatory dense v-model="type" tile color="blue accent-2" group>
           <v-btn @click="setViewType('day')" value="day">Jour</v-btn>
           <v-btn @click="setViewType('week')" value="week">Semaine</v-btn>
           <v-btn @click="setViewType('month')" value="month">Mois</v-btn>
-          <v-btn @click="setViewType('4day')" value="4day">4 Jours</v-btn>
         </v-btn-toggle>
       </v-col>
     </v-row>
@@ -83,6 +82,13 @@ export default {
     },
     formatDate(date, format) {
       return moment(date).format(format);
+    },
+    isMobile() {
+      return (
+        this.$vuetify.breakpoint.xs ||
+        this.$vuetify.breakpoint.sm ||
+        this.$vuetify.breakpoint.md
+      );
     }
   }
 };

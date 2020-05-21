@@ -65,7 +65,7 @@ export default {
     }
   },
   mounted() {
-    fetch(`https://edt.maner.fr/data/`)
+    fetch(`https://edtapi.maner.fr/`)
       .then(res => res.json())
       .then(edtList => {
         let etaList = [];

@@ -16,15 +16,14 @@
 
         <v-col class="mx-auto" v-for="(eta) in etaList" :key="eta.numEta">
           <h2 class="mt-3 mb-1">{{eta.nomEta}} :</h2>
-
           <v-row justify="center">
             <v-col cols="6" class="mx-auto" v-for="(annee) in eta.data" :key="annee.numAnnee">
               <h2 class="font-weight-regular">Année {{annee.numAnnee}} :</h2>
               <v-col class="pt-2 pb-1 mx-auto" v-for="(edt, i) in annee.data" :key="edt.edtId">
-                <router-link :to="'/edt/' + edt.edtId">
+                <router-link :to="'/edt/' + edt.edtId" tag="button">
                   <v-btn
                     x-large
-                    :class="{'subtitle-1 pt-6 pb-6 pl-12 pr-12': $vuetify.breakpoint.lg || $vuetify.breakpoint.xl}"
+                    :class="{'subtitle-1 pl-12 pr-12': $vuetify.breakpoint.lg || $vuetify.breakpoint.xl}"
                     :color="colorList[i]"
                     @click="selectEDT(edt.edtId)"
                     dark

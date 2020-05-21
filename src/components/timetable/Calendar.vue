@@ -89,8 +89,6 @@ export default {
     events: []
   }),
   mounted() {
-    this.onWindowResize();
-
     this.eventStyle.availableColors.forEach(color =>
       this.eventStyle.colorsList.push(color + " lighten-3")
     );
@@ -116,6 +114,10 @@ export default {
         this.$root.$emit("loader-update", false);
         this.loading = false;
       });
+
+    this.$nextTick(() => {
+      this.onWindowResize();
+    });
 
     window.addEventListener("resize", this.onWindowResize);
     document.addEventListener("keydown", this.onKeyPress);
@@ -202,8 +204,7 @@ export default {
       });
     },
     onWindowResize() {
-      if (["xs", "sm", "md"].includes(this.$vuetify.breakpoint.name))
-        this.setViewType("day");
+      if (this.$isMobile()) this.setViewType("day");
     },
     handleTouchStart(evt) {
       const firstTouch = evt.touches[0];

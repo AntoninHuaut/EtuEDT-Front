@@ -15,7 +15,7 @@
       </router-link>
 
       <router-link class="ml-5 mr-3" to="/faq">
-        <v-icon class="mb-1">sync</v-icon>
+        <v-icon class="mb-1">mdi-sync</v-icon>
         <span class="white--text title font-weight-regular ml-1">Sync</span>
       </router-link>
 
@@ -37,7 +37,7 @@
         v-clipboard:success="() => {copyData = true}"
         @click="setRouteName"
         large
-      >link</v-icon>
+      >mdi-link</v-icon>
 
       <v-snackbar color="light-blue" top timeout="5000" v-model="copyData">
         Le lien direct de l'emploi du temps a été copié dans le presse-papier

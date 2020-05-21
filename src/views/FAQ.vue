@@ -18,7 +18,7 @@
               <span
                 class="infos"
               >
-                <v-icon>link</v-icon>
+                <v-icon>mdi-link</v-icon>
                 <br />Le lien contenant les informations de l'EDT va être copié dans votre presse-papier
               </span>
             </li>

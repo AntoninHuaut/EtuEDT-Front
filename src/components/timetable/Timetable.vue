@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row justify="space-between">
-      <v-col :cols="isMobile() ? '12': '6'">
+      <v-col :cols="this.$isMobile() ? '12': '6'">
         <v-row class="ml-0" justify="left" align="center">
           <v-btn
             outlined
@@ -20,8 +20,8 @@
       </v-col>
 
       <v-col
-        :class="'text-right mr-0 ' + (isMobile() ? 'd-none': '')"
-        :cols="isMobile() ? '12': '6'"
+        :class="'text-right mr-0 ' + (this.$isMobile() ? 'd-none': '')"
+        :cols="this.$isMobile() ? '12': '6'"
       >
         <v-btn-toggle mandatory dense v-model="type" tile color="blue accent-2" group>
           <v-btn @click="setViewType('day')" value="day">Jour</v-btn>
@@ -82,13 +82,6 @@ export default {
     },
     formatDate(date, format) {
       return moment(date).format(format);
-    },
-    isMobile() {
-      return (
-        this.$vuetify.breakpoint.xs ||
-        this.$vuetify.breakpoint.sm ||
-        this.$vuetify.breakpoint.md
-      );
     }
   }
 };

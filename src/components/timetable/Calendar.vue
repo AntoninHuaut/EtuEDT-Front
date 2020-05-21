@@ -203,7 +203,7 @@ export default {
     },
     onWindowResize() {
       if (["xs", "sm", "md"].includes(this.$vuetify.breakpoint.name))
-        this.type = "day";
+        this.setViewType("day");
     },
     handleTouchStart(evt) {
       const firstTouch = evt.touches[0];

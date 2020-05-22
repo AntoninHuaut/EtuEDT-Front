@@ -47,8 +47,8 @@
     </div>
 
     <div class="ml-3">
-      <v-icon v-if="dark" @click="toggle" large>mdi-white-balance-sunny</v-icon>
-      <v-icon v-if="!dark" @click="toggle" large>mdi-moon-waxing-crescent</v-icon>
+      <v-icon v-if="!dark" @click="toggle" large>mdi-white-balance-sunny</v-icon>
+      <v-icon v-if="dark" @click="toggle" large>mdi-moon-waxing-crescent</v-icon>
     </div>
   </v-app-bar>
 </template>

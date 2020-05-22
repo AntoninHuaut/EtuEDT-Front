@@ -10,11 +10,11 @@
         width="40"
       />
 
-      <router-link class="ml-5 mr-3" to="/">
+      <router-link class="ml-5 mr-3" to="/" tag="button">
         <span class="white--text title font-weight-regular">Accueil</span>
       </router-link>
 
-      <router-link class="ml-5 mr-3" to="/faq">
+      <router-link class="ml-5 mr-3" to="/faq" tag="button">
         <v-icon class="mb-1">mdi-sync</v-icon>
         <span class="white--text title font-weight-regular ml-1">Sync</span>
       </router-link>
@@ -24,6 +24,7 @@
         v-if="edt"
         class="ml-5 mr-3"
         :to="'/edt/' + edt.edtId"
+        tag="button"
       >
         <span class="white--text title font-weight-regular">{{edt.edtName}}</span>
       </router-link>
@@ -44,15 +45,27 @@
         <v-btn @click="copyData = false" text>Fermer</v-btn>
       </v-snackbar>
     </div>
+
+    <div class="ml-3">
+      <v-icon v-if="dark" @click="toggle" large>mdi-white-balance-sunny</v-icon>
+      <v-icon v-if="!dark" @click="toggle" large>mdi-moon-waxing-crescent</v-icon>
+    </div>
   </v-app-bar>
 </template>
 
 <script>
+import {
+  enable as enableDarkMode,
+  disable as disableDarkMode,
+  setFetchMethod
+} from "darkreader";
+
 export default {
   data: () => ({
     routeName: undefined,
     copyData: false,
-    edt: undefined
+    edt: undefined,
+    dark: false
   }),
   mounted() {
     this.updateEDT(localStorage.edtId);
@@ -63,6 +76,10 @@ export default {
           return this.updateEDT(get.value);
       }
     });
+
+    this.dark = localStorage.dark == "true";
+    setFetchMethod(window.fetch);
+    this.setTheme();
   },
   watch: {
     $route: function() {
@@ -82,6 +99,16 @@ export default {
             this.lastRefresh = true;
           })
           .catch(() => {});
+    },
+    toggle() {
+      this.$nextTick(() => {
+        this.dark = !this.dark;
+        localStorage.dark = this.dark;
+        this.setTheme();
+      });
+    },
+    setTheme() {
+      this.dark ? enableDarkMode() : disableDarkMode();
     }
   }
 };

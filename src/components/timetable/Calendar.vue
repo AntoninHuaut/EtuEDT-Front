@@ -13,7 +13,9 @@
     :event-color="getEventColor"
     :type="type"
     :now="today"
+    @click:day="clickDay"
     @click:date="clickDay"
+    @click:more="clickDay"
     @click:time="clickDay"
   >
     <template v-slot:event="{event}">

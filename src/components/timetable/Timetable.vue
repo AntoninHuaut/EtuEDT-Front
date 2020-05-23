@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row justify="space-between">
       <v-col :cols="this.$isMobile() ? '12': '6'">
-        <v-row class="ml-0" justify="left" align="center">
+        <v-row class="ml-0" :justify="this.$isMobile() ? 'center': 'left'" align="center">
           <v-btn
             outlined
             color="grey darken-2"

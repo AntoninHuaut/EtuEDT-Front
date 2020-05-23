@@ -97,6 +97,12 @@ export default {
 
     const edtId = this.$route.params.edtId || localStorage.edtId;
 
+    const today = moment();
+    if (today.days() >= 6) today.add(8 - today.days(), "days"); // Skip weekends
+
+    this.today = today.format(this.format);
+    this.setToday();
+
     fetch(`https://edtapi.maner.fr/${edtId}/json`)
       .then(res => res.json())
       .then(res => {
@@ -109,7 +115,6 @@ export default {
         });
 
         this.events = res;
-        this.today = moment().format(this.format);
       })
       .catch(() => this.$root.$emit("error", true))
       .finally(() => {

@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row justify="space-between">
-      <v-col :cols="this.$isMobile() ? '12': '6'">
+      <v-col :cols="this.$isMobile() ? '12': '6'" :class="this.$isMobile() ? 'pt-0 pb-0' : ''">
         <v-row class="ml-0" :justify="this.$isMobile() ? 'center': 'left'" align="center">
           <v-btn
             outlined
@@ -20,7 +20,7 @@
       </v-col>
 
       <v-col
-        :class="'text-right mr-0 ' + (this.$isMobile() ? 'd-none': '')"
+        :class="'mr-0 ' + (this.$isMobile() ? 'text-center pt-0 pb-0': 'text-right')"
         :cols="this.$isMobile() ? '12': '6'"
       >
         <v-btn-toggle mandatory dense v-model="type" tile color="blue accent-2" group>

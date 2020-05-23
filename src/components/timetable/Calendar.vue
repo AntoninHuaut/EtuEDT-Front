@@ -19,8 +19,8 @@
     @click:time="clickDay"
   >
     <template v-slot:event="{event}">
-      <div class="pr-1 pl-1 black--text">
-        <v-row>
+      <div v-if="!$isMobile() || type == 'day'" class="pr-1 pl-1 black--text">
+        <v-row class="text-wrap">
           <v-col class="pt-0 pb-0">
             <span class="font-weight-medium">{{ event.title }}</span>
           </v-col>
@@ -36,6 +36,22 @@
           </v-col>
           <v-col class="pt-0 pb-0 text-right">
             <span bottom class="pr-1 caption font-italic font-weight-light">{{ event.enseignant }}</span>
+          </v-col>
+        </v-row>
+      </div>
+
+      <div v-else class="pl-1 pr-1 black--text">
+        <v-row class="text-wrap">
+          <v-col cols="12" class="pt-0 pb-0">
+            <span class="min5em">{{ event.title }}</span>
+          </v-col>
+          <v-col cols="12" class="pt-0 pb-0">
+            <span class="min5em">{{ event.location }}</span>
+          </v-col>
+          <v-col cols="12" class="pt-0 pb-0">
+            <span
+              class="min5em"
+            >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
           </v-col>
         </v-row>
       </div>
@@ -123,10 +139,9 @@ export default {
       });
 
     this.$nextTick(() => {
-      this.onWindowResize();
+      this.initWindowsSize();
     });
 
-    window.addEventListener("resize", this.onWindowResize);
     document.addEventListener("keydown", this.onKeyPress);
     document.addEventListener("touchstart", this.handleTouchStart, false);
     document.addEventListener("touchmove", this.handleTouchMove, false);
@@ -210,7 +225,7 @@ export default {
         value: value
       });
     },
-    onWindowResize() {
+    initWindowsSize() {
       if (this.$isMobile()) this.setViewType("day");
     },
     handleTouchStart(evt) {
@@ -237,6 +252,10 @@ export default {
 </script>
 
 <style lang="scss">
+.min5em {
+  font-size: 0.5em;
+}
+
 .v-calendar .v-event-timed {
   font-size: 14px !important;
   font-weight: normal !important;

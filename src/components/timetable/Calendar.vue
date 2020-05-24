@@ -114,7 +114,12 @@ export default {
     const edtId = this.$route.params.edtId || localStorage.edtId;
 
     const today = moment();
-    if (today.days() >= 6) today.add(8 - today.days(), "days"); // Skip weekends
+
+    /* Skip weekends */
+    const dayNum = today.days();
+    if (dayNum == 6) today.add(2, "days");
+    else if (dayNum == 0) today.add(1, "days");
+    /* */
 
     this.today = today.format(this.format);
     this.setToday();

@@ -55,7 +55,7 @@
           </v-col>
           <v-col v-if="!$vuetify.breakpoint.xs" cols="12" class="pt-0 pb-0">
             <span
-              :style="getSizeByScreen('')"
+              :style="getSizeByScreen()"
             >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
           </v-col>
         </v-row>
@@ -65,7 +65,7 @@
       <div v-else class="pl-1 pr-1 black--text">
         <v-row class="text-wrap">
           <v-col cols="12" class="line-height-mobile pt-1 pb-0">
-            <span :style="getSizeByScreen(event.title)">{{ event.title }}</span>
+            <span :style="getSizeByScreen(event.title, 1.5)">{{ event.title }}</span>
           </v-col>
         </v-row>
       </div>
@@ -266,14 +266,13 @@ export default {
         else this.next();
       }
     },
-    getSizeByScreen(txt, penality = 0) {
+    getSizeByScreen(txt = "", penalty = 0) {
       if (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm) {
-        if (this.$vuetify.breakpoint.xs) penality += 1.5;
-        if (txt.length > 15) penality += 1;
-        if (this.type === "month") penality += 1.5;
+        if (this.$vuetify.breakpoint.xs) penalty += 1.5;
+        if (txt.length > 15) penalty += 1;
       }
 
-      const fontSize = 10 - penality;
+      const fontSize = 10 - penalty;
       return `font-size: ${fontSize}px;`;
     }
   }

@@ -19,6 +19,7 @@
     @click:time="clickDay"
   >
     <template v-slot:event="{event}">
+      <!-- Default view / Mobile view (day) -->
       <div v-if="!$isMobile() || type == 'day'" class="pr-1 pl-1 black--text">
         <v-row class="text-wrap">
           <v-col class="pt-0 pb-0">
@@ -40,18 +41,31 @@
         </v-row>
       </div>
 
+      <!-- Mobile view (week) -->
+      <div v-else-if="type == 'week'" class="pl-1 pr-1 black--text">
+        <v-row class="text-wrap">
+          <v-col cols="12" class="line-height-mobile pt-0 pb-0">
+            <span :style="getSizeByScreen(event.title)">{{ event.title }}</span>
+          </v-col>
+          <v-col cols="12" class="line-height-mobile pt-1 pb-0">
+            <span
+              v-if="type !== 'month'"
+              :style="getSizeByScreen(event.location, 1)"
+            >{{ event.location }}</span>
+          </v-col>
+          <v-col v-if="!$vuetify.breakpoint.xs" cols="12" class="pt-0 pb-0">
+            <span
+              :style="getSizeByScreen('')"
+            >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
+          </v-col>
+        </v-row>
+      </div>
+
+      <!-- Mobile view (month) -->
       <div v-else class="pl-1 pr-1 black--text">
         <v-row class="text-wrap">
-          <v-col cols="12" class="pt-0 pb-0">
-            <span class="min5em">{{ event.title }}</span>
-          </v-col>
-          <v-col cols="12" class="pt-0 pb-0">
-            <span class="min5em">{{ event.location }}</span>
-          </v-col>
-          <v-col cols="12" class="pt-0 pb-0">
-            <span
-              class="min5em"
-            >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
+          <v-col cols="12" class="line-height-mobile pt-1 pb-0">
+            <span :style="getSizeByScreen(event.title)">{{ event.title }}</span>
           </v-col>
         </v-row>
       </div>
@@ -251,14 +265,24 @@ export default {
         if (xDiff < 0) this.prev();
         else this.next();
       }
+    },
+    getSizeByScreen(txt, penality = 0) {
+      if (this.$vuetify.breakpoint.xs || this.$vuetify.breakpoint.sm) {
+        if (this.$vuetify.breakpoint.xs) penality += 1.5;
+        if (txt.length > 15) penality += 1;
+        if (this.type === "month") penality += 1.5;
+      }
+
+      const fontSize = 10 - penality;
+      return `font-size: ${fontSize}px;`;
     }
   }
 };
 </script>
 
 <style lang="scss">
-.min5em {
-  font-size: 0.5em;
+.line-height-mobile {
+  line-height: 0.85 !important;
 }
 
 .v-calendar .v-event-timed {

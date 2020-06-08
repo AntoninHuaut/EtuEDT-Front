@@ -47,7 +47,8 @@ export default {
   data: () => ({
     edt: undefined,
     type: "week",
-    lastRefresh: false
+    lastRefresh: false,
+    error: false
   }),
   mounted() {
     const edtId = this.$route.params.edtId || localStorage.edtId;
@@ -56,7 +57,8 @@ export default {
       .then(res => res.json())
       .then(res => {
         this.edt = res;
-        this.lastRefresh = true;
+
+        if (!this.error) this.lastRefresh = true;
       })
       .catch(() => this.$root.$emit("error", true));
 
@@ -65,6 +67,11 @@ export default {
         case "updateViewType":
           return (this.type = get.value);
       }
+    });
+
+    this.$root.$on("error", err => {
+      this.error = err;
+      if (err) this.lastRefresh = false;
     });
 
     this.setViewType(this.type);

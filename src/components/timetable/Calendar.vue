@@ -141,6 +141,8 @@ export default {
     fetch(`https://edtapi.maner.fr/${edtId}/json`)
       .then(res => res.json())
       .then(res => {
+        if (!res || !Array.isArray(res) || !res.length) throw new Error();
+
         res = res.map(item => {
           item.name = item.title;
           item.start = moment(item.start).format(this.format);

@@ -10,7 +10,12 @@
           <span>{{ icons[0].text }}</span>
         </a>
 
-        <a href="https://github.com/Manerr/" class="ml-2 mr-2 white--text" target="_blank">
+        <a
+          href="https://github.com/Manerr/"
+          class="ml-2 mr-2 white--text"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <v-icon size="24px">{{ icons[1].icon }}</v-icon>
         </a>
 

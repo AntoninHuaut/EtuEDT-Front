@@ -7,16 +7,9 @@ import VueClipboard from 'vue-clipboard2'
 import isMobile from './plugins/isMobile.js'
 
 Vue.prototype.$isMobile = isMobile
-
-Vue.use(VueClipboard);
-
 Vue.config.productionTip = false
 
-const ignoreWarnMessage = 'The .native modifier for v-on is only valid on components but it was used on <div>.';
-Vue.config.warnHandler = function (msg) {
-  if (msg === ignoreWarnMessage)
-    msg = null;
-}
+Vue.use(VueClipboard);
 
 new Vue({
   router,

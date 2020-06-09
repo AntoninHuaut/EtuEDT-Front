@@ -71,10 +71,7 @@ export default {
     this.updateEDT(localStorage.edtId);
     this.setRouteName();
     this.$root.$on("updateStorage", get => {
-      switch (get.path) {
-        case "edtId":
-          return this.updateEDT(get.value);
-      }
+      if (get.path === "edtId") this.updateEDT(get.value);
     });
 
     this.dark = localStorage.dark == "true";

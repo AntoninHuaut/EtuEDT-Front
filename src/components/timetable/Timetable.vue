@@ -63,10 +63,7 @@ export default {
       .catch(() => this.$root.$emit("error", true));
 
     this.$root.$on("timetable-update", get => {
-      switch (get.type) {
-        case "updateViewType":
-          return (this.type = get.value);
-      }
+      if (get.type === "updateViewType") this.type = get.value;
     });
 
     this.$root.$on("error", err => {

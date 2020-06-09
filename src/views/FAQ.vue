@@ -31,6 +31,7 @@
               <img
                 class="alignCenter"
                 src="https://i.imgur.com/93ipZJK.png"
+                alt="Icône '+' à côté de 'Autres agendas'"
               />
               <span class="infos">
                 <br />Vous devez choisir la sous-catégorie : "À partir de l'URL"

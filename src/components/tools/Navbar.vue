@@ -10,7 +10,11 @@
         width="40"
       />
 
-      <router-link class="ml-5 mr-3" to="/" tag="button">
+      <router-link class="ml-2 mr-2" to="/swagger" tag="button">
+        <v-icon class="mb-0">mdi-book-information-variant</v-icon>
+      </router-link>
+
+      <router-link class="ml-2 mr-0" to="/" tag="button">
         <span class="white--text title font-weight-regular">Accueil</span>
       </router-link>
 

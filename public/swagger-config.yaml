@@ -1,0 +1,100 @@
+swagger: "2.0"
+info:
+  description: "API of EtuEDT-Deno server."
+  version: "1.0.0"
+  title: "EtuEDT-Deno"
+host: "edtapi.maner.fr"
+basePath: "/"
+schemes:
+- "https"
+paths:
+  /:
+    get:
+      tags:
+      - "schedule"
+      summary: "Get a list of schedule information"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Schedule"
+  /{edtId}:
+    get:
+      tags:
+      - "schedule"
+      summary: "Get schedule information by id"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "edtId"
+        in: "path"
+        description: "Id of schedule to return"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Schedule"
+        "404":
+          description: "Invalid edtId"
+          schema:
+            type: "object"
+  /{edtId}/{format}:
+    get:
+      tags:
+      - "schedule"
+      summary: "Get schedule by id and by format"
+      produces:
+      - "application/json"
+      - "text/calendar"
+      parameters:
+      - name: "edtId"
+        in: "path"
+        description: "Id of schedule to return"
+        required: true
+        type: "integer"
+      - name: "format"
+        in: "path"
+        description: "Format to return"
+        required: true
+        type: "string"
+        enum: ['ics', 'json']
+      responses:
+        "200":
+          description: "Successful operation"
+        "404":
+          description: "Invalid edtId or format"
+          schema:
+            type: "object"
+definitions:
+  Schedule:
+    type: "object"
+    properties:
+      numEta:
+        type: "integer"
+        example: 1
+      nomEta:
+        type: "string"
+        example: "DUT Informatique"
+      numAnnee:
+        type: "integer"
+        example: 1
+      numTP:
+        type: "string"
+        example: "1.1"
+      edtName:
+        type: "string"
+        example: "1A TP 1.1"
+      edtId:
+        type: "string"
+        example: "1177"
+      lastUpdate:
+        type: "string"
+        example: "2020-06-16T07:14:34.017Z"

@@ -22,10 +22,10 @@
       <!-- Default view / Mobile view (day) -->
       <div v-if="!$isMobile() || type == 'day'" class="pr-1 pl-1 black--text">
         <v-row class="text-wrap">
-          <v-col class="pt-0 pb-0">
+          <v-col class="skipTooLongText pt-0 pb-0" cols="8">
             <span class="font-weight-medium">{{ event.title }}</span>
           </v-col>
-          <v-col class="pt-0 pb-0 text-right">
+          <v-col class="pt-0 pb-0 text-right" cols="4">
             <span class="caption">{{ event.location }}</span>
           </v-col>
         </v-row>
@@ -97,14 +97,14 @@ export default {
         "blue-grey",
         "light-green",
         "lime",
-        "amber"
+        "amber",
       ],
       colorsList: [],
-      mats: { increment: 0 }
+      mats: { increment: 0 },
     },
     handleTouch: {
       xDown: undefined,
-      yDown: undefined
+      yDown: undefined,
     },
 
     shortWeekdays: false,
@@ -118,10 +118,10 @@ export default {
     type: undefined,
     focus: "",
     today: undefined,
-    events: []
+    events: [],
   }),
   mounted() {
-    this.eventStyle.availableColors.forEach(color =>
+    this.eventStyle.availableColors.forEach((color) =>
       this.eventStyle.colorsList.push(color + " lighten-3")
     );
 
@@ -139,11 +139,11 @@ export default {
     this.setToday();
 
     fetch(`https://edtapi.maner.fr/${edtId}/json`)
-      .then(res => res.json())
-      .then(res => {
+      .then((res) => res.json())
+      .then((res) => {
         if (!res || !Array.isArray(res) || !res.length) throw new Error();
 
-        res = res.map(item => {
+        res = res.map((item) => {
           item.name = item.title;
           item.start = moment(item.start).format(this.format);
           item.end = moment(item.end).format(this.format);
@@ -167,7 +167,7 @@ export default {
     document.addEventListener("touchstart", this.handleTouchStart, false);
     document.addEventListener("touchmove", this.handleTouchMove, false);
 
-    this.$root.$on("calendar-update", get => {
+    this.$root.$on("calendar-update", (get) => {
       switch (get.type) {
         case "setToday":
           return this.setToday();
@@ -201,13 +201,13 @@ export default {
       this.type = viewType;
       this.$root.$emit("timetable-update", {
         type: "updateViewType",
-        value: viewType
+        value: viewType,
       });
     },
     getColorMatiere(mat) {
       mat = mat.replace(/ /g, "");
       ["TD", "TP", "CM", "CC", "CTP"].forEach(
-        get => (mat = mat.replace(get, ""))
+        (get) => (mat = mat.replace(get, ""))
       );
 
       if (!this.eventStyle.matHashCode[mat]) {
@@ -216,7 +216,7 @@ export default {
           .reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0);
 
         this.eventStyle.matHashCode[mat] = {
-          index: Math.abs(matHashCode) % this.eventStyle.colorsList.length
+          index: Math.abs(matHashCode) % this.eventStyle.colorsList.length,
         };
       }
 
@@ -243,7 +243,7 @@ export default {
     emitTimetableUpdate(type, value = undefined) {
       this.$root.$emit("timetable-update", {
         type: type,
-        value: value
+        value: value,
       });
     },
     initWindowsSize() {
@@ -276,12 +276,19 @@ export default {
 
       const fontSize = 10 - penalty;
       return `font-size: ${fontSize}px;`;
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
+.skipTooLongText {
+  white-space: nowrap;
+  overflow: hidden; /* "overflow" value must be different from  visible"*/
+  -o-text-overflow: ellipsis; /* Opera < 11*/
+  text-overflow: ellipsis; /* IE, Safari (WebKit), Opera >= 11, FF > 6 */
+}
+
 .line-height-mobile {
   line-height: 0.85 !important;
 }

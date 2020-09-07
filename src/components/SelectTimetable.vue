@@ -15,7 +15,7 @@
         <v-divider class="mt-3"></v-divider>
 
         <v-col class="mx-auto" v-for="(eta) in etaList" :key="eta.numEta">
-          <h2 class="mt-3 mb-1">{{eta.nomEta}} :</h2>
+          <h2 class="mt-3 mb-1">{{eta.nomEta}}</h2>
           <v-row justify="center">
             <v-col cols="6" class="mx-auto" v-for="(annee) in eta.data" :key="annee.numAnnee">
               <h2 class="font-weight-regular">Année {{annee.numAnnee}} :</h2>

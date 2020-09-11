@@ -11,15 +11,15 @@
 export default {
   data: () => ({
     error: false,
-    timeout: 0
+    timeout: -1,
   }),
-  mounted: function() {
-    this.$root.$on("error", boolean => (this.error = boolean));
+  mounted: function () {
+    this.$root.$on("error", (boolean) => (this.error = boolean));
   },
   methods: {
     backHome() {
       this.$router.push({ path: "/" });
-    }
-  }
+    },
+  },
 };
 </script>

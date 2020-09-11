@@ -8,27 +8,27 @@ import Swagger from '../views/Swagger.vue'
 Vue.use(VueRouter)
 
 const routes = [{
-  path: '/',
-  name: 'Home',
-  component: Home
+    path: '/',
+    name: 'Home',
+    component: Home
 }, {
-  path: '/faq',
-  name: 'FAQ',
-  component: FAQ
+    path: '/faq',
+    name: 'FAQ',
+    component: FAQ
 }, {
-  path: '/edt/:edtId',
-  name: 'ViewTimetable',
-  component: ViewTimetable
+    path: '/edt/:numUniv/:adeResources',
+    name: 'ViewTimetable',
+    component: ViewTimetable
 }, {
-  path: '/swagger',
-  name: 'Swagger',
-  component: Swagger
+    path: '/swagger',
+    name: 'Swagger',
+    component: Swagger
 }]
 
 const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+    mode: 'history',
+    base: process.env.BASE_URL,
+    routes
 })
 
 export default router

@@ -125,7 +125,9 @@ export default {
       this.eventStyle.colorsList.push(color + " lighten-3")
     );
 
-    const edtId = this.$route.params.edtId || localStorage.edtId;
+    const adeResources =
+      this.$route.params.adeResources || localStorage.adeResources;
+    const numUniv = this.$route.params.numUniv || localStorage.numUniv;
 
     const today = moment();
 
@@ -138,7 +140,7 @@ export default {
     this.today = today.format(this.format);
     this.setToday();
 
-    fetch(`https://edtapi.maner.fr/${edtId}/json`)
+    fetch(`${this.apiBaseUrl}${numUniv}/${adeResources}/json`)
       .then((res) => res.json())
       .then((res) => {
         if (!res || !Array.isArray(res) || !res.length) throw new Error();
@@ -296,5 +298,9 @@ export default {
 .v-calendar .v-event-timed {
   font-size: 14px !important;
   font-weight: normal !important;
+}
+
+div.v-event-timed-container > div.v-event-timed.white--text {
+  border-color: transparent !important;
 }
 </style>

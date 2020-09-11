@@ -25,20 +25,20 @@
 
       <router-link
         :class="($vuetify.breakpoint.xs ? 'd-none': '')"
-        v-if="edt"
+        v-if="timetable"
         class="ml-5 mr-3"
-        :to="'/edt/' + edt.edtId"
+        :to="'/edt/' + timetable.numUniv + '/' + timetable.adeResources"
         tag="button"
       >
-        <span class="white--text title font-weight-regular">{{edt.edtName}}</span>
+        <span class="white--text title font-weight-regular">{{timetable.nameTT}}</span>
       </router-link>
     </div>
 
     <v-spacer></v-spacer>
 
-    <div v-if="routeName === 'ViewTimetable' && edt">
+    <div v-if="routeName === 'ViewTimetable' && timetable">
       <v-icon
-        v-clipboard:copy="'https://edtapi.maner.fr/' + edt.edtId + '/ics'"
+        v-clipboard:copy="this.apiBaseUrl + timetable.numUniv + '/' + timetable.adeResources + '/ics'"
         v-clipboard:success="() => {copyData = true}"
         @click="setRouteName"
         large
@@ -61,21 +61,22 @@
 import {
   enable as enableDarkMode,
   disable as disableDarkMode,
-  setFetchMethod
+  setFetchMethod,
 } from "darkreader";
 
 export default {
   data: () => ({
     routeName: undefined,
     copyData: false,
-    edt: undefined,
-    dark: false
+    timetable: undefined,
+    dark: false,
   }),
   mounted() {
-    this.updateEDT(localStorage.edtId);
+    this.updateTT(localStorage.numUniv, localStorage.adeResources);
     this.setRouteName();
-    this.$root.$on("updateStorage", get => {
-      if (get.path === "edtId") this.updateEDT(get.value);
+    this.$root.$on("updateStorage", (get) => {
+      if (get.path === "adeResources")
+        this.updateTT(localStorage.numUniv, get.value);
     });
 
     this.dark = localStorage.dark == "true";
@@ -83,23 +84,24 @@ export default {
     this.setTheme();
   },
   watch: {
-    $route: function() {
+    $route: function () {
       this.setRouteName();
-    }
+    },
   },
   methods: {
     setRouteName() {
       this.routeName = this.$router.history.current.name;
     },
-    updateEDT(edtId) {
-      if (edtId)
-        fetch(`https://edtapi.maner.fr/${edtId}`)
-          .then(res => res.json())
-          .then(res => {
-            this.edt = res;
+    updateTT(numUniv, adeResources) {
+      if (numUniv && adeResources) {
+        fetch(`${this.apiBaseUrl}${numUniv}/${adeResources}`)
+          .then((res) => res.json())
+          .then((res) => {
+            this.timetable = res;
             this.lastRefresh = true;
           })
           .catch(() => {});
+      }
     },
     toggle() {
       this.$nextTick(() => {
@@ -110,7 +112,7 @@ export default {
     },
     setTheme() {
       this.dark ? enableDarkMode() : disableDarkMode();
-    }
-  }
+    },
+  },
 };
 </script>

@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   description: "API of EtuEDT-Deno server."
-  version: "1.0.0"
+  version: "2.0.0"
   title: "EtuEDT-Deno"
 host: "edtapi.maner.fr"
 basePath: "/"
@@ -12,7 +12,19 @@ paths:
     get:
       tags:
       - "schedule"
-      summary: "Get a list of schedule information"
+      summary: "Get the path to the latest api"
+      produces:
+      - "application/json"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            type: "object"
+  /v2/:
+    get:
+      tags:
+      - "schedule"
+      summary: "Get the list of universities"
       produces:
       - "application/json"
       responses:
@@ -21,18 +33,18 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Schedule"
-  /{edtId}:
+              $ref: "#/definitions/University"
+  /v2/{numUniv}:
     get:
       tags:
       - "schedule"
-      summary: "Get schedule information by id"
+      summary: "Get a list of the university's timetables"
       produces:
       - "application/json"
       parameters:
-      - name: "edtId"
+      - name: "numUniv"
         in: "path"
-        description: "Id of schedule to return"
+        description: "Id of university"
         required: true
         type: "integer"
       responses:
@@ -43,21 +55,53 @@ paths:
             items:
               $ref: "#/definitions/Schedule"
         "404":
-          description: "Invalid edtId"
+          description: "Invalid numUniv"
           schema:
             type: "object"
-  /{edtId}/{format}:
+  /v2/{numUniv}/{adeResources}:
     get:
       tags:
       - "schedule"
-      summary: "Get schedule by id and by format"
+      summary: "Get schedule details by numUniv and adeResource"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "numUniv"
+        in: "path"
+        description: "Id of university"
+        required: true
+        type: "integer"
+      - name: "adeResources"
+        in: "path"
+        description: "Id of timetable"
+        required: true
+        type: "integer"
+      responses:
+        "200":
+          description: "Successful operation"
+          schema:
+            $ref: "#/definitions/Schedule"
+        "404":
+          description: "Invalid parameters"
+          schema:
+            type: "object"
+  /v2/{numUniv}/{adeResources}/{format}:
+    get:
+      tags:
+      - "schedule"
+      summary: "Get schedule by numUniv, adeResources and by format"
       produces:
       - "application/json"
       - "text/calendar"
       parameters:
-      - name: "edtId"
+      - name: "numUniv"
         in: "path"
-        description: "Id of schedule to return"
+        description: "Id of university"
+        required: true
+        type: "integer"
+      - name: "adeResources"
+        in: "path"
+        description: "Id of timetable"
         required: true
         type: "integer"
       - name: "format"
@@ -70,31 +114,44 @@ paths:
         "200":
           description: "Successful operation"
         "404":
-          description: "Invalid edtId or format"
-          schema:
-            type: "object"
+          description: "Invalid parameters"
 definitions:
+  University:
+    type: "object"
+    properties:
+      numUniv:
+        type: "integer"
+        example: 1
+      nameUniv:
+        type: "string"
+        example: "Université de Caen"
+      adeUniv:
+        type: "string"
+        example: "http://ade.unicaen.fr"
   Schedule:
     type: "object"
     properties:
-      numEta:
+      numUniv:
         type: "integer"
         example: 1
-      nomEta:
+      nameUniv:
         type: "string"
-        example: "DUT Informatique"
-      numAnnee:
-        type: "integer"
-        example: 1
-      numTP:
-        type: "string"
-        example: "1.1"
-      edtName:
+        example: "Université de Caen"
+      nameTT:
         type: "string"
         example: "1A TP 1.1"
-      edtId:
+      numYearTT:
+        type: "integer"
+        example: 1
+      descTT:
         type: "string"
-        example: "1177"
+        example: "TP 1.1"
+      adeResources:
+        type: "integer"
+        example: 1177
+      adeProjectId:
+        type: "integer"
+        example: 4
       lastUpdate:
         type: "string"
         example: "2020-06-16T07:14:34.017Z"

@@ -48,25 +48,27 @@ export default {
     edt: undefined,
     type: "week",
     lastRefresh: false,
-    error: false
+    error: false,
   }),
   mounted() {
-    const edtId = this.$route.params.edtId || localStorage.edtId;
+    const adeResources =
+      this.$route.params.adeResources || localStorage.adeResources;
+    const numUniv = this.$route.params.numUniv || localStorage.numUniv;
 
-    fetch(`https://edtapi.maner.fr/${edtId}`)
-      .then(res => res.json())
-      .then(res => {
+    fetch(`${this.apiBaseUrl}${numUniv}/${adeResources}`)
+      .then((res) => res.json())
+      .then((res) => {
         this.edt = res;
 
         if (!this.error) this.lastRefresh = true;
       })
       .catch(() => this.$root.$emit("error", true));
 
-    this.$root.$on("timetable-update", get => {
+    this.$root.$on("timetable-update", (get) => {
       if (get.type === "updateViewType") this.type = get.value;
     });
 
-    this.$root.$on("error", err => {
+    this.$root.$on("error", (err) => {
       this.error = err;
       if (err) this.lastRefresh = false;
     });
@@ -81,12 +83,12 @@ export default {
     emitCalendarUpdate(type, value = undefined) {
       this.$root.$emit("calendar-update", {
         type: type,
-        value: value
+        value: value,
       });
     },
     formatDate(date, format) {
       return moment(date).format(format);
-    }
-  }
+    },
+  },
 };
 </script>

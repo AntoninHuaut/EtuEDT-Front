@@ -11,9 +11,17 @@ Vue.config.productionTip = false
 
 Vue.use(VueClipboard);
 
+Vue.mixin({
+    data: function() {
+        return {
+            apiBaseUrl: 'https://edtapi.maner.fr/v2/'
+        }
+    }
+});
+
 new Vue({
-  router,
-  store,
-  vuetify,
-  render: h => h(App)
+    router,
+    store,
+    vuetify,
+    render: h => h(App)
 }).$mount('#app')

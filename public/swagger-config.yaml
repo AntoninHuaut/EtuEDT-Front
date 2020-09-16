@@ -8,18 +8,6 @@ basePath: "/"
 schemes:
 - "https"
 paths:
-  /:
-    get:
-      tags:
-      - "schedule"
-      summary: "Get the path to the latest api"
-      produces:
-      - "application/json"
-      responses:
-        "200":
-          description: "Successful operation"
-          schema:
-            type: "object"
   /v2/:
     get:
       tags:

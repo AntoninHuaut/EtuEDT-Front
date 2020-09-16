@@ -9,7 +9,7 @@
             class="mr-5"
             @click="emitCalendarUpdate('setToday')"
           >Aujourd'hui</v-btn>
-          <v-toolbar-title>{{edt ? edt.edtName : 'N/A'}}</v-toolbar-title>
+          <v-toolbar-title>{{edt ? edt.nameTT : 'N/A'}}</v-toolbar-title>
           <v-btn fab text small color="grey darken-2" @click="emitCalendarUpdate('prev')">
             <v-icon small>mdi-chevron-left</v-icon>
           </v-btn>

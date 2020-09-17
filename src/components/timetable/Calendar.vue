@@ -1,82 +1,91 @@
 <template>
-  <v-calendar
-    v-if="!loading"
-    ref="calendar"
-    v-model="focus"
-    :value="today"
-    :events="events"
-    :locale="locale"
-    :short-weekdays="shortWeekdays"
-    :weekdays="weekdays"
-    :max-days="maxDays"
-    :first-interval="firstInterval"
-    :event-color="getEventColor"
-    :type="type"
-    :now="today"
-    @click:day="clickDay"
-    @click:date="clickDay"
-    @click:more="clickDay"
-    @click:time="clickDay"
-  >
-    <template v-slot:event="{event}">
-      <!-- Default view / Mobile view (day) -->
-      <div v-if="!$isMobile() || type == 'day'" class="pr-1 pl-1 black--text">
-        <v-row class="text-wrap">
-          <v-col class="skipTooLongText pt-0 pb-0" cols="8">
-            <span class="font-weight-medium">{{ event.title }}</span>
-          </v-col>
-          <v-col class="pt-0 pb-0 text-right" cols="4">
-            <span class="caption">{{ event.location }}</span>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="pt-0 pb-0">
-            <span
-              class="caption"
-            >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
-          </v-col>
-          <v-col class="pt-0 pb-0 text-right">
-            <span bottom class="pr-1 caption font-italic font-weight-light">{{ event.enseignant }}</span>
-          </v-col>
-        </v-row>
-      </div>
+  <div>
+    <v-calendar
+      v-if="!loading"
+      ref="calendar"
+      v-model="focus"
+      :value="today"
+      :events="events"
+      :locale="locale"
+      :short-weekdays="shortWeekdays"
+      :weekdays="weekdays"
+      :max-days="maxDays"
+      :first-interval="firstInterval"
+      :event-color="getEventColor"
+      :type="type"
+      :now="today"
+      @click:event="showEvent"
+      @click:day="clickDay"
+      @click:date="clickDay"
+      @click:more="clickDay"
+    >
+      <template v-slot:event="{event}">
+        <!-- Default view / Mobile view (day) -->
+        <div v-if="!$isMobile() || type == 'day'" class="pr-1 pl-1 black--text">
+          <v-row no-gutters class="text-wrap">
+            <v-col class="skipTooLongText pt-0 pb-0">
+              <span class="font-weight-medium">{{ event.title }}</span>
+            </v-col>
+            <v-col class="pt-0 pb-0 text-right">
+              <span class="text-caption">{{ formatDate(event.start, 'HH[h]mm') }}</span>
+            </v-col>
+          </v-row>
+          <v-row no-gutters class="text-wrap">
+            <v-col class="skipTooLongText pt-0 pb-0">
+              <span class="text-caption">{{ event.location }}</span>
+            </v-col>
+            <v-col class="pt-0 pb-0 text-right">
+              <span class="text-caption">{{ formatDate(event.end, 'HH[h]mm') }}</span>
+            </v-col>
+          </v-row>
+          <v-row no-gutters class="text-wrap">
+            <v-col class="skipTooLongText pt-0 pb-0">
+              <span class="text-caption font-italic font-weight-light">{{ event.enseignant }}</span>
+            </v-col>
+          </v-row>
+        </div>
 
-      <!-- Mobile view (week) -->
-      <div v-else-if="type == 'week'" class="pl-1 pr-1 black--text">
-        <v-row class="text-wrap">
-          <v-col cols="12" class="line-height-mobile pt-0 pb-0">
-            <span :style="getSizeByScreen(event.title)">{{ event.title }}</span>
-          </v-col>
-          <v-col cols="12" class="line-height-mobile pt-1 pb-0">
-            <span
-              v-if="type !== 'month'"
-              :style="getSizeByScreen(event.location, 1)"
-            >{{ event.location }}</span>
-          </v-col>
-          <v-col v-if="!$vuetify.breakpoint.xs" cols="12" class="pt-0 pb-0">
-            <span
-              :style="getSizeByScreen()"
-            >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
-          </v-col>
-        </v-row>
-      </div>
+        <!-- Mobile view (week) -->
+        <div v-else-if="type == 'week'" class="pl-1 pr-1 black--text">
+          <v-row class="text-wrap">
+            <v-col cols="12" class="skipTooLongText line-height-mobile pt-0 pb-0">
+              <span :style="getSizeByScreen(event.title)">{{ event.title }}</span>
+            </v-col>
+            <v-col cols="12" class="skipTooLongText line-height-mobile pt-1 pb-0">
+              <span
+                v-if="type !== 'month'"
+                :style="getSizeByScreen(event.location, 1)"
+              >{{ event.location }}</span>
+            </v-col>
+            <v-col v-if="!$vuetify.breakpoint.xs" cols="12" class="pt-0 pb-0">
+              <span
+                :style="getSizeByScreen()"
+              >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
+            </v-col>
+          </v-row>
+        </div>
 
-      <!-- Mobile view (month) -->
-      <div v-else class="pl-1 pr-1 black--text">
-        <v-row class="text-wrap">
-          <v-col cols="12" class="line-height-mobile pt-1 pb-0">
-            <span :style="getSizeByScreen(event.title, 1.5)">{{ event.title }}</span>
-          </v-col>
-        </v-row>
-      </div>
-    </template>
-  </v-calendar>
+        <!-- Mobile view (month) -->
+        <div v-else class="pl-1 pr-1 black--text">
+          <v-row class="text-wrap">
+            <v-col cols="12" class="skipTooLongText line-height-mobile pt-1 pb-0">
+              <span :style="getSizeByScreen(event.title, 1.5)">{{ event.title }}</span>
+            </v-col>
+          </v-row>
+        </div>
+      </template>
+    </v-calendar>
+
+    <DetailMenu />
+  </div>
 </template>
 
 <script>
 import moment from "moment";
+import DetailMenu from "@/components/timetable/DetailMenu.vue";
 
 export default {
+  components: { DetailMenu },
   data: () => ({
     eventStyle: {
       matHashCode: {},
@@ -204,6 +213,12 @@ export default {
       this.$root.$emit("timetable-update", {
         type: "updateViewType",
         value: viewType,
+      });
+    },
+    showEvent({ nativeEvent, event }) {
+      this.$root.$emit("timetable-update", {
+        type: "showEvent",
+        value: { nativeEvent, event },
       });
     },
     getColorMatiere(mat) {

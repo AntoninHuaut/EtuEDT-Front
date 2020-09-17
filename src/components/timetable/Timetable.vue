@@ -1,8 +1,12 @@
 <template>
   <v-container fluid>
-    <v-row justify="space-between">
+    <v-row class="justify-space-between">
       <v-col :cols="this.$isMobile() ? '12': '6'" :class="this.$isMobile() ? 'pt-0 pb-0' : ''">
-        <v-row class="ml-0" :justify="this.$isMobile() ? 'center': 'left'" align="center">
+        <v-row
+          class="ml-0"
+          :class="this.$isMobile() ? 'justify-center': 'justify-start'"
+          align="center"
+        >
           <v-btn
             outlined
             color="grey darken-2"

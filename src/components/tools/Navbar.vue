@@ -2,12 +2,12 @@
   <v-app-bar app color="primary" dark>
     <div class="d-flex align-center">
       <v-img
-        alt="EtuEDT Logo"
-        class="shrink mr-2"
-        contain
-        src="/favicon.ico"
-        transition="scale-transition"
-        width="40"
+          alt="EtuEDT Logo"
+          class="shrink mr-2"
+          contain
+          src="/favicon.ico"
+          transition="scale-transition"
+          width="40"
       />
 
       <router-link class="ml-2 mr-2" to="/swagger" tag="button">
@@ -23,25 +23,24 @@
         <span class="white--text title font-weight-regular ml-1">Sync</span>
       </router-link>
 
-      <router-link
-        :class="($vuetify.breakpoint.xs ? 'd-none': '')"
-        v-if="timetable"
-        class="ml-5 mr-3"
-        :to="'/edt/' + timetable.numUniv + '/' + timetable.adeResources"
-        tag="button"
+      <button
+          :class="($vuetify.breakpoint.xs ? 'd-none': '')"
+          v-if="timetable"
+          class="ml-5 mr-3"
+          @click="switchToMemoryTimetable()"
       >
         <span class="white--text title font-weight-regular">{{timetable.nameTT}}</span>
-      </router-link>
+      </button>
     </div>
 
     <v-spacer></v-spacer>
 
     <div v-if="routeName === 'ViewTimetable' && timetable">
       <v-icon
-        v-clipboard:copy="this.apiBaseUrl + timetable.numUniv + '/' + timetable.adeResources + '/ics'"
-        v-clipboard:success="() => {copyData = true}"
-        @click="setRouteName"
-        large
+          v-clipboard:copy="this.apiBaseUrl + timetable.numUniv + '/' + timetable.adeResources + '/ics'"
+          v-clipboard:success="() => {copyData = true}"
+          @click="setRouteName"
+          large
       >mdi-link</v-icon>
 
       <v-snackbar color="light-blue" top timeout="5000" v-model="copyData">
@@ -89,18 +88,27 @@ export default {
     },
   },
   methods: {
+    switchToMemoryTimetable() {
+      const oldRoute = this.$router.currentRoute;
+      this.$router.push('/edt/' + this.timetable.numUniv + '/' + this.timetable.adeResources).catch(() => {});
+      const newRoute = this.$router.currentRoute;
+
+      if (oldRoute.name === "ViewTimetable" && newRoute.path !== oldRoute.path) {
+         this.$router.go(0);
+       }
+    },
     setRouteName() {
       this.routeName = this.$router.history.current.name;
     },
     updateTT(numUniv, adeResources) {
       if (numUniv && adeResources) {
         fetch(`${this.apiBaseUrl}${numUniv}/${adeResources}`)
-          .then((res) => res.json())
-          .then((res) => {
-            this.timetable = res;
-            this.lastRefresh = true;
-          })
-          .catch(() => {});
+            .then((res) => res.json())
+            .then((res) => {
+              this.timetable = res;
+              this.lastRefresh = true;
+            })
+            .catch(() => {});
       }
     },
     toggle() {

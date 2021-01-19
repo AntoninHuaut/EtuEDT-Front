@@ -1,23 +1,24 @@
 <template>
   <div>
     <v-calendar
-      v-if="!loading"
-      ref="calendar"
-      v-model="focus"
-      :value="today"
-      :events="events"
-      :locale="locale"
-      :short-weekdays="shortWeekdays"
-      :weekdays="weekdays"
-      :max-days="maxDays"
-      :first-interval="firstInterval"
-      :event-color="getEventColor"
-      :type="type"
-      :now="today"
-      @click:event="showEvent"
-      @click:day="clickDay"
-      @click:date="clickDay"
-      @click:more="clickDay"
+        v-if="!loading"
+        ref="calendar"
+        v-model="focus"
+        :value="today"
+        :events="events"
+        :locale="locale"
+        :short-weekdays="shortWeekdays"
+        :weekdays="weekdays"
+        :max-days="maxDays"
+        :first-interval="firstInterval"
+        :event-color="getEventColor"
+        :type="type"
+        :now="today"
+        @click:event="showEvent"
+        @click:day="clickDay"
+        @click:date="clickDay"
+        @click:more="clickDay"
+        @change="dateChanged"
     >
       <template v-slot:event="{event}">
         <!-- Default view / Mobile view (day) -->
@@ -53,13 +54,13 @@
             </v-col>
             <v-col cols="12" class="skipTooLongText line-height-mobile pt-1 pb-0">
               <span
-                v-if="type !== 'month'"
-                :style="getSizeByScreen(event.location, 1)"
+                  v-if="type !== 'month'"
+                  :style="getSizeByScreen(event.location, 1)"
               >{{ event.location }}</span>
             </v-col>
             <v-col v-if="!$vuetify.breakpoint.xs" cols="12" class="pt-0 pb-0">
               <span
-                :style="getSizeByScreen()"
+                  :style="getSizeByScreen()"
               >{{ formatDate(event.start, 'HH[h]mm') }} - {{ formatDate(event.end, 'HH[h]mm') }}</span>
             </v-col>
           </v-row>
@@ -76,7 +77,7 @@
       </template>
     </v-calendar>
 
-    <DetailMenu />
+    <DetailMenu/>
   </div>
 </template>
 
@@ -85,7 +86,7 @@ import moment from "moment";
 import DetailMenu from "@/components/timetable/DetailMenu.vue";
 
 export default {
-  components: { DetailMenu },
+  components: {DetailMenu},
   data: () => ({
     eventStyle: {
       matHashCode: {},
@@ -109,7 +110,7 @@ export default {
         "amber",
       ],
       colorsList: [],
-      mats: { increment: 0 },
+      mats: {increment: 0},
     },
     handleTouch: {
       xDown: undefined,
@@ -122,6 +123,7 @@ export default {
     firstInterval: 8,
     locale: "fr",
     format: "YYYY-MM-DD HH:mm",
+    lastAction: undefined,
 
     loading: true,
     type: undefined,
@@ -131,11 +133,11 @@ export default {
   }),
   mounted() {
     this.eventStyle.availableColors.forEach((color) =>
-      this.eventStyle.colorsList.push(color + " lighten-3")
+        this.eventStyle.colorsList.push(color + " lighten-3")
     );
 
     const adeResources =
-      this.$route.params.adeResources || localStorage.adeResources;
+        this.$route.params.adeResources || localStorage.adeResources;
     const numUniv = this.$route.params.numUniv || localStorage.numUniv;
 
     const today = moment();
@@ -150,25 +152,25 @@ export default {
     this.setToday();
 
     fetch(`${this.apiBaseUrl}${numUniv}/${adeResources}/json`)
-      .then((res) => res.json())
-      .then((res) => {
-        if (!res || !Array.isArray(res) || !res.length) throw new Error();
+        .then((res) => res.json())
+        .then((res) => {
+          if (!res || !Array.isArray(res) || !res.length) throw new Error();
 
-        res = res.map((item) => {
-          item.name = item.title;
-          item.start = moment(item.start).format(this.format);
-          item.end = moment(item.end).format(this.format);
-          item.color = this.getColorMatiere(item.title);
-          return item;
+          res = res.map((item) => {
+            item.name = item.title;
+            item.start = moment(item.start).format(this.format);
+            item.end = moment(item.end).format(this.format);
+            item.color = this.getColorMatiere(item.title);
+            return item;
+          });
+
+          this.events = res;
+        })
+        .catch(() => this.$root.$emit("error", true))
+        .finally(() => {
+          this.$root.$emit("loader-update", false);
+          this.loading = false;
         });
-
-        this.events = res;
-      })
-      .catch(() => this.$root.$emit("error", true))
-      .finally(() => {
-        this.$root.$emit("loader-update", false);
-        this.loading = false;
-      });
 
     this.$nextTick(() => {
       this.initWindowsSize();
@@ -196,10 +198,35 @@ export default {
       this.focus = this.today;
     },
     prev() {
+      if (!this.$refs.calendar) return;
+
+      this.lastAction = "prev";
       this.$refs.calendar.prev();
     },
     next() {
+      if (!this.$refs.calendar) return;
+
+      this.lastAction = "next";
       this.$refs.calendar.next();
+    },
+    dateChanged(event) {
+      if (this.type !== "day") return;
+
+      if (event.start.weekday === 6 // Saturday
+          || event.start.weekday === 0) // Sunday
+      {
+        switch (this.lastAction) {
+          case "prev":
+            this.prev();
+            break;
+          case "next":
+            this.next();
+            break;
+          default:
+            this.today();
+            break;
+        }
+      }
     },
     getEventColor(event) {
       return event.color;
@@ -215,22 +242,22 @@ export default {
         value: viewType,
       });
     },
-    showEvent({ nativeEvent, event }) {
+    showEvent({nativeEvent, event}) {
       this.$root.$emit("timetable-update", {
         type: "showEvent",
-        value: { nativeEvent, event },
+        value: {nativeEvent, event},
       });
     },
     getColorMatiere(mat) {
       mat = mat.replace(/ /g, "");
       ["TD", "TP", "CM", "CC", "CTP"].forEach(
-        (get) => (mat = mat.replace(get, ""))
+          (get) => (mat = mat.replace(get, ""))
       );
 
       if (!this.eventStyle.matHashCode[mat]) {
         const matHashCode = mat
-          .split("")
-          .reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0);
+            .split("")
+            .reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0);
 
         this.eventStyle.matHashCode[mat] = {
           index: Math.abs(matHashCode) % this.eventStyle.colorsList.length,

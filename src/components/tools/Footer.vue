@@ -11,7 +11,7 @@
         </a>
 
         <a
-          href="https://github.com/Manerr/"
+          href="https://github.com/AntoninHuaut/"
           class="ml-2 mr-2 white--text"
           target="_blank"
           rel="noopener noreferrer"
@@ -34,12 +34,12 @@ export default {
       {
         icon: "mdi-github",
         text: "Back-end",
-        url: "https://github.com/Manerr/EtuEDT-Deno"
+        url: "https://github.com/AntoninHuaut/EtuEDT-Deno"
       },
       {
         icon: "mdi-github",
         text: "Front-end",
-        url: "https://github.com/Manerr/EtuEDT-vue"
+        url: "https://github.com/AntoninHuaut/EtuEDT-vue"
       }
     ]
   })

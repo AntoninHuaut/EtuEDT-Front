@@ -12,9 +12,9 @@ Vue.config.productionTip = false
 Vue.use(VueClipboard);
 
 Vue.mixin({
-    data: function() {
+    data: function () {
         return {
-            apiBaseUrl: 'https://edtapi.maner.fr/v2/'
+            apiBaseUrl: 'https://edtapi.antoninhuaut.fr/v2/'
         }
     }
 });

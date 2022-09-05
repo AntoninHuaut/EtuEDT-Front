@@ -11378,3 +11378,7 @@
 }
 
 /*# sourceMappingURL=swagger-ui.css.map*/
+
+.v-application code {
+    background-color: inherit !important;
+}

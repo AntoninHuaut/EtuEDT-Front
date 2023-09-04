@@ -3,8 +3,10 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "serve": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service serve",
-        "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build"
+        "serve": "vue-cli-service serve",
+        "serve-new": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service serve",
+        "build": "vue-cli-service build",
+        "build-new": "cross-env NODE_OPTIONS=--openssl-legacy-provider vue-cli-service build"
     },
     "dependencies": {
         "core-js": "^3.6.4",

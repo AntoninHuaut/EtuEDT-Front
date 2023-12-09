@@ -11,14 +11,14 @@ export default {
   mounted: () => {
     SwaggerUI({
       dom_id: "#swagger",
-      url: "/swagger-config.yaml"
+      url: "https://edtapi.antoninhuaut.fr/openapi",
     });
   }
 };
 </script>
 
 <style>
-div.swagger-ui > div > div > section > div > div.info {
+div.swagger-ui>div>div>section>div>div.info {
   background-color: white !important;
   border-color: white !important;
 }

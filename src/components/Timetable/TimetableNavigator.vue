@@ -18,7 +18,7 @@
             @click="() => setDate(null, 'prev')" />
         </template>
       </v-tooltip>
-      <v-tooltip text="💡 [Flèche/swipe droite]" open-delay="350">
+      <v-tooltip text="💡 [Flèche/swipe droit]" open-delay="350">
         <template v-slot:activator="{ props }">
           <v-btn v-bind="props" variant="text" density="comfortable" :size="getBtnSize()" icon="mdi-chevron-right"
             @click="() => setDate(null, 'next')" />

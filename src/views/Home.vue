@@ -1,41 +1,32 @@
 <template>
-  <div class="home">
-    <div v-if="showUnivPage">
-      <SelectUniv />
-    </div>
-    <div v-else>
-      <SelectTimetable />
-    </div>
-  </div>
+  <v-container fluid class="full-height">
+    <v-row class="text-center">
+      <v-col class="mx-auto" :cols="mdAndDown ? '12' : '6'">
+        <SelectUniv v-if="toDisplay === 'selectUniv'" />
+        <SelectTimetable v-else-if="toDisplay === 'selectTimetable'" />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
-<script>
-import SelectUniv from "@/components/SelectUniv.vue";
-import SelectTimetable from "@/components/SelectTimetable.vue";
+<script lang="ts" setup>
+import SelectTimetable from "@/components/Home/SelectTimetable.vue";
+import SelectUniv from "@/components/Home/SelectUniv.vue";
+import { useAppStore } from "@/store/";
+import { type Ref, ref, watchEffect } from "vue";
+import { useDisplay } from "vuetify";
 
-export default {
-  name: "Home",
-  data() {
-    return {
-      showUnivPage: false,
-      numUniv: null,
-    };
-  },
-  mounted() {
-    this.numUniv = localStorage.numUniv;
-    if (!this.numUniv) this.showUnivPage = true;
+const { mdAndDown } = useDisplay();
+const appStore = useAppStore();
+const toDisplay: Ref<"selectUniv" | "selectTimetable"> = ref("selectUniv");
 
-    this.$root.$on("updateStorage", (get) => {
-      if (get.path === "numUniv") this.showUnivPage = false;
-    });
+function displaySelectComponent(univ: number | undefined) {
+    if (!univ) {
+        toDisplay.value = "selectUniv";
+    } else {
+        toDisplay.value = "selectTimetable";
+    }
+}
 
-    this.$root.$on("requestPage", (get) => {
-      if (get.path === "SelectUniv") this.showUnivPage = true;
-    });
-  },
-  components: {
-    SelectTimetable,
-    SelectUniv,
-  },
-};
+watchEffect(() => displaySelectComponent(appStore.numUniv));
 </script>

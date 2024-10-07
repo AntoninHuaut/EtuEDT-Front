@@ -13,6 +13,7 @@ import { timetableEventsRequest } from "@/api/api_requests";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
+import { getLanguage } from "@/utils/locale";
 import { errorNoDataFetchNotif, genericError, infoNotif } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { createCalendar, createViewDay, createViewMonthGrid, createViewWeek } from "@schedule-x/calendar";
@@ -40,18 +41,11 @@ const calendarApp = shallowRef(
     createCalendar({
         selectedDate: getEventDate(timetableViewStore.calDate).split(" ")[0],
         views: [createViewDay(), createViewWeek(), createViewMonthGrid()],
-        plugins: [
-            createEventModalPlugin(),
-            createCurrentTimePlugin({
-                fullWeekWidth: true,
-            }),
-            calendarControls,
-            eventsServicePlugin,
-        ],
+        plugins: [createEventModalPlugin(), createCurrentTimePlugin(), calendarControls, eventsServicePlugin],
         calendars: getCalendarsList(),
         events: [],
         defaultView: timetableViewStore.viewMode,
-        locale: navigator.language ?? "en-US",
+        locale: getLanguage(true),
         dayBoundaries: {
             start: "08:00",
             end: "20:00",
@@ -149,6 +143,7 @@ function getEventDate(date: Date) {
 }
 
 .sx__week-grid__date-number {
-    height: 1em;
+    height: 1.25em;
+    width: 1.25em;
 }
 </style>

@@ -66,7 +66,6 @@ const calendarApp = shallowRef(
 watchEffect(() => calendarApp.value.setTheme(theme.global.name.value === "dark" ? "dark" : "light"));
 watchEffect(() => calendarControls.setDate(getEventDate(timetableViewStore.calDate).split(" ")[0]));
 watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
-watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
 watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
 const evtsQuery = ref(

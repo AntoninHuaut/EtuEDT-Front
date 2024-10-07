@@ -90,6 +90,7 @@ watch(
         if (evtsQuery.value.error) {
             console.error("Failed to get Timetable Events, got", evtsQuery.value.error);
             genericError(evtsQuery.value.error.message);
+            return;
         }
         if (!evtsQuery.value.isSuccess) return;
         if (!evtsQuery.value.data) return errorNoDataFetchNotif();

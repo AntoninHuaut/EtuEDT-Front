@@ -83,6 +83,7 @@ watch(
             if (ttQuery.value.error.message === "Not Found") {
                 appStore.$patch({ numUniv: undefined, adeResources: undefined });
             }
+            return;
         }
         if (!ttQuery.value.isSuccess) return;
         if (!ttQuery.value.data) return errorNoDataFetchNotif();

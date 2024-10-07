@@ -46,6 +46,7 @@ watch(
         if (univQuery.value.error) {
             console.error("Failed to get Univ List, got", univQuery.value.error);
             genericError(univQuery.value.error.message);
+            return;
         }
         if (!univQuery.value.isSuccess) return;
         if (!univQuery.value.data) return errorNoDataFetchNotif();

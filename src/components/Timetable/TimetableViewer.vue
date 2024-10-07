@@ -146,4 +146,8 @@ function getEventDate(date: Date) {
     height: 1.25em;
     width: 1.25em;
 }
+
+.sx__current-time-indicator {
+    z-index: 10;
+}
 </style>

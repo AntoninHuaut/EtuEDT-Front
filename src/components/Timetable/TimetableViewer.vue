@@ -1,10 +1,10 @@
 <template>
   <div class="d-flex flex-column mt-3">
     <div v-if="evtsQuery.isLoading" class="mt-5 pt-5 text-center">
-      <v-progress-circular :size="128" :width="12" color="primary" indeterminate />
+      <v-progress-circular :size="128" :width="12" color="primary" indeterminate/>
     </div>
 
-    <ScheduleXCalendar :class="evtsQuery.isLoading ? 'hidden' : ''" :calendar-app="calendarApp" />
+    <ScheduleXCalendar :calendar-app="calendarApp" :class="evtsQuery.isLoading ? 'hidden' : ''"/>
   </div>
 </template>
 
@@ -47,7 +47,7 @@ const calendarApp = shallowRef(
         defaultView: timetableViewStore.viewMode,
         locale: getLanguage(true),
         dayBoundaries: {
-            start: "08:00",
+            start: "07:00",
             end: "20:00",
         },
         monthGridOptions: {
@@ -71,7 +71,11 @@ watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 const evtsQuery = ref(
     useQuery<IJsonEvent[]>({
         queryKey: ["timetableEvents", appStore.numUniv, appStore.adeResources],
-        queryFn: ({ signal }) => wrapFetch({ ...timetableEventsRequest(appStore.numUniv ?? 0, appStore.adeResources ?? 0, "json"), signal }),
+        queryFn: ({ signal }) =>
+            wrapFetch({
+                ...timetableEventsRequest(appStore.numUniv ?? 0, appStore.adeResources ?? 0, "json"),
+                signal,
+            }),
         enabled: false,
     }),
 );
@@ -95,9 +99,22 @@ watch(
         if (!evtsQuery.value.isSuccess) return;
         if (!evtsQuery.value.data) return errorNoDataFetchNotif();
 
+        const year = new Date().getFullYear();
+        const events = [
+            ...evtsQuery.value.data,
+            {
+                title: "Initiation à la pêche aux poissons",
+                description: "N'oubliez pas de prendre votre canne à pêche",
+                location: "Piscine",
+                start: `${year}-04-01T07:00:00+02:00`,
+                end: `${year}-04-01T09:00:00+02:00`,
+                teacher: "Mr Pingouin",
+            },
+        ];
+
         timetableViewStore.events.length = 0;
         timetableViewStore.events.push(
-            ...evtsQuery.value.data.map((event, index) => ({
+            ...events.map((event, index) => ({
                 ...event,
                 id: index,
                 start: getEventDate(new Date(event.start)),
@@ -109,8 +126,18 @@ watch(
 
         if (timetableData.lastUpdate.value) {
             const date = new Date(timetableData.lastUpdate.value);
-            const datePart = new Intl.DateTimeFormat("fr", { year: "numeric", month: "numeric", day: "numeric" }).format(date);
-            const timePart = new Intl.DateTimeFormat("fr", { hour: "numeric", minute: "numeric", hourCycle: "h23" }).format(date).replace(":", "h");
+            const datePart = new Intl.DateTimeFormat("fr", {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+            }).format(date);
+            const timePart = new Intl.DateTimeFormat("fr", {
+                hour: "numeric",
+                minute: "numeric",
+                hourCycle: "h23",
+            })
+                .format(date)
+                .replace(":", "h");
 
             infoNotif({ message: `Dernière mise à jour de l'emploi du temps le ${datePart} à ${timePart}` });
         }
@@ -119,13 +146,22 @@ watch(
 );
 
 function getEventDate(date: Date) {
-    return new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(date).replace(",", "");
+    return new Intl.DateTimeFormat("en-CA", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    })
+        .format(date)
+        .replace(",", "");
 }
 </script>
 
 <style>
 .hidden {
- visibility: hidden;
+  visibility: hidden;
 }
 
 .sx__calendar-header {
@@ -133,21 +169,21 @@ function getEventDate(date: Date) {
 }
 
 .sx__time-grid-event-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-wrap: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
 }
 
 .sx__week-grid__date {
-    padding: 8px; 
+  padding: 8px;
 }
 
 .sx__week-grid__date-number {
-    height: 1.25em;
-    width: 1.25em;
+  height: 1.25em;
+  width: 1.25em;
 }
 
 .sx__current-time-indicator {
-    z-index: 10;
+  z-index: 10;
 }
 </style>

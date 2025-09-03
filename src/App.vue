@@ -23,9 +23,9 @@ watchEffect(() => setTheme(themeStore.theme));
 
 function setTheme(currentTheme: string | undefined) {
     if (currentTheme === ETheme.DARK || (preferredDark.value && currentTheme === ETheme.SYSTEM)) {
-        vuetifyTheme.global.name.value = "dark";
+        vuetifyTheme.change("dark");
     } else {
-        vuetifyTheme.global.name.value = "light";
+        vuetifyTheme.change("light");
     }
 }
 </script>

@@ -34,7 +34,6 @@ export function getCalendarsList(): CalendarConfig["calendars"] {
 
 export function getColorByLessonTitle(lessonTitle: string): string {
     for (const get of ["TD", "TP", "CM", "CC", "CTP"]) {
-        // biome-ignore lint/style/noParameterAssign: skip
         lessonTitle = lessonTitle.replace(/ /g, "").replace(get, "");
     }
 

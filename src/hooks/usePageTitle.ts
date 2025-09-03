@@ -8,7 +8,6 @@ export const usePageTitle = () => {
     onUnmounted(() => resetPageTitle());
 
     const setPageTitle = (title: string) => {
-        // biome-ignore lint/style/noParameterAssign: skip
         title = `${appName}${appSeparator}${title}`;
         pageTitle.value = title;
         document.title = title;

@@ -21,19 +21,19 @@ const timetableViewStore = useTimetableViewStore();
 const route = useRoute();
 const { adeResources, numUniv } = route.params;
 if (adeResources && numUniv && !Number.isNaN(+adeResources) && !Number.isNaN(+numUniv)) {
-    appStore.$patch({
-        adeResources: +adeResources,
-        numUniv: +numUniv,
-    });
+  appStore.$patch({
+    adeResources: +adeResources,
+    numUniv: +numUniv,
+  });
 }
 
 const timetableData = useTimetable();
 const { setPageTitle } = usePageTitle();
-watchEffect(() => setPageTitle(timetableData.nameTT.value === "?" ? "Emploi du temps" : timetableData.nameTT.value));
+watchEffect(() => setPageTitle(timetableData.name.value === "?" ? "Emploi du temps" : timetableData.name.value));
 
 onMounted(() => {
-    timetableViewStore.$patch({
-        calDate: dateHelper.skipWeekend(new Date(), "next"),
-    });
+  timetableViewStore.$patch({
+    calDate: dateHelper.skipWeekend(new Date(), "next"),
+  });
 });
 </script>

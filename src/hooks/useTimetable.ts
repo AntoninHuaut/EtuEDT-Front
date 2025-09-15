@@ -1,6 +1,6 @@
 import { timetableDetailsRequest } from "@/api/api_requests";
 import { useAppStore } from "@/store/";
-import { ref, watch, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 
 import type { ITimetable } from "@/types/APIType";
 import { wrapFetch } from "@/utils/wrapFetch";
@@ -9,8 +9,7 @@ import { useQuery } from "@tanstack/vue-query";
 export const useTimetable = () => {
     const appStore = useAppStore();
 
-    const nameTT = ref<string>("?");
-    const lastUpdate = ref<string>("");
+    const timetable = ref<ITimetable | undefined>();
 
     const ttQuery = ref(
         useQuery<ITimetable>({
@@ -30,12 +29,10 @@ export const useTimetable = () => {
             if (ttQuery.value.error) {
                 console.error(ttQuery.value.error);
 
-                nameTT.value = "?";
-                lastUpdate.value = "";
+                timetable.value = undefined;
             }
             if (ttQuery.value.data) {
-                nameTT.value = ttQuery.value.data.nameTT;
-                lastUpdate.value = ttQuery.value.data.lastUpdate;
+                timetable.value = ttQuery.value.data;
             }
         },
         { immediate: true },
@@ -47,5 +44,18 @@ export const useTimetable = () => {
         }
     });
 
-    return { nameTT, lastUpdate };
+    const name = computed(() => {
+        if (!timetable.value) {
+            return "?";
+        }
+
+        if (timetable.value.numYearTT < 0) {
+            return timetable.value.descTT ?? "?";
+        }
+
+        return timetable.value?.nameTT ?? "?";
+    });
+    const lastUpdate = computed(() => timetable.value?.lastUpdate ?? "");
+
+    return { name, lastUpdate };
 };

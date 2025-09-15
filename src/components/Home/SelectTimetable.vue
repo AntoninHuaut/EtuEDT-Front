@@ -1,31 +1,38 @@
 <template>
-	<div class="d-flex justify-center">
-		<BackSelectUniv :size="mobile ? 24 : 32" />
-		<p :class="`text-h${mobile ? '5' : '4'}` + ' mt-3'">Choix de l'emploi du temps</p>
-	</div>
+    <div class="d-flex justify-center">
+        <BackSelectUniv :size="mobile ? 24 : 32" />
+        <p :class="`text-h${mobile ? '5' : '4'}` + ' mt-3'">Choix de l'emploi du temps</p>
+    </div>
 
-	<v-divider class="mt-3 mb-3"></v-divider>
+    <v-divider class="mt-3 mb-3"></v-divider>
 
-	<div class="d-flex flex-column">
-		<div v-if="ttQuery.isLoading" class="mt-5">
-			<v-progress-circular color="primary" indeterminate :size="128" :width="12" />
-		</div>
+    <div class="d-flex flex-column">
+        <div v-if="ttQuery.isLoading" class="mt-5">
+            <v-progress-circular color="primary" indeterminate :size="128" :width="12" />
+        </div>
 
-		<div v-else>
-			<h4 v-if="mobile" class="mb-1">{{ nameUniv }}</h4>
-			<h2 v-else class="mb-1">{{ nameUniv }}</h2>
+        <div v-else>
+            <h4 v-if="mobile" class="mb-1">{{ nameUniv }}</h4>
+            <h2 v-else class="mb-1">{{ nameUniv }}</h2>
 
-			<v-row justify="center">
-				<v-col cols="4" class="px-1" v-for="(year) in yearList" :key="year">
-					<p class="text-h6 mt-3 mb-1">Année {{ year }}A</p>
+            <v-row justify="center">
+                <v-col cols="3" class="px-1" v-for="year in yearList" :key="year">
+                    <p class="text-h6 mt-3 mb-1">{{ getTitle(year) }}</p>
 
-					<v-col class="pt-2 pb-1 px-0" v-for="(timetable, i) in ttsByYear[Number.parseInt(year)]" :key="timetable.adeResources">
-						<TimetableButton :timetable="timetable" :colorHex="colorList[i % colorList.length]" />
-					</v-col>
-				</v-col>
-			</v-row>
-		</div>
-	</div>
+                    <v-col v-if="Number.parseInt(year) < 0">
+                        <v-select v-model="selectedExtra" :items="ttsByYear[Number.parseInt(year)]" item-title="descTT"
+                            item-value="adeResources" :label="`${ttsByYear[Number.parseInt(year)].length} entrée(s)`" variant="outlined"
+                            density="compact" @update:model-value="setSelectedExtra"></v-select>
+                    </v-col>
+
+                    <v-col v-else class="pt-2 pb-1 px-0" v-for="(timetable, i) in ttsByYear[Number.parseInt(year)]"
+                        :key="timetable.adeResources">
+                        <TimetableButton :timetable="timetable" :colorHex="colorList[i % colorList.length]" />
+                    </v-col>
+                </v-col>
+            </v-row>
+        </div>
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -36,6 +43,7 @@ import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { useQuery } from "@tanstack/vue-query";
 import { onMounted, ref, watch, watchEffect } from "vue";
+import { useRouter } from "vue-router";
 import { useDisplay, useTheme } from "vuetify";
 import { selectColorsList } from "../Timetable/helper";
 import BackSelectUniv from "./BackSelectUniv.vue";
@@ -51,6 +59,25 @@ const yearList = ref<string[]>([]);
 const colorList = ref(selectColorsList);
 
 const theme = useTheme();
+const router = useRouter();
+
+const selectedExtra = ref<string>();
+function setSelectedExtra(adeResources: string) {
+    if (+adeResources) {
+        appStore.$patch({ adeResources: +adeResources })
+        router.push(`/edt/${appStore.numUniv}/${adeResources}`);
+    }
+}
+
+// Shitty API model
+function getTitle(yearId: string) {
+    switch (yearId) {
+        case "-1":
+            return "Salles";
+        default:
+            return "Année " + yearId + "A";
+    }
+};
 
 watchEffect(() => {
     if (theme.global.name.value === "dark") {

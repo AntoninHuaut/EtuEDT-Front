@@ -29,7 +29,7 @@ if (adeResources && numUniv && !Number.isNaN(+adeResources) && !Number.isNaN(+nu
 
 const timetableData = useTimetable();
 const { setPageTitle } = usePageTitle();
-watchEffect(() => setPageTitle(timetableData.name.value === "?" ? "Emploi du temps" : timetableData.name.value));
+watchEffect(() => setPageTitle(timetableData.nameTT.value === "?" ? "Emploi du temps" : timetableData.nameTT.value));
 
 onMounted(() => {
   timetableViewStore.$patch({

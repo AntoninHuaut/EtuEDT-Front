@@ -44,7 +44,7 @@ export const useTimetable = () => {
         }
     });
 
-    const name = computed(() => {
+    const nameTT = computed(() => {
         if (!timetable.value) {
             return "?";
         }
@@ -53,9 +53,9 @@ export const useTimetable = () => {
             return timetable.value.descTT ?? "?";
         }
 
-        return timetable.value?.nameTT ?? "?";
+        return `${timetable.value?.numYearTT}A ${timetable.value?.descTT}`;
     });
     const lastUpdate = computed(() => timetable.value?.lastUpdate ?? "");
 
-    return { name, lastUpdate };
+    return { nameTT, lastUpdate };
 };

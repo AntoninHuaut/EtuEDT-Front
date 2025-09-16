@@ -12,7 +12,7 @@
             </template>
           </v-tooltip>
 
-          <p id="timetableName" :class="xs ? 'mx-0' : 'text-h6 mx-2'">{{ timetableData.name }}</p>
+          <p id="timetableName" :class="xs ? 'mx-0' : 'text-h6 mx-2'">{{ timetableData.nameTT }}</p>
 
           <v-tooltip text="💡 [Flèche/swipe gauche]" open-delay="350">
             <template v-slot:activator="{ props }">

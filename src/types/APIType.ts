@@ -1,7 +1,6 @@
 export interface ITimetable {
     numUniv: number;
     nameUniv: string;
-    nameTT: string;
     descTT: string;
     numYearTT: number;
     adeResources: number;

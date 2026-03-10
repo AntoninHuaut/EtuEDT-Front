@@ -21,7 +21,7 @@ const appStore = useAppStore();
 const toDisplay: Ref<"selectUniv" | "selectTimetable"> = ref("selectUniv");
 
 function displaySelectComponent(univ: number | undefined) {
-    if (!univ) {
+    if (univ === undefined) {
         toDisplay.value = "selectUniv";
     } else {
         toDisplay.value = "selectTimetable";

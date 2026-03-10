@@ -5,28 +5,35 @@ export const API_URL_V2 = `${BASE_API_URL}/v2`;
 
 export const univListRequest = () => {
     return {
-        url: API_URL_V2,
+        url: `${API_URL_V2}/univ`,
+        options: { method: HttpMethod.GET },
+    };
+};
+
+export const roomListRequest = () => {
+    return {
+        url: `${API_URL_V2}/room`,
         options: { method: HttpMethod.GET },
     };
 };
 
 export const timetableListRequest = (numUniv: number) => {
     return {
-        url: `${API_URL_V2}/${numUniv}`,
+        url: numUniv === -1 ? `${API_URL_V2}/room` : `${API_URL_V2}/univ/${numUniv}`,
         options: { method: HttpMethod.GET },
     };
 };
 
-export const timetableDetailsRequest = (numUniv: number, numTimetable: number) => {
+export const timetableDetailsRequest = (numTimetable: number, isRoom: boolean = false) => {
     return {
-        url: `${API_URL_V2}/${numUniv}/${numTimetable}`,
+        url: `${API_URL_V2}${isRoom ? "/room" : ""}/${numTimetable}`,
         options: { method: HttpMethod.GET },
     };
 };
 
-export const timetableEventsRequest = (numUniv: number, numTimetable: number, format: string) => {
+export const timetableEventsRequest = (numTimetable: number, format: string, isRoom: boolean = false) => {
     return {
-        url: `${API_URL_V2}/${numUniv}/${numTimetable}/${format}`,
+        url: `${API_URL_V2}${isRoom ? "/room" : ""}/${numTimetable}/${format}`,
         options: { method: HttpMethod.GET },
     };
 };

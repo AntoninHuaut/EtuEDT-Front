@@ -10,6 +10,10 @@ import { useTheme } from "vuetify";
 const appStore = useAppStore();
 const theme = useTheme();
 const backToUnivList = () => {
-    appStore.$patch({ numUniv: undefined, adeResources: undefined });
+    if (appStore.numUniv === -1 && appStore.lastUniv !== undefined) {
+        appStore.$patch({ numUniv: appStore.lastUniv, lastUniv: undefined });
+    } else {
+        appStore.$patch({ numUniv: undefined, adeResources: undefined, lastUniv: undefined });
+    }
 };
 </script>

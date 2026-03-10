@@ -10,7 +10,7 @@
         <v-col cols="auto" :class="smAndUp && 'ml-2'">
           <AppBarButton to="/" text="EtuEDT" :class="mobile ? 'text-body-1':'text-h6'" tooltip="Page d'accueil" />
         </v-col>
-        <v-col v-if="appStore.numUniv && appStore.adeResources && !mobile" cols="auto">
+        <v-col v-if="appStore.numUniv !== undefined && appStore.adeResources && !mobile" cols="auto">
           <AppBarButton :to="`/edt/${appStore.numUniv}/${appStore.adeResources}`" text="Emploi du temps" class="text-h6"
             tooltip="Afficher le dernier emploi du temps consulté" />
         </v-col>
@@ -41,14 +41,14 @@ const appStore = useAppStore();
 const route = useRoute();
 
 const copyTimetableLink = async () => {
-    if (!appStore.adeResources || !appStore.numUniv) {
+    if (!appStore.adeResources || appStore.numUniv === undefined) {
         errorNotif({
             message: "Aucun emploi du temps n'est actuellement sélectionné.",
         });
         return;
     }
 
-    const urlToCopy = `${API_URL_V2}/${appStore.numUniv}/${appStore.adeResources}/ics`;
+    const urlToCopy = `${API_URL_V2}${appStore.numUniv === -1 ? "/room" : ""}/${appStore.adeResources}/ics`;
     await navigator.clipboard.writeText(urlToCopy);
     successNotif({
         message: "Le lien direct de l'emploi du temps a été copié dans le presse-papier.",

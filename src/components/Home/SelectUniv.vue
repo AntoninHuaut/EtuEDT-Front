@@ -8,8 +8,20 @@
   <div v-else>
     <v-col class="mx-auto" v-for="(univ) in univList" :key="univ.numUniv">
       <v-row justify="center">
-        <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" color="#1565C0" @click="selectUniv(univ)">
+        <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" color="#1565C0"
+          :loading="selectingUniv === univ.numUniv" @click="selectUniv(univ)">
           {{ univ.nameUniv }}
+        </v-btn>
+      </v-row>
+    </v-col>
+
+    <v-divider class="mt-3 mb-8"></v-divider>
+
+    <v-col class="mx-auto">
+      <v-row justify="center">
+        <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" variant="outlined" color="#1565C0"
+          :loading="isSelectingRooms" @click="selectRooms()">
+          Salles de cours
         </v-btn>
       </v-row>
     </v-col>
@@ -29,6 +41,8 @@ import { useDisplay } from "vuetify";
 const { mobile } = useDisplay();
 const appStore = useAppStore();
 const univList = ref<IUniv[]>([]);
+const selectingUniv = ref<number | undefined>();
+const isSelectingRooms = ref(false);
 
 const univQuery = ref(
     useQuery<IUniv[]>({
@@ -58,6 +72,12 @@ watch(
 );
 
 function selectUniv(univ: IUniv) {
+    selectingUniv.value = univ.numUniv;
     appStore.$patch({ numUniv: univ.numUniv, adeResources: undefined });
+}
+
+function selectRooms() {
+    isSelectingRooms.value = true;
+    appStore.$patch({ numUniv: -1, adeResources: undefined });
 }
 </script>

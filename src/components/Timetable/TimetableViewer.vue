@@ -1,10 +1,10 @@
 <template>
   <div class="d-flex flex-column mt-3">
-    <div v-if="evtsQuery.isLoading" class="mt-5 pt-5 text-center">
+    <div v-if="evtsQuery.isFetching" class="mt-5 pt-5 text-center">
       <v-progress-circular :size="128" :width="12" color="primary" indeterminate />
     </div>
 
-    <ScheduleXCalendar :class="evtsQuery.isLoading ? 'hidden' : ''" :calendar-app="calendarApp" />
+    <ScheduleXCalendar :class="evtsQuery.isFetching ? 'hidden' : ''" :calendar-app="calendarApp" />
   </div>
 </template>
 
@@ -71,13 +71,13 @@ watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 const evtsQuery = ref(
     useQuery<IJsonEvent[]>({
         queryKey: ["timetableEvents", appStore.numUniv, appStore.adeResources],
-        queryFn: ({ signal }) => wrapFetch({ ...timetableEventsRequest(appStore.numUniv ?? 0, appStore.adeResources ?? 0, "json"), signal }),
+        queryFn: ({ signal }) => wrapFetch({ ...timetableEventsRequest(appStore.adeResources ?? 0, "json", appStore.numUniv === -1), signal }),
         enabled: false,
     }),
 );
 
 onMounted(() => {
-    if (appStore.numUniv && appStore.adeResources) {
+    if (appStore.numUniv !== undefined && appStore.adeResources) {
         evtsQuery.value.refetch();
     } else {
         router.push({ name: "Home" });

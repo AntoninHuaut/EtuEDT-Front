@@ -16,7 +16,7 @@ export const useTimetable = () => {
             queryKey: ["fetchTimetable", appStore.numUniv, appStore.adeResources],
             queryFn: ({ signal }) =>
                 wrapFetch({
-                    ...timetableDetailsRequest(appStore.numUniv ?? 0, appStore.adeResources ?? 0),
+                    ...timetableDetailsRequest(appStore.adeResources ?? 0, appStore.numUniv === -1),
                     signal,
                 }),
             enabled: false,
@@ -39,7 +39,7 @@ export const useTimetable = () => {
     );
 
     watchEffect(() => {
-        if (appStore.numUniv && appStore.adeResources) {
+        if (appStore.numUniv !== undefined && appStore.adeResources) {
             ttQuery.value.refetch();
         }
     });

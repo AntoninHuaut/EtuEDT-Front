@@ -9,7 +9,8 @@ import { useDisplay } from "vuetify";
 export const useAppStore = defineStore("app", () => {
     const adeResources = useLocalStorage<number | undefined>("adeResources", undefined);
     const numUniv = useLocalStorage<number | undefined>("numUniv", undefined);
-    return { adeResources, numUniv };
+    const lastUniv = useLocalStorage<number | undefined>("lastUniv", undefined);
+    return { adeResources, numUniv, lastUniv };
 });
 
 export const useThemeStore = defineStore("theme", () => {

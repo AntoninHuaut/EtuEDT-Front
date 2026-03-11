@@ -11,7 +11,7 @@ const appStore = useAppStore();
 const theme = useTheme();
 const backToUnivList = () => {
     if (appStore.numUniv === -1 && appStore.lastUniv !== undefined) {
-        appStore.$patch({ numUniv: appStore.lastUniv, lastUniv: undefined });
+        appStore.$patch({ numUniv: appStore.lastUniv, adeResources: undefined, lastUniv: undefined });
     } else {
         appStore.$patch({ numUniv: undefined, adeResources: undefined, lastUniv: undefined });
     }

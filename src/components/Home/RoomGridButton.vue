@@ -18,7 +18,6 @@ import { useAppStore } from "@/store/";
 import type { ITimetable } from "@/types/APIType";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useTheme } from "vuetify";
 
 const props = defineProps<{
   room: ITimetable;
@@ -26,14 +25,17 @@ const props = defineProps<{
 }>();
 
 const appStore = useAppStore();
-const theme = useTheme();
 const router = useRouter();
 const isLoading = ref(false);
 
-const selectRoom = () => {
+const selectRoom = async () => {
   isLoading.value = true;
-  appStore.$patch({ adeResources: props.room.adeResources });
-  router.push(`/edt/${props.room.numUniv}/${props.room.adeResources}`);
+  try {
+    appStore.$patch({ adeResources: props.room.adeResources });
+    await router.push(`/edt/${props.room.numUniv}/${props.room.adeResources}`);
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>
 

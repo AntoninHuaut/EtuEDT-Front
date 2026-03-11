@@ -25,6 +25,7 @@
                   variant="text"
                   :href="contributor.github"
                   target="_blank"
+                  rel="noopener noreferrer"
                 ></v-btn>
                 <v-btn
                   v-if="contributor.linkedin"
@@ -32,6 +33,7 @@
                   variant="text"
                   :href="contributor.linkedin"
                   target="_blank"
+                  rel="noopener noreferrer"
                 ></v-btn>
                 <v-btn
                   v-if="contributor.website"
@@ -39,6 +41,7 @@
                   variant="text"
                   :href="contributor.website"
                   target="_blank"
+                  rel="noopener noreferrer"
                 ></v-btn>
               </v-card-actions>
             </v-card>
@@ -55,6 +58,7 @@
             variant="tonal"
             href="https://github.com/AntoninHuaut/EtuEDT-Front"
             target="_blank"
+            rel="noopener noreferrer"
           >
             Front-end
           </v-btn>
@@ -64,6 +68,7 @@
             variant="tonal"
             href="https://github.com/AntoninHuaut/EtuEDT-Back"
             target="_blank"
+            rel="noopener noreferrer"
           >
             Back-end
           </v-btn>

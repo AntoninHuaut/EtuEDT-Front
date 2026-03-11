@@ -18,7 +18,7 @@ export interface IJsonEvent {
 }
 
 export interface IUniv {
-    numUniv: number;
+    id: number;
     nameUniv: string;
     adeUniv: string;
 }

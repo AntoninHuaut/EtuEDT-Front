@@ -6,10 +6,10 @@
   <v-progress-circular v-if="univQuery.isLoading" class="mt-5" color="primary" indeterminate :size="128" :width="12"></v-progress-circular>
 
   <div v-else>
-    <v-col class="mx-auto" v-for="(univ) in univList" :key="univ.numUniv">
+    <v-col class="mx-auto" v-for="(univ) in univList" :key="univ.id">
       <v-row justify="center">
         <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" color="#1565C0"
-          :loading="selectingUniv === univ.numUniv" @click="selectUniv(univ)">
+          :loading="selectingUniv === univ.id" @click="selectUniv(univ)">
           {{ univ.nameUniv }}
         </v-btn>
       </v-row>
@@ -72,8 +72,8 @@ watch(
 );
 
 function selectUniv(univ: IUniv) {
-    selectingUniv.value = univ.numUniv;
-    appStore.$patch({ numUniv: univ.numUniv, adeResources: undefined });
+    selectingUniv.value = univ.id;
+    appStore.$patch({ numUniv: univ.id, adeResources: undefined });
 }
 
 function selectRooms() {

@@ -48,7 +48,7 @@ const copyTimetableLink = async () => {
         return;
     }
 
-    const urlToCopy = `${API_URL_V2}${appStore.numUniv === -1 ? "/room" : ""}/${appStore.adeResources}/ics`;
+    const urlToCopy = `${API_URL_V2}${appStore.numUniv === -1 ? "/rooms" : ""}/${appStore.adeResources}/ics`;
     await navigator.clipboard.writeText(urlToCopy);
     successNotif({
         message: "Le lien direct de l'emploi du temps a été copié dans le presse-papier.",

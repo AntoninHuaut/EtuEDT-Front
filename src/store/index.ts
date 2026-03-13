@@ -9,8 +9,11 @@ import { useDisplay } from "vuetify";
 export const useAppStore = defineStore("app", () => {
     const adeResources = useLocalStorage<number | undefined>("adeResources", undefined);
     const numUniv = useLocalStorage<number | undefined>("numUniv", undefined);
-    const lastUniv = useLocalStorage<number | undefined>("lastUniv", undefined);
-    return { adeResources, numUniv, lastUniv };
+    const univName = useLocalStorage<string | undefined>("univName", undefined);
+    const groupId = useLocalStorage<number | undefined>("groupId", undefined);
+    const resourceType = useLocalStorage<"timetable" | "room">("resourceType", "timetable");
+    const homeSelectionView = useLocalStorage<"timetable" | "room">("homeSelectionView", "timetable");
+    return { adeResources, numUniv, univName, groupId, resourceType, homeSelectionView };
 });
 
 export const useThemeStore = defineStore("theme", () => {

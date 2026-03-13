@@ -5,15 +5,25 @@
 
 <script lang="ts" setup>
 import { useAppStore } from "@/store/";
+import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 
 const appStore = useAppStore();
 const theme = useTheme();
+const route = useRoute();
+const router = useRouter();
 const backToUnivList = () => {
-    if (appStore.numUniv === -1 && appStore.lastUniv !== undefined) {
-        appStore.$patch({ numUniv: appStore.lastUniv, adeResources: undefined, lastUniv: undefined });
-    } else {
-        appStore.$patch({ numUniv: undefined, adeResources: undefined, lastUniv: undefined });
+    if (route.name === "Rooms") {
+        appStore.$patch({ adeResources: undefined, resourceType: "timetable", homeSelectionView: "timetable" });
+        router.push({ name: "Home" });
+        return;
     }
+
+    if (appStore.groupId !== undefined) {
+        appStore.$patch({ groupId: undefined, adeResources: undefined, resourceType: "timetable", homeSelectionView: "timetable" });
+        return;
+    }
+
+    appStore.$patch({ numUniv: undefined, groupId: undefined, adeResources: undefined, resourceType: "timetable", homeSelectionView: "timetable" });
 };
 </script>

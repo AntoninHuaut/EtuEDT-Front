@@ -19,11 +19,15 @@ const appStore = useAppStore();
 const dateHelper = useDateHelper();
 const timetableViewStore = useTimetableViewStore();
 const route = useRoute();
-const { adeResources, numUniv } = route.params;
-if (adeResources && numUniv && !Number.isNaN(+adeResources) && !Number.isNaN(+numUniv)) {
+const { adeResources, numUniv, groupId, resourceType } = route.params;
+const isValidResourceType = resourceType === "timetable" || resourceType === "room";
+
+if (adeResources && numUniv && !Number.isNaN(+adeResources) && !Number.isNaN(+numUniv) && isValidResourceType) {
   appStore.$patch({
     adeResources: +adeResources,
     numUniv: +numUniv,
+    groupId: groupId && !Number.isNaN(+groupId) ? +groupId : undefined,
+    resourceType,
   });
 }
 

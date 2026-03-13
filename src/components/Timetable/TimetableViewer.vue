@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-import { timetableEventsRequest } from "@/api/api_requests";
+import { roomEventsRequest, timetableEventsRequest } from "@/api/api_requests";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
@@ -70,14 +70,20 @@ watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
 const evtsQuery = ref(
     useQuery<IJsonEvent[]>({
-        queryKey: ["timetableEvents", appStore.numUniv, appStore.adeResources],
-        queryFn: ({ signal }) => wrapFetch({ ...timetableEventsRequest(appStore.adeResources ?? 0, "json", appStore.numUniv === -1), signal }),
+        queryKey: ["timetableEvents", appStore.numUniv, appStore.groupId, appStore.adeResources, appStore.resourceType],
+        queryFn: ({ signal }) =>
+            wrapFetch({
+                ...(appStore.resourceType === "room"
+                    ? roomEventsRequest(appStore.numUniv ?? 0, appStore.adeResources ?? 0)
+                    : timetableEventsRequest(appStore.numUniv ?? 0, appStore.groupId ?? 0, appStore.adeResources ?? 0)),
+                signal,
+            }),
         enabled: false,
     }),
 );
 
 onMounted(() => {
-    if (appStore.numUniv !== undefined && appStore.adeResources) {
+    if (appStore.numUniv !== undefined && appStore.adeResources && (appStore.resourceType === "room" || appStore.groupId !== undefined)) {
         evtsQuery.value.refetch();
     } else {
         router.push({ name: "Home" });

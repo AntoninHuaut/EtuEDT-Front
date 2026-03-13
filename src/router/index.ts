@@ -22,7 +22,12 @@ const routes = [
                 component: () => import("@/views/Sync.vue"),
             },
             {
-                path: "edt/:numUniv?/:adeResources?",
+                path: "rooms",
+                name: "Rooms",
+                component: () => import("@/views/Rooms.vue"),
+            },
+            {
+                path: "edt/:numUniv?/:groupId?/:resourceType?/:adeResources?",
                 name: "Timetable",
                 component: () => import("@/views/Timetable.vue"),
             },

@@ -3,7 +3,7 @@
   <v-btn @click="selectTimetable(timetable)" :size="mobile ? undefined : 'x-large'"
     :class="(mobile ? 'text-subtitle-2 px-10' : 'text-subtitle-1 px-12') + ' text-white'" :color="colorHex"
     :loading="isLoading">
-    {{ timetable.descTT }}
+    {{ timetable.label }}
   </v-btn>
 </template>
 
@@ -27,8 +27,8 @@ const isLoading = ref(false);
 const selectTimetable = async (timetable: ITimetable) => {
   isLoading.value = true;
   try {
-    appStore.$patch({ adeResources: timetable.adeResources });
-    await router.push(`/edt/${timetable.numUniv}/${timetable.adeResources}`);
+    appStore.$patch({ adeResources: timetable.adeResources, resourceType: "timetable", homeSelectionView: "timetable" });
+    await router.push(`/edt/${appStore.numUniv}/${appStore.groupId}/timetable/${timetable.adeResources}`);
   } finally {
     isLoading.value = false;
   }

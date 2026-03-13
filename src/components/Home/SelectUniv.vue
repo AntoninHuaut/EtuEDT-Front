@@ -10,18 +10,7 @@
       <v-row justify="center">
         <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" color="#1565C0"
           :loading="selectingUniv === univ.id" @click="selectUniv(univ)">
-          {{ univ.nameUniv }}
-        </v-btn>
-      </v-row>
-    </v-col>
-
-    <v-divider class="mt-3 mb-8"></v-divider>
-
-    <v-col class="mx-auto">
-      <v-row justify="center">
-        <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" variant="outlined" color="#1565C0"
-          :loading="isSelectingRooms" @click="selectRooms()">
-          Salles de cours
+          {{ univ.name }}
         </v-btn>
       </v-row>
     </v-col>
@@ -42,7 +31,6 @@ const { mobile } = useDisplay();
 const appStore = useAppStore();
 const univList = ref<IUniv[]>([]);
 const selectingUniv = ref<number | undefined>();
-const isSelectingRooms = ref(false);
 
 const univQuery = ref(
     useQuery<IUniv[]>({
@@ -73,11 +61,13 @@ watch(
 
 function selectUniv(univ: IUniv) {
     selectingUniv.value = univ.id;
-    appStore.$patch({ numUniv: univ.id, adeResources: undefined });
-}
-
-function selectRooms() {
-    isSelectingRooms.value = true;
-    appStore.$patch({ numUniv: -1, adeResources: undefined });
+  appStore.$patch({
+    numUniv: univ.id,
+    univName: univ.name,
+    groupId: undefined,
+    adeResources: undefined,
+    resourceType: "timetable",
+    homeSelectionView: "timetable",
+  });
 }
 </script>

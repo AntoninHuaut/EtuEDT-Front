@@ -11,7 +11,7 @@
           <AppBarButton to="/" text="EtuEDT" :class="mobile ? 'text-body-1':'text-h6'" tooltip="Page d'accueil" />
         </v-col>
         <v-col v-if="appStore.numUniv !== undefined && appStore.adeResources && !mobile" cols="auto">
-          <AppBarButton :to="`/edt/${appStore.numUniv}/${appStore.adeResources}`" text="Emploi du temps" class="text-h6"
+          <AppBarButton :to="`/edt/${appStore.numUniv}/${appStore.groupId}/${appStore.resourceType}/${appStore.adeResources}`" text="Emploi du temps" class="text-h6"
             tooltip="Afficher le dernier emploi du temps consulté" />
         </v-col>
       </v-row>
@@ -48,7 +48,17 @@ const copyTimetableLink = async () => {
         return;
     }
 
-    const urlToCopy = `${API_URL_V2}${appStore.numUniv === -1 ? "/rooms" : ""}/${appStore.adeResources}/ics`;
+  if (appStore.resourceType === "timetable" && appStore.groupId === undefined) {
+    errorNotif({
+      message: "Aucun groupe n'est actuellement sélectionné.",
+    });
+    return;
+  }
+
+  const urlToCopy = appStore.resourceType === "room"
+    ? `${API_URL_V2}/univ/${appStore.numUniv}/rooms/${appStore.adeResources}/events`
+    : `${API_URL_V2}/univ/${appStore.numUniv}/groups/${appStore.groupId}/${appStore.adeResources}/events`;
+
     await navigator.clipboard.writeText(urlToCopy);
     successNotif({
         message: "Le lien direct de l'emploi du temps a été copié dans le presse-papier.",

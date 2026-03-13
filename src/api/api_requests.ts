@@ -10,30 +10,61 @@ export const univListRequest = () => {
     };
 };
 
-export const roomListRequest = () => {
+export const groupListRequest = (univId: number) => {
     return {
-        url: `${API_URL_V2}/rooms`,
+        url: `${API_URL_V2}/univ/${univId}/groups`,
         options: { method: HttpMethod.GET },
     };
 };
 
-export const timetableListRequest = (numUniv: number) => {
+export const timetableListRequest = (univId: number, groupId: number) => {
     return {
-        url: numUniv === -1 ? `${API_URL_V2}/rooms` : `${API_URL_V2}/univ/${numUniv}`,
+        url: `${API_URL_V2}/univ/${univId}/groups/${groupId}`,
         options: { method: HttpMethod.GET },
     };
 };
 
-export const timetableDetailsRequest = (numTimetable: number, isRoom: boolean = false) => {
+export const roomListRequest = (univId: number) => {
     return {
-        url: `${API_URL_V2}${isRoom ? "/rooms" : ""}/${numTimetable}`,
+        url: `${API_URL_V2}/univ/${univId}/rooms`,
         options: { method: HttpMethod.GET },
     };
 };
 
-export const timetableEventsRequest = (numTimetable: number, format: string, isRoom: boolean = false) => {
+export const timetableDetailsRequest = (univId: number, groupId: number, adeResources: number) => {
     return {
-        url: `${API_URL_V2}${isRoom ? "/rooms" : ""}/${numTimetable}/${format}`,
+        url: `${API_URL_V2}/univ/${univId}/groups/${groupId}/${adeResources}`,
         options: { method: HttpMethod.GET },
+    };
+};
+
+export const roomDetailsRequest = (univId: number, adeResources: number) => {
+    return {
+        url: `${API_URL_V2}/univ/${univId}/rooms/${adeResources}`,
+        options: { method: HttpMethod.GET },
+    };
+};
+
+export const timetableEventsRequest = (univId: number, groupId: number, adeResources: number) => {
+    return {
+        url: `${API_URL_V2}/univ/${univId}/groups/${groupId}/${adeResources}/events`,
+        options: {
+            method: HttpMethod.GET,
+            headers: {
+                Accept: "application/json",
+            },
+        },
+    };
+};
+
+export const roomEventsRequest = (univId: number, adeResources: number) => {
+    return {
+        url: `${API_URL_V2}/univ/${univId}/rooms/${adeResources}/events`,
+        options: {
+            method: HttpMethod.GET,
+            headers: {
+                Accept: "application/json",
+            },
+        },
     };
 };

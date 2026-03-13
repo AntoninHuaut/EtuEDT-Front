@@ -8,19 +8,19 @@
     ripple
   >
     <v-card-text class="pa-2 font-weight-bold text-truncate w-100">
-      {{ room.descTT }}
+      {{ room.label }}
     </v-card-text>
   </v-card>
 </template>
 
 <script lang="ts" setup>
 import { useAppStore } from "@/store/";
-import type { ITimetable } from "@/types/APIType";
+import type { IRoom } from "@/types/APIType";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const props = defineProps<{
-  room: ITimetable;
+  room: IRoom;
   colorHex: string;
 }>();
 
@@ -31,8 +31,8 @@ const isLoading = ref(false);
 const selectRoom = async () => {
   isLoading.value = true;
   try {
-    appStore.$patch({ adeResources: props.room.adeResources });
-    await router.push(`/edt/${props.room.numUniv}/${props.room.adeResources}`);
+    appStore.$patch({ adeResources: props.room.adeResources, resourceType: "room", homeSelectionView: "room" });
+    await router.push(`/edt/${appStore.numUniv}/${appStore.groupId}/room/${props.room.adeResources}`);
   } finally {
     isLoading.value = false;
   }

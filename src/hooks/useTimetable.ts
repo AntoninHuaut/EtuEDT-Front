@@ -1,22 +1,24 @@
-import { timetableDetailsRequest } from "@/api/api_requests";
+import { roomDetailsRequest, timetableDetailsRequest } from "@/api/api_requests";
 import { useAppStore } from "@/store/";
 import { computed, ref, watch, watchEffect } from "vue";
 
-import type { ITimetable } from "@/types/APIType";
+import type { IRoom, ITimetable } from "@/types/APIType";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { useQuery } from "@tanstack/vue-query";
 
 export const useTimetable = () => {
     const appStore = useAppStore();
 
-    const timetable = ref<ITimetable | undefined>();
+    const timetable = ref<ITimetable | IRoom | undefined>();
 
     const ttQuery = ref(
-        useQuery<ITimetable>({
-            queryKey: ["fetchTimetable", appStore.numUniv, appStore.adeResources],
+        useQuery<ITimetable | IRoom>({
+            queryKey: ["fetchTimetable", appStore.numUniv, appStore.groupId, appStore.adeResources, appStore.resourceType],
             queryFn: ({ signal }) =>
                 wrapFetch({
-                    ...timetableDetailsRequest(appStore.adeResources ?? 0, appStore.numUniv === -1),
+                    ...(appStore.resourceType === "room"
+                        ? roomDetailsRequest(appStore.numUniv ?? 0, appStore.adeResources ?? 0)
+                        : timetableDetailsRequest(appStore.numUniv ?? 0, appStore.groupId ?? 0, appStore.adeResources ?? 0)),
                     signal,
                 }),
             enabled: false,
@@ -39,7 +41,7 @@ export const useTimetable = () => {
     );
 
     watchEffect(() => {
-        if (appStore.numUniv !== undefined && appStore.adeResources) {
+        if (appStore.numUniv !== undefined && appStore.adeResources && (appStore.resourceType === "room" || appStore.groupId !== undefined)) {
             ttQuery.value.refetch();
         }
     });
@@ -49,11 +51,16 @@ export const useTimetable = () => {
             return "?";
         }
 
-        if (timetable.value.numYearTT < 0) {
-            return timetable.value.descTT ?? "?";
+        if (appStore.resourceType === "room") {
+            return timetable.value.label ?? "?";
         }
 
-        return `${timetable.value?.numYearTT}A ${timetable.value?.descTT}`;
+        const currentTimetable = timetable.value as ITimetable;
+        if (currentTimetable.year < 0) {
+            return currentTimetable.label ?? "?";
+        }
+
+        return `${currentTimetable.year}A ${currentTimetable.label}`;
     });
     const lastUpdate = computed(() => timetable.value?.lastUpdate ?? "");
 

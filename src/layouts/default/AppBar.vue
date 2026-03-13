@@ -20,6 +20,7 @@
     <template v-slot:append>
       <AppBarButton v-if="route.name === 'Timetable'" icon="mdi-link" :on-click="copyTimetableLink"
         tooltip="Obtenir le lien de l'emploi du temps" />
+      <AppBarButton to="/contributors" icon="mdi-github" tooltip="Contributeurs" />
       <AppBarButton to="/sync" icon="mdi-sync" tooltip="Synchroniser avec un service externe" />
       <AppBarButton to="/swagger" icon="mdi-api" tooltip="Documentation API" />
       <AppThemeButton />

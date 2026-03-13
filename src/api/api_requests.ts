@@ -1,7 +1,7 @@
 import { HttpMethod } from "./requests";
 
-export const BASE_API_URL = "http://localhost:4000";
-export const API_URL_V2 = `${BASE_API_URL}/v2`;
+export const BASE_API_URL = "https://edtapi.antoninhuaut.fr";
+export const API_URL_V2 = `${BASE_API_URL}/v3`;
 
 export const univListRequest = () => {
     return {

@@ -40,19 +40,19 @@
 
 <script lang="ts" setup>
 import { groupListRequest } from "@/api/api_requests";
+import { useQueryNotifications } from "@/hooks/useQueryNotifications";
+import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store";
 import type { IGroup } from "@/types/APIType";
-import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { useQuery } from "@tanstack/vue-query";
-import { computed, ref, watch } from "vue";
-import { useRouter } from "vue-router";
+import { computed, ref } from "vue";
 import { useDisplay } from "vuetify";
 import BackSelectUniv from "./BackSelectUniv.vue";
 
 const { mobile } = useDisplay();
 const appStore = useAppStore();
-const router = useRouter();
+const { goToRooms, selectGroup: selectGroupInStore } = useResourceSelection();
 const selectingGroupId = ref<number | undefined>();
 
 const query = useQuery<IGroup[]>({
@@ -65,26 +65,16 @@ const groupList = computed(() => query.data.value ?? []);
 
 const selectedUnivName = computed(() => appStore.univName ?? "");
 
-watch(query.error, (err) => {
-  if (!err) return;
-  console.error("Failed to get Group List, got", err);
-  genericError(err.message);
-});
-
-watch(query.isSuccess, (success) => {
-  if (success && !query.data.value) {
-    errorNoDataFetchNotif();
-  }
+useQueryNotifications<IGroup[]>({
+  contextName: "Group List",
+  getError: () => query.error.value,
+  getIsSuccess: () => query.isSuccess.value,
+  getData: () => query.data.value,
 });
 
 function selectGroup(id: number) {
   selectingGroupId.value = id;
-  appStore.$patch({ groupId: id, adeResources: undefined, resourceType: "timetable", homeSelectionView: "timetable" });
-}
-
-function goToRooms() {
-  appStore.$patch({ adeResources: undefined, resourceType: "room" });
-  router.push({ name: "Rooms" });
+  selectGroupInStore(id);
 }
 
 const isFetching = computed(() => query.isFetching.value || query.isLoading.value);

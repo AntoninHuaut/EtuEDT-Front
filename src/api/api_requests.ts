@@ -1,6 +1,6 @@
 import { HttpMethod } from "./requests";
 
-export const BASE_API_URL = "http://localhost:4000";
+export const BASE_API_URL = import.meta.env.VITE_API_BASE_URL ?? "https://edtapi.antoninhuaut.fr";
 export const API_URL_V3 = `${BASE_API_URL}/v3`;
 
 export const univListRequest = () => {
@@ -49,10 +49,7 @@ export const timetableEventsRequest = (univId: number, groupId: number, adeResou
     return {
         url: `${API_URL_V3}/univs/${univId}/groups/${groupId}/${adeResources}/events`,
         options: {
-            method: HttpMethod.GET,
-            headers: {
-                Accept: "application/json",
-            },
+            method: HttpMethod.GET
         },
     };
 };
@@ -61,10 +58,7 @@ export const roomEventsRequest = (univId: number, adeResources: number) => {
     return {
         url: `${API_URL_V3}/univs/${univId}/rooms/${adeResources}/events`,
         options: {
-            method: HttpMethod.GET,
-            headers: {
-                Accept: "application/json",
-            },
+            method: HttpMethod.GET
         },
     };
 };

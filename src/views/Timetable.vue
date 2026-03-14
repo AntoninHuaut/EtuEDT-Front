@@ -12,6 +12,7 @@ import { useDateHelper } from "@/hooks/useDateHelper";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store/";
+import { createTimetableContext } from "@/utils/timetableContext";
 import { onMounted, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 
@@ -19,15 +20,14 @@ const appStore = useAppStore();
 const dateHelper = useDateHelper();
 const timetableViewStore = useTimetableViewStore();
 const route = useRoute();
-const { adeResources, numUniv, groupId, resourceType } = route.params;
-const isValidResourceType = resourceType === "timetable" || resourceType === "room";
+const timetableContext = createTimetableContext(route.params);
 
-if (adeResources && numUniv && !Number.isNaN(+adeResources) && !Number.isNaN(+numUniv) && isValidResourceType) {
+if (timetableContext) {
   appStore.$patch({
-    adeResources: +adeResources,
-    numUniv: +numUniv,
-    groupId: groupId && !Number.isNaN(+groupId) ? +groupId : undefined,
-    resourceType,
+    adeResources: timetableContext.adeResources,
+    numUniv: timetableContext.numUniv,
+    groupId: timetableContext.groupId,
+    resourceType: timetableContext.resourceType,
   });
 }
 

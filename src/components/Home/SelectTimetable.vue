@@ -26,13 +26,13 @@
             <v-row justify="center">
                 <v-col cols="12" sm="6" md="4" lg="3" class="px-1" v-for="year in yearList" :key="year">
                     <div v-if="getFilteredTtsByYear(Number.parseInt(year)).length > 0">
-                        <p class="text-h6 mt-3 mb-1">{{ getTitle(Number.parseInt(year)) }}</p>
+                        <p class="text-h6 mt-3 mb-1">{{ getYearTitle(Number.parseInt(year)) }}</p>
 
                         <v-col v-if="Number.parseInt(year) < 0" class="px-0">
                             <v-select v-model="selectedExtra" :items="getFilteredTtsByYear(Number.parseInt(year))"
                                 item-title="label" item-value="adeResources"
                                 :label="`${getFilteredTtsByYear(Number.parseInt(year)).length} entrée(s)`" variant="outlined"
-                                density="compact" @update:model-value="setSelectedExtra"></v-select>
+                                density="compact" @update:model-value="selectTimetable"></v-select>
                         </v-col>
 
                         <v-col v-else class="pt-2 pb-1 px-0" v-for="(timetable, i) in getFilteredTtsByYear(Number.parseInt(year))"
@@ -51,24 +51,25 @@
 
 <script lang="ts" setup>
 import { timetableListRequest } from "@/api/api_requests";
+import { useQueryNotifications } from "@/hooks/useQueryNotifications";
+import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store/";
 import type { ITimetable } from "@/types/APIType";
-import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { useQuery } from "@tanstack/vue-query";
 import { computed, ref, watch, watchEffect } from "vue";
-import { useRouter } from "vue-router";
 import { useDisplay, useTheme } from "vuetify";
 import { selectColorsList } from "../Timetable/helper";
+import { getYearTitle } from "@/utils/timetable";
 import BackSelectUniv from "./BackSelectUniv.vue";
 import TimetableButton from "./TimetableButton.vue";
 
 const { mobile } = useDisplay();
 const appStore = useAppStore();
+const { goToRooms, selectTimetable } = useResourceSelection();
 
 const colorList = ref(selectColorsList);
 const theme = useTheme();
-const router = useRouter();
 
 const searchQuery = ref("");
 
@@ -103,24 +104,6 @@ function getFilteredTtsByYear(year: number) {
     return filteredTimetables.value.filter(tt => tt.year === year);
 }
 
-const selectedExtra = ref<string>();
-function setSelectedExtra(adeResources: string) {
-    if (+adeResources) {
-        appStore.$patch({ adeResources: +adeResources, resourceType: "timetable", homeSelectionView: "timetable" });
-        router.push(`/edt/${appStore.numUniv}/${appStore.groupId}/timetable/${adeResources}`);
-    }
-}
-
-function goToRooms() {
-    appStore.$patch({ adeResources: undefined, resourceType: "room" });
-    router.push({ name: "Rooms" });
-}
-
-function getTitle(yearId: number) {
-    if (yearId <= 0) return "Autres";
-    return "Année " + yearId + "A";
-};
-
 watchEffect(() => {
     if (theme.global.name.value === "dark") {
         colorList.value = selectColorsList.map((color) => `${color}AA`);
@@ -129,17 +112,11 @@ watchEffect(() => {
     }
 });
 
-watch(timetableQuery.error, (err) => {
-    if (err) {
-        console.error("Failed to get Timetable List, got", err);
-        genericError(err.message);
-    }
-});
-
-watch(timetableQuery.isSuccess, (success) => {
-    if (success && !timetableQuery.data.value) {
-        errorNoDataFetchNotif();
-    }
+useQueryNotifications<ITimetable[]>({
+    contextName: "Timetable List",
+    getError: () => timetableQuery.error.value,
+    getIsSuccess: () => timetableQuery.isSuccess.value,
+    getData: () => timetableQuery.data.value,
 });
 
 watch(() => [appStore.numUniv, appStore.groupId], () => {

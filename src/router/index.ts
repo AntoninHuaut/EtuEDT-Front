@@ -1,5 +1,7 @@
 // Composables
 import { createRouter, createWebHistory } from "vue-router";
+import type { RouteLocationNormalized } from "vue-router";
+import { createTimetableContext } from "@/utils/timetableContext";
 
 const routes = [
     {
@@ -22,9 +24,16 @@ const routes = [
                 component: () => import("@/views/Rooms.vue"),
             },
             {
-                path: "edt/:numUniv?/:groupId?/:resourceType?/:adeResources?",
+                path: "edt/:numUniv(\\d+)?/:groupId(\\d+)?/:resourceType(timetable|room)?/:adeResources(\\d+)?",
                 name: "Timetable",
                 component: () => import("@/views/Timetable.vue"),
+                beforeEnter: (to: RouteLocationNormalized) => {
+                    if (createTimetableContext(to.params)) {
+                        return true;
+                    }
+
+                    return { name: "Home" };
+                },
             },
             {
                 path: "contributors",

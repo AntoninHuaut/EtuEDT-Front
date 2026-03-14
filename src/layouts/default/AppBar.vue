@@ -11,7 +11,7 @@
           <AppBarButton to="/" text="EtuEDT" :class="mobile ? 'text-body-1':'text-h6'" tooltip="Page d'accueil" />
         </v-col>
         <v-col v-if="appStore.numUniv !== undefined && appStore.adeResources && !mobile" cols="auto">
-          <AppBarButton :to="`/edt/${appStore.numUniv}/${appStore.groupId}/${appStore.resourceType}/${appStore.adeResources}`" text="Emploi du temps" class="text-h6"
+          <AppBarButton :on-click="goToLastTimetable" text="Emploi du temps" class="text-h6"
             tooltip="Afficher le dernier emploi du temps consulté" />
         </v-col>
       </v-row>
@@ -22,6 +22,7 @@
         tooltip="Obtenir le lien de l'emploi du temps" />
       <AppBarButton to="/contributors" icon="mdi-github" tooltip="Contributeurs" />
       <AppBarButton to="/sync" icon="mdi-sync" tooltip="Synchroniser avec un service externe" />
+      <AppBarButton :href="`${BASE_API_URL}/docs`" icon="mdi-book-open-variant" tooltip="Documentation" />
       <AppThemeButton />
     </template>
   </v-app-bar>
@@ -32,32 +33,75 @@ import AppBarButton from "@/components/layout/AppBarButton.vue";
 import AppThemeButton from "@/components/layout/AppThemeButton.vue";
 import { useAppStore } from "@/store/";
 import { errorNotif, successNotif } from "@/utils/notification";
-import { useRoute } from "vue-router";
+import { buildTimetableRouteParams, createTimetableContext, isGroupMissingForTimetable } from "@/utils/timetableContext";
+import { useRoute, useRouter } from "vue-router";
 import { useDisplay } from "vuetify";
+import { BASE_API_URL } from "@/api/api_requests";
 
 const { smAndUp, mobile } = useDisplay();
 const appStore = useAppStore();
 const route = useRoute();
+const router = useRouter();
+
+const goToLastTimetable = async () => {
+  const context = createTimetableContext({
+    numUniv: appStore.numUniv,
+    groupId: appStore.groupId,
+    adeResources: appStore.adeResources,
+    resourceType: appStore.resourceType,
+  });
+
+  if (!context) {
+    if (isGroupMissingForTimetable({ resourceType: appStore.resourceType, groupId: appStore.groupId })) {
+      errorNotif({
+        message: "Aucun groupe n'est actuellement sélectionné.",
+      });
+    }
+    return;
+  }
+
+  await router.push({
+    name: "Timetable",
+    params: buildTimetableRouteParams(context),
+  });
+};
 
 const copyTimetableLink = async () => {
-    if (!appStore.adeResources || appStore.numUniv === undefined) {
+    const context = createTimetableContext({
+        numUniv: appStore.numUniv,
+        groupId: appStore.groupId,
+        adeResources: appStore.adeResources,
+        resourceType: appStore.resourceType,
+    });
+
+    if (!context) {
+        if (isGroupMissingForTimetable({ resourceType: appStore.resourceType, groupId: appStore.groupId })) {
+            errorNotif({
+                message: "Aucun groupe n'est actuellement sélectionné.",
+            });
+            return;
+        }
+
         errorNotif({
             message: "Aucun emploi du temps n'est actuellement sélectionné.",
         });
         return;
     }
 
-  if (appStore.resourceType === "timetable" && appStore.groupId === undefined) {
-    errorNotif({
-      message: "Aucun groupe n'est actuellement sélectionné.",
-    });
-    return;
-  }
-
     if (!appStore.adeUrl) {
-        errorNotif({
-            message: "Lien ADE indisponible pour cet emploi du temps.",
-        });
+        if (appStore.isTimetableLoading) {
+            errorNotif({
+                message: "L'emploi du temps est encore en cours de chargement.",
+            });
+        } else if (appStore.isTimetableError) {
+            errorNotif({
+                message: "Impossible de récupérer le lien ADE suite à une erreur.",
+            });
+        } else {
+            errorNotif({
+                message: "Lien ADE indisponible pour cet emploi du temps.",
+            });
+        }
         return;
     }
 

@@ -12,18 +12,26 @@ const appStore = useAppStore();
 const theme = useTheme();
 const route = useRoute();
 const router = useRouter();
+
 const backToUnivList = () => {
+    const resetTimetableContext = {
+        adeResources: undefined,
+        adeUrl: undefined,
+        resourceType: "timetable" as const,
+    };
+
     if (route.name === "Rooms") {
-        appStore.$patch({ adeResources: undefined, resourceType: "timetable", homeSelectionView: "timetable" });
+        appStore.$patch(resetTimetableContext);
         router.push({ name: "Home" });
         return;
     }
 
     if (appStore.groupId !== undefined) {
-        appStore.$patch({ groupId: undefined, adeResources: undefined, resourceType: "timetable", homeSelectionView: "timetable" });
+        appStore.$patch({ groupId: undefined, ...resetTimetableContext });
         return;
     }
 
-    appStore.$patch({ numUniv: undefined, groupId: undefined, adeResources: undefined, resourceType: "timetable", homeSelectionView: "timetable" });
+    appStore.$patch({ numUniv: undefined, groupId: undefined, ...resetTimetableContext });
+
 };
 </script>

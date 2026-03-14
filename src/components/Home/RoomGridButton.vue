@@ -3,7 +3,7 @@
     class="room-card ma-1 d-flex flex-column align-center justify-center text-center text-white"
     :color="colorHex"
     :loading="isLoading"
-    @click="selectRoom"
+    @click="navigateToRoom"
     hover
     ripple
   >
@@ -14,25 +14,22 @@
 </template>
 
 <script lang="ts" setup>
-import { useAppStore } from "@/store/";
+import { useResourceSelection } from "@/hooks/useResourceSelection";
 import type { IRoom } from "@/types/APIType";
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 
 const props = defineProps<{
   room: IRoom;
   colorHex: string;
 }>();
 
-const appStore = useAppStore();
-const router = useRouter();
+const { selectRoom } = useResourceSelection();
 const isLoading = ref(false);
 
-const selectRoom = async () => {
+const navigateToRoom = async () => {
   isLoading.value = true;
   try {
-    appStore.$patch({ adeResources: props.room.adeResources, resourceType: "room", homeSelectionView: "room" });
-    await router.push(`/edt/${appStore.numUniv}/${appStore.groupId}/room/${props.room.adeResources}`);
+    await selectRoom(props.room.adeResources);
   } finally {
     isLoading.value = false;
   }

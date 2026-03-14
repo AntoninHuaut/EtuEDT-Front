@@ -1,20 +1,22 @@
 <template>
   <div class="d-flex flex-column mt-3">
-    <div v-if="evtsQuery.isFetching" class="mt-5 pt-5 text-center">
+    <div v-if="evtsQuery.isLoading" class="mt-5 pt-5 text-center">
       <v-progress-circular :size="128" :width="12" color="primary" indeterminate />
     </div>
 
-    <ScheduleXCalendar :class="evtsQuery.isFetching ? 'hidden' : ''" :calendar-app="calendarApp" />
+    <ScheduleXCalendar :class="evtsQuery.isLoading ? 'hidden' : ''" :calendar-app="calendarApp" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { roomEventsRequest, timetableEventsRequest } from "@/api/api_requests";
+import { buildResourceEventsRequest } from "@/api/resourceRequestFactory";
+import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
 import { getLanguage } from "@/utils/locale";
-import { errorNoDataFetchNotif, genericError, infoNotif } from "@/utils/notification";
+import { errorNoDataFetchNotif, infoNotif } from "@/utils/notification";
+import { createTimetableContext } from "@/utils/timetableContext";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { createCalendar, createViewDay, createViewMonthGrid, createViewWeek } from "@schedule-x/calendar";
 import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
@@ -73,17 +75,34 @@ const evtsQuery = ref(
         queryKey: ["timetableEvents", appStore.numUniv, appStore.groupId, appStore.adeResources, appStore.resourceType],
         queryFn: ({ signal }) =>
             wrapFetch({
-                ...(appStore.resourceType === "room"
-                    ? roomEventsRequest(appStore.numUniv ?? 0, appStore.adeResources ?? 0)
-                    : timetableEventsRequest(appStore.numUniv ?? 0, appStore.groupId ?? 0, appStore.adeResources ?? 0)),
+                ...buildResourceEventsRequest({
+                    numUniv: appStore.numUniv ?? 0,
+                    groupId: appStore.groupId,
+                    adeResources: appStore.adeResources ?? 0,
+                    resourceType: appStore.resourceType,
+                }),
                 signal,
             }),
         enabled: false,
     }),
 );
 
+useQueryNotifications<IJsonEvent[]>({
+    contextName: "Timetable Events",
+    getError: () => evtsQuery.value.error,
+    getIsSuccess: () => evtsQuery.value.isSuccess,
+    getData: () => evtsQuery.value.data,
+});
+
 onMounted(() => {
-    if (appStore.numUniv !== undefined && appStore.adeResources && (appStore.resourceType === "room" || appStore.groupId !== undefined)) {
+    const context = createTimetableContext({
+        numUniv: appStore.numUniv,
+        groupId: appStore.groupId,
+        adeResources: appStore.adeResources,
+        resourceType: appStore.resourceType,
+    });
+
+    if (context) {
         evtsQuery.value.refetch();
     } else {
         router.push({ name: "Home" });
@@ -93,11 +112,7 @@ onMounted(() => {
 watch(
     () => evtsQuery.value.isLoading,
     () => {
-        if (evtsQuery.value.error) {
-            console.error("Failed to get Timetable Events, got", evtsQuery.value.error);
-            genericError(evtsQuery.value.error.message);
-            return;
-        }
+        if (evtsQuery.value.error) return;
         if (!evtsQuery.value.isSuccess) return;
         if (!evtsQuery.value.data) return errorNoDataFetchNotif();
 

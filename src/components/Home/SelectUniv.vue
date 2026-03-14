@@ -19,9 +19,9 @@
 
 <script lang="ts" setup>
 import { univListRequest } from "@/api/api_requests";
+import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useAppStore } from "@/store/";
 import type { IUniv } from "@/types/APIType";
-import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { useQuery } from "@tanstack/vue-query";
 import { onMounted, ref, watch } from "vue";
@@ -42,16 +42,18 @@ const univQuery = ref(
 
 onMounted(() => univQuery.value.refetch());
 
+useQueryNotifications<IUniv[]>({
+  contextName: "Univ List",
+  getError: () => univQuery.value.error,
+  getIsSuccess: () => univQuery.value.isSuccess,
+  getData: () => univQuery.value.data,
+});
+
 watch(
     () => univQuery.value.isLoading,
     () => {
-        if (univQuery.value.error) {
-            console.error("Failed to get Univ List, got", univQuery.value.error);
-            genericError(univQuery.value.error.message);
-            return;
-        }
         if (!univQuery.value.isSuccess) return;
-        if (!univQuery.value.data) return errorNoDataFetchNotif();
+    if (!univQuery.value.data) return;
 
         univList.value.length = 0;
         univList.value.push(...univQuery.value.data);
@@ -66,8 +68,9 @@ function selectUniv(univ: IUniv) {
     univName: univ.name,
     groupId: undefined,
     adeResources: undefined,
+    adeUrl: undefined,
     resourceType: "timetable",
-    homeSelectionView: "timetable",
   });
+
 }
 </script>

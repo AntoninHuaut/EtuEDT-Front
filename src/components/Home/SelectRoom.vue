@@ -47,13 +47,13 @@
 
 <script lang="ts" setup>
 import { roomListRequest } from "@/api/api_requests";
+import { useQueryNotifications } from "@/hooks/useQueryNotifications";
+import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store/";
 import type { IRoom } from "@/types/APIType";
-import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { useQuery } from "@tanstack/vue-query";
-import { computed, ref, watch, watchEffect } from "vue";
-import { useRouter } from "vue-router";
+import { computed, ref, watchEffect } from "vue";
 import { useDisplay, useTheme } from "vuetify";
 import { selectColorsList } from "../Timetable/helper";
 import BackSelectUniv from "./BackSelectUniv.vue";
@@ -61,8 +61,8 @@ import RoomGridButton from "./RoomGridButton.vue";
 
 const { mobile } = useDisplay();
 const appStore = useAppStore();
-const router = useRouter();
 const theme = useTheme();
+const { goToGroups, goToTimetables} = useResourceSelection();
 const searchQuery = ref("");
 const colorList = ref(selectColorsList);
 
@@ -79,19 +79,10 @@ const roomsQuery = useQuery<IRoom[]>({
 const filteredRooms = computed(() => {
   const list = roomsQuery.data.value ?? [];
   if (!searchQuery.value) return list;
-  const query = searchQuery.value.toLowerCase();
-  return list.filter((room) => room.label.toLowerCase().includes(query));
+  return list.filter((room) => room.label.toLowerCase().includes(searchQuery.value.toLowerCase()));
 });
 
-function goToGroups() {
-  appStore.$patch({ groupId: undefined, adeResources: undefined, resourceType: "timetable" });
-  router.push({ name: "Home" });
-}
 
-function goToTimetables() {
-  appStore.$patch({ adeResources: undefined, resourceType: "timetable" });
-  router.push({ name: "Home" });
-}
 
 watchEffect(() => {
   if (theme.global.name.value === "dark") {
@@ -101,16 +92,11 @@ watchEffect(() => {
   }
 });
 
-watch(roomsQuery.error, (err) => {
-  if (!err) return;
-  console.error("Failed to get Room List, got", err);
-  genericError(err.message);
-});
-
-watch(roomsQuery.isSuccess, (success) => {
-  if (success && !roomsQuery.data.value) {
-    errorNoDataFetchNotif();
-  }
+useQueryNotifications<IRoom[]>({
+  contextName: "Room List",
+  getError: () => roomsQuery.error.value,
+  getIsSuccess: () => roomsQuery.isSuccess.value,
+  getData: () => roomsQuery.data.value,
 });
 
 const isFetching = computed(() => roomsQuery.isFetching.value || roomsQuery.isLoading.value);

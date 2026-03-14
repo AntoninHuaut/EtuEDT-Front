@@ -2,7 +2,9 @@
   "name": "etuedt-vue3",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10",
   "scripts": {
+    "preinstall": "node -e \"if (!/pnpm/.test(process.env.npm_config_user_agent || '')) { console.error('This project uses pnpm only.'); process.exit(1); }\"",
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview"

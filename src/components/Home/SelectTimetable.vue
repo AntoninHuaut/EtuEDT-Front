@@ -26,7 +26,7 @@
             <v-row justify="center">
                 <v-col cols="12" sm="6" md="4" lg="3" class="px-1" v-for="year in yearList" :key="year">
                     <div v-if="getFilteredTtsByYear(Number.parseInt(year)).length > 0">
-                        <p class="text-h6 mt-3 mb-1">{{ getTitle(year) }}</p>
+                        <p class="text-h6 mt-3 mb-1">{{ getTitle(Number.parseInt(year)) }}</p>
 
                         <v-col v-if="Number.parseInt(year) < 0" class="px-0">
                             <v-select v-model="selectedExtra" :items="getFilteredTtsByYear(Number.parseInt(year))"
@@ -116,8 +116,8 @@ function goToRooms() {
     router.push({ name: "Rooms" });
 }
 
-function getTitle(yearId: string) {
-    if (+yearId < 0) return "Autres";
+function getTitle(yearId: number) {
+    if (yearId <= 0) return "Autres";
     return "Année " + yearId + "A";
 };
 

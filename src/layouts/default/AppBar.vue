@@ -22,14 +22,12 @@
         tooltip="Obtenir le lien de l'emploi du temps" />
       <AppBarButton to="/contributors" icon="mdi-github" tooltip="Contributeurs" />
       <AppBarButton to="/sync" icon="mdi-sync" tooltip="Synchroniser avec un service externe" />
-      <AppBarButton to="/swagger" icon="mdi-api" tooltip="Documentation API" />
       <AppThemeButton />
     </template>
   </v-app-bar>
 </template>
 
 <script lang="ts" setup>
-import { API_URL_V2 } from "@/api/api_requests";
 import AppBarButton from "@/components/layout/AppBarButton.vue";
 import AppThemeButton from "@/components/layout/AppThemeButton.vue";
 import { useAppStore } from "@/store/";
@@ -56,11 +54,14 @@ const copyTimetableLink = async () => {
     return;
   }
 
-  const urlToCopy = appStore.resourceType === "room"
-    ? `${API_URL_V2}/univ/${appStore.numUniv}/rooms/${appStore.adeResources}/events`
-    : `${API_URL_V2}/univ/${appStore.numUniv}/groups/${appStore.groupId}/${appStore.adeResources}/events`;
+    if (!appStore.adeUrl) {
+        errorNotif({
+            message: "Lien ADE indisponible pour cet emploi du temps.",
+        });
+        return;
+    }
 
-    await navigator.clipboard.writeText(urlToCopy);
+    await navigator.clipboard.writeText(appStore.adeUrl);
     successNotif({
         message: "Le lien direct de l'emploi du temps a été copié dans le presse-papier.",
     });

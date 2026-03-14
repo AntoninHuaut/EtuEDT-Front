@@ -12,11 +12,6 @@ const routes = [
                 component: () => import("@/views/Home.vue"),
             },
             {
-                path: "swagger",
-                name: "Swagger",
-                component: () => import("@/views/Swagger.vue"),
-            },
-            {
                 path: "sync",
                 name: "Sync",
                 component: () => import("@/views/Sync.vue"),

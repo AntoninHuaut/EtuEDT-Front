@@ -32,9 +32,11 @@ export const useTimetable = () => {
                 console.error(ttQuery.value.error);
 
                 timetable.value = undefined;
+                appStore.adeUrl = undefined;
             }
             if (ttQuery.value.data) {
                 timetable.value = ttQuery.value.data;
+                appStore.adeUrl = ttQuery.value.data.adeUrl;
             }
         },
         { immediate: true },

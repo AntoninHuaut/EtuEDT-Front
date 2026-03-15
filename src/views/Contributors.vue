@@ -10,85 +10,36 @@
       </v-card-item>
 
       <v-card-text>
-        <div>
-          <div class="text-subtitle-1 mb-3">Mainteneur</div>
-          <v-row>
-            <v-col v-for="contributor in maintainers" :key="contributor.name" cols="12" sm="6" md="4">
-              <v-card variant="flat" class="text-center pa-2">
-                <v-avatar size="100" class="mx-auto mb-3">
-                  <v-img :src="contributor.avatar" :alt="contributor.name"></v-img>
-                </v-avatar>
-                <div class="text-h6">{{ contributor.name }}</div>
-                <div class="text-caption">Mainteneur</div>
-              </v-card>
-            </v-col>
-          </v-row>
-        </div>
-
-        <v-divider class="my-4"></v-divider>
-
-        <div>
-          <div class="text-subtitle-1 mb-3">Contributeurs</div>
-          <v-row>
-            <v-col v-for="contributor in otherContributors" :key="contributor.name" cols="12" sm="6" md="4">
-              <v-card variant="flat" class="text-center pa-2">
-                <v-avatar size="100" class="mx-auto mb-3">
-                  <v-img :src="contributor.avatar" :alt="contributor.name"></v-img>
-                </v-avatar>
-                <div class="text-h6">{{ contributor.name }}</div>
-                <v-card-actions class="justify-center">
-                  <v-btn
-                    v-if="contributor.github"
-                    icon="mdi-github"
-                    variant="text"
-                    :href="contributor.github"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  ></v-btn>
-                  <v-btn
-                    v-if="contributor.linkedin"
-                    icon="mdi-linkedin"
-                    variant="text"
-                    :href="contributor.linkedin"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  ></v-btn>
-                  <v-btn
-                    v-if="contributor.website"
-                    icon="mdi-web"
-                    variant="text"
-                    :href="contributor.website"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  ></v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-col>
-          </v-row>
-        </div>
+        <v-row>
+          <v-col v-for="contributor in contributors" :key="contributor.name" cols="12" sm="6" md="4">
+            <v-card variant="flat" class="text-center pa-2">
+              <v-avatar size="100" class="mx-auto mb-3">
+                <v-img :src="contributor.avatar" :alt="contributor.name"></v-img>
+              </v-avatar>
+              <div class="text-h6">{{ contributor.name }}</div>
+              <div class="text-caption">{{ getRoleText(contributor.role) }}</div>
+              <v-card-actions class="justify-center">
+                <v-btn v-if="contributor.github" icon="mdi-github" variant="text" :href="contributor.github" target="_blank"
+                  rel="noopener noreferrer"></v-btn>
+                <v-btn v-if="contributor.linkedin" icon="mdi-linkedin" variant="text" :href="contributor.linkedin" target="_blank"
+                  rel="noopener noreferrer"></v-btn>
+                <v-btn v-if="contributor.website" icon="mdi-web" variant="text" :href="contributor.website" target="_blank"
+                  rel="noopener noreferrer"></v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
 
         <v-divider class="my-6"></v-divider>
 
         <div class="text-center mb-4">
           <div class="text-subtitle-1 mb-2">Code Source</div>
-          <v-btn
-            class="ma-2"
-            prepend-icon="mdi-github"
-            variant="tonal"
-            href="https://github.com/AntoninHuaut/EtuEDT-Back"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <v-btn class="ma-2" prepend-icon="mdi-github" variant="tonal" href="https://github.com/AntoninHuaut/EtuEDT-Back" target="_blank"
+            rel="noopener noreferrer">
             Back-end
           </v-btn>
-          <v-btn
-            class="ma-2"
-            prepend-icon="mdi-github"
-            variant="tonal"
-            href="https://github.com/AntoninHuaut/EtuEDT-Front"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <v-btn class="ma-2" prepend-icon="mdi-github" variant="tonal" href="https://github.com/AntoninHuaut/EtuEDT-Front" target="_blank"
+            rel="noopener noreferrer">
             Front-end
           </v-btn>
         </div>
@@ -98,15 +49,22 @@
 </template>
 
 <script lang="ts" setup>
-import { useDisplay } from "vuetify";
 import { contributors } from "@/data/contributors";
+import { useDisplay } from "vuetify";
 
 const { width } = useDisplay();
 
-const maintainers = contributors.filter(c => c.role === "maintainer");
-const otherContributors = contributors.filter(c => c.role !== "maintainer");
+function getRoleText(role: string): string {
+  switch (role) {
+    case "maintainer":
+      return "Mainteneur";
+    case "contributor":
+      return "Contributeur";
+    default:
+      return role;
+  }
+}
 </script>
-
 
 <style scoped>
 .v-card-title {

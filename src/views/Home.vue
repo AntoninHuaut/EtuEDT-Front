@@ -11,25 +11,29 @@
 </template>
 
 <script lang="ts" setup>
+import { type Ref, ref, watchEffect } from "vue";
+import { useDisplay } from "vuetify";
 import SelectGroup from "@/components/Home/SelectGroup.vue";
 import SelectTimetable from "@/components/Home/SelectTimetable.vue";
 import SelectUniv from "@/components/Home/SelectUniv.vue";
 import { useAppStore } from "@/store/";
-import { type Ref, ref, watchEffect } from "vue";
-import { useDisplay } from "vuetify";
 
 const { mdAndDown } = useDisplay();
 const appStore = useAppStore();
-const toDisplay: Ref<"selectUniv" | "selectGroup" | "selectTimetable"> = ref("selectUniv");
+const toDisplay: Ref<"selectUniv" | "selectGroup" | "selectTimetable"> =
+	ref("selectUniv");
 
-function displaySelectComponent(univ: number | undefined, groupId: number | undefined) {
-    if (univ === undefined) {
-        toDisplay.value = "selectUniv";
-    } else if (groupId === undefined) {
-        toDisplay.value = "selectGroup";
-    } else {
-        toDisplay.value = "selectTimetable";
-    }
+function displaySelectComponent(
+	univ: number | undefined,
+	groupId: number | undefined,
+) {
+	if (univ === undefined) {
+		toDisplay.value = "selectUniv";
+	} else if (groupId === undefined) {
+		toDisplay.value = "selectGroup";
+	} else {
+		toDisplay.value = "selectTimetable";
+	}
 }
 
 watchEffect(() => displaySelectComponent(appStore.numUniv, appStore.groupId));

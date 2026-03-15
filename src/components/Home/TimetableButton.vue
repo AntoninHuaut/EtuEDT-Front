@@ -8,14 +8,14 @@
 </template>
 
 <script lang="ts" setup>
-import { useResourceSelection } from "@/hooks/useResourceSelection";
-import type { ITimetable } from "@/types/APIType";
 import { ref } from "vue";
 import { useDisplay } from "vuetify";
+import { useResourceSelection } from "@/hooks/useResourceSelection";
+import type { ITimetable } from "@/types/APIType";
 
 defineProps<{
-  timetable: ITimetable;
-  colorHex: string;
+	timetable: ITimetable;
+	colorHex: string;
 }>();
 
 const { mobile } = useDisplay();
@@ -23,12 +23,12 @@ const { selectTimetable } = useResourceSelection();
 const isLoading = ref(false);
 
 const navigateToTimetable = async (timetable: ITimetable) => {
-  isLoading.value = true;
-  try {
-    await selectTimetable(timetable.adeResources);
-  } finally {
-    isLoading.value = false;
-  }
+	isLoading.value = true;
+	try {
+		await selectTimetable(timetable.adeResources);
+	} finally {
+		isLoading.value = false;
+	}
 };
 </script>
 

@@ -1,4 +1,4 @@
-import { URL, fileURLToPath } from "node:url";
+import { fileURLToPath, URL } from "node:url";
 
 // Plugins
 import vue from "@vitejs/plugin-vue";
@@ -7,31 +7,31 @@ import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 // Utilities
 // https://vitejs.dev/config/
 export default {
-    plugins: [
-        vue({
-            template: { transformAssetUrls },
-        }),
-        vuetify({
-            autoImport: true,
-            styles: {
-                configFile: "src/styles/App.scss",
-            },
-        }),
-    ],
-    css: {
-        preprocessorOptions: {
-            sass: {
-                api: "modern",
-            },
-        },
-    },
-    resolve: {
-        alias: {
-            "@": fileURLToPath(new URL("./src", import.meta.url)),
-        },
-        extensions: [".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".vue"],
-    },
-    server: {
-        port: 3000,
-    },
+	plugins: [
+		vue({
+			template: { transformAssetUrls },
+		}),
+		vuetify({
+			autoImport: true,
+			styles: {
+				configFile: "src/styles/App.scss",
+			},
+		}),
+	],
+	css: {
+		preprocessorOptions: {
+			sass: {
+				api: "modern",
+			},
+		},
+	},
+	resolve: {
+		alias: {
+			"@": fileURLToPath(new URL("./src", import.meta.url)),
+		},
+		extensions: [".js", ".json", ".jsx", ".mjs", ".ts", ".tsx", ".vue"],
+	},
+	server: {
+		port: 3000,
+	},
 };

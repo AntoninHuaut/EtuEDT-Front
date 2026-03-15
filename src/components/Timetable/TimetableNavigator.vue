@@ -50,12 +50,12 @@
 </template>
 
 <script lang="ts" setup>
-import { useDateHelper } from "@/hooks/useDateHelper";
-import { useTimetable } from "@/hooks/useTimetable";
-import { useTimetableViewStore } from "@/store";
 import { onKeyStroke, useSwipe } from "@vueuse/core";
 import { watch } from "vue";
 import { useDate, useDisplay } from "vuetify";
+import { useDateHelper } from "@/hooks/useDateHelper";
+import { useTimetable } from "@/hooks/useTimetable";
+import { useTimetableViewStore } from "@/store";
 
 const timetableData = useTimetable();
 const timetableViewStore = useTimetableViewStore();
@@ -65,69 +65,81 @@ const { xs } = useDisplay();
 const { isSwiping, direction } = useSwipe(document.body);
 
 function getBtnSize() {
-  return xs.value ? "small" : undefined;
+	return xs.value ? "small" : undefined;
 }
 
-function setDate(evt: KeyboardEvent | null, navigationType: "prev" | "today" | "next") {
-  evt?.preventDefault();
+function setDate(
+	evt: KeyboardEvent | null,
+	navigationType: "prev" | "today" | "next",
+) {
+	evt?.preventDefault();
 
-  let newCalDate: Date;
-  if (navigationType === "today") {
-    newCalDate = new Date();
-  } else {
-    const invertIfPrev = navigationType === "prev" ? -1 : 1;
+	let newCalDate: Date;
+	if (navigationType === "today") {
+		newCalDate = new Date();
+	} else {
+		const invertIfPrev = navigationType === "prev" ? -1 : 1;
 
-    switch (timetableViewStore.viewMode) {
-      case "month-grid":
-        newCalDate = adapter.addMonths(timetableViewStore.calDate, 1 * invertIfPrev) as Date;
-        break;
-      case "week":
-        newCalDate = adapter.addDays(timetableViewStore.calDate, 7 * invertIfPrev) as Date;
-        break;
-      case "day":
-        newCalDate = adapter.addDays(timetableViewStore.calDate, 1 * invertIfPrev) as Date;
-        break;
-      default:
-        return;
-    }
-  }
+		switch (timetableViewStore.viewMode) {
+			case "month-grid":
+				newCalDate = adapter.addMonths(
+					timetableViewStore.calDate,
+					1 * invertIfPrev,
+				) as Date;
+				break;
+			case "week":
+				newCalDate = adapter.addDays(
+					timetableViewStore.calDate,
+					7 * invertIfPrev,
+				) as Date;
+				break;
+			case "day":
+				newCalDate = adapter.addDays(
+					timetableViewStore.calDate,
+					1 * invertIfPrev,
+				) as Date;
+				break;
+			default:
+				return;
+		}
+	}
 
-  newCalDate = dateHelper.skipWeekend(newCalDate, navigationType);
-  timetableViewStore.$patch({ calDate: newCalDate });
+	newCalDate = dateHelper.skipWeekend(newCalDate, navigationType);
+	timetableViewStore.$patch({ calDate: newCalDate });
 }
 
 function getDisplayedDate(date: Date) {
-  return new Intl.DateTimeFormat(
-    navigator.language,
-    { month: "long", year: "numeric" }
-  )
-    .format(date)
-    .replace(/^\w/, c => c.toUpperCase());
+	return new Intl.DateTimeFormat(navigator.language, {
+		month: "long",
+		year: "numeric",
+	})
+		.format(date)
+		.replace(/^\w/, (c) => c.toUpperCase());
 }
 
 function setView(view: "day" | "week" | "month-grid") {
-  timetableViewStore.$patch({ viewMode: view });
+	timetableViewStore.$patch({ viewMode: view });
 }
 
 watch(isSwiping, (isSwiping) => {
-  if (isSwiping) {
-    if (direction.value === "left") setDate(null, "next");
-    else if (direction.value === "right") setDate(null, "prev");
-  }
+	if (isSwiping) {
+		if (direction.value === "left") setDate(null, "next");
+		else if (direction.value === "right") setDate(null, "prev");
+	}
 });
 
-onKeyStroke(["w", "W"], (e) => {
-  switch (timetableViewStore.viewMode) {
-    case "day":
-      setView("week");
-      break;
-    case "week":
-      setView("month-grid");
-      break;
-    case "month-grid":
-      setView("day");
-      break;
-  }
+onKeyStroke(["w", "W"], (_e) => {
+	switch (timetableViewStore.viewMode) {
+		case "day":
+			setView("week");
+			break;
+		case "week":
+			setView("month-grid");
+			break;
+		case "month-grid":
+			setView("day");
+			break;
+	}
 });
 
 onKeyStroke("ArrowLeft", (e) => setDate(e, "prev"));

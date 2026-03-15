@@ -1,31 +1,33 @@
-import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 import { watch } from "vue";
+import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 
 interface IQueryNotificationsParams<TData> {
-    contextName: string;
-    getError: () => Error | null | undefined;
-    getIsSuccess: () => boolean;
-    getData: () => TData | undefined;
+	contextName: string;
+	getError: () => Error | null | undefined;
+	getIsSuccess: () => boolean;
+	getData: () => TData | undefined;
 }
 
-export function useQueryNotifications<TData>(params: IQueryNotificationsParams<TData>) {
-    watch(
-        () => params.getError(),
-        (error) => {
-            if (!error) return;
-            console.error(`Failed to get ${params.contextName}, got`, error);
-            genericError(error.message);
-        },
-    );
+export function useQueryNotifications<TData>(
+	params: IQueryNotificationsParams<TData>,
+) {
+	watch(
+		() => params.getError(),
+		(error) => {
+			if (!error) return;
+			console.error(`Failed to get ${params.contextName}, got`, error);
+			genericError(error.message);
+		},
+	);
 
-    watch(
-        () => params.getIsSuccess(),
-        (isSuccess) => {
-            if (!isSuccess) return;
-            const data = params.getData();
-            if (!data) {
-                errorNoDataFetchNotif();
-            }
-        },
-    );
+	watch(
+		() => params.getIsSuccess(),
+		(isSuccess) => {
+			if (!isSuccess) return;
+			const data = params.getData();
+			if (!data) {
+				errorNoDataFetchNotif();
+			}
+		},
+	);
 }

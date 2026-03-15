@@ -55,18 +55,18 @@
 </template>
 
 <script lang="ts" setup>
+import { useQuery } from "@tanstack/vue-query";
+import { computed, ref, watch, watchEffect } from "vue";
+import { useDisplay, useTheme } from "vuetify";
 import { timetableListRequest } from "@/api/api_requests";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store/";
 import type { ITimetable } from "@/types/APIType";
-import { wrapFetch } from "@/utils/wrapFetch";
-import { useQuery } from "@tanstack/vue-query";
-import { computed, ref, watch, watchEffect } from "vue";
-import { useDebounce } from "@/hooks/useDebounce";
-import { useDisplay, useTheme } from "vuetify";
-import { selectColorsList } from "../Timetable/helper";
 import { getYearTitle } from "@/utils/timetable";
+import { wrapFetch } from "@/utils/wrapFetch";
+import { selectColorsList } from "../Timetable/helper";
 import BackSelectUniv from "./BackSelectUniv.vue";
 import TimetableButton from "./TimetableButton.vue";
 
@@ -79,68 +79,77 @@ const theme = useTheme();
 
 const searchQuery = ref("");
 const selectedExtra = ref<number | undefined>();
-const { debounced: debouncedQuery, isDebouncing } = useDebounce(searchQuery, 250);
+const { debounced: debouncedQuery, isDebouncing } = useDebounce(
+	searchQuery,
+	250,
+);
 
 const onSelectExtra = async (val: number | undefined) => {
-    if (val !== undefined) {
-        const navigated = await selectTimetable(val);
-        if (navigated) selectedExtra.value = undefined;
-    }
+	if (val !== undefined) {
+		const navigated = await selectTimetable(val);
+		if (navigated) selectedExtra.value = undefined;
+	}
 };
 
-
 const timetableQuery = useQuery<ITimetable[]>({
-    queryKey: ["timetableList", appStore.numUniv, appStore.groupId],
-    queryFn: ({ signal }) =>
-        wrapFetch({
-            ...timetableListRequest(appStore.numUniv ?? 0, appStore.groupId ?? 0),
-            signal,
-        }),
-    enabled: computed(() => appStore.numUniv !== undefined && appStore.groupId !== undefined),
+	queryKey: ["timetableList", appStore.numUniv, appStore.groupId],
+	queryFn: ({ signal }) =>
+		wrapFetch({
+			...timetableListRequest(appStore.numUniv ?? 0, appStore.groupId ?? 0),
+			signal,
+		}),
+	enabled: computed(
+		() => appStore.numUniv !== undefined && appStore.groupId !== undefined,
+	),
 });
 
 const nameUniv = computed(() => appStore.univName ?? "");
 
 const filteredTimetables = computed(() => {
-    const list = timetableQuery.data.value ?? [];
-    if (!debouncedQuery.value) return list;
-    const query = debouncedQuery.value.toLowerCase();
-    return list.filter(tt => {
-        const label = tt.label.toLowerCase();
-        return label.includes(query);
-    });
+	const list = timetableQuery.data.value ?? [];
+	if (!debouncedQuery.value) return list;
+	const query = debouncedQuery.value.toLowerCase();
+	return list.filter((tt) => {
+		const label = tt.label.toLowerCase();
+		return label.includes(query);
+	});
 });
 
 const yearList = computed(() => {
-    const tts = filteredTimetables.value;
-    const years = [...new Set(tts.map(tt => tt.year))].sort((a, b) => a - b);
-    return years.map(y => y.toString());
+	const tts = filteredTimetables.value;
+	const years = [...new Set(tts.map((tt) => tt.year))].sort((a, b) => a - b);
+	return years.map((y) => y.toString());
 });
 
 function getFilteredTtsByYear(year: number) {
-    return filteredTimetables.value.filter(tt => tt.year === year);
+	return filteredTimetables.value.filter((tt) => tt.year === year);
 }
 
 watchEffect(() => {
-    if (theme.global.name.value === "dark") {
-        colorList.value = selectColorsList.map((color) => `${color}AA`);
-    } else {
-        colorList.value = selectColorsList;
-    }
+	if (theme.global.name.value === "dark") {
+		colorList.value = selectColorsList.map((color) => `${color}AA`);
+	} else {
+		colorList.value = selectColorsList;
+	}
 });
 
 useQueryNotifications<ITimetable[]>({
-    contextName: "Timetable List",
-    getError: () => timetableQuery.error.value,
-    getIsSuccess: () => timetableQuery.isSuccess.value,
-    getData: () => timetableQuery.data.value,
+	contextName: "Timetable List",
+	getError: () => timetableQuery.error.value,
+	getIsSuccess: () => timetableQuery.isSuccess.value,
+	getData: () => timetableQuery.data.value,
 });
 
-watch(() => [appStore.numUniv, appStore.groupId], () => {
-    searchQuery.value = "";
-});
+watch(
+	() => [appStore.numUniv, appStore.groupId],
+	() => {
+		searchQuery.value = "";
+	},
+);
 
-const isFetchingTimetables = computed(() => timetableQuery.isFetching.value || timetableQuery.isLoading.value);
+const isFetchingTimetables = computed(
+	() => timetableQuery.isFetching.value || timetableQuery.isLoading.value,
+);
 </script>
 
 <style scoped>

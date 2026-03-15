@@ -14,25 +14,25 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from "vue";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import type { IRoom } from "@/types/APIType";
-import { ref } from "vue";
 
 const props = defineProps<{
-  room: IRoom;
-  colorHex: string;
+	room: IRoom;
+	colorHex: string;
 }>();
 
 const { selectRoom } = useResourceSelection();
 const isLoading = ref(false);
 
 const navigateToRoom = async () => {
-  isLoading.value = true;
-  try {
-    await selectRoom(props.room.adeResources);
-  } finally {
-    isLoading.value = false;
-  }
+	isLoading.value = true;
+	try {
+		await selectRoom(props.room.adeResources);
+	} finally {
+		isLoading.value = false;
+	}
 };
 </script>
 

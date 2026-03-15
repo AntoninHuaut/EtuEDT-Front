@@ -29,14 +29,18 @@
 </template>
 
 <script lang="ts" setup>
+import { useRoute, useRouter } from "vue-router";
+import { useDisplay } from "vuetify";
+import { BASE_API_URL } from "@/api/api_requests";
 import AppBarButton from "@/components/layout/AppBarButton.vue";
 import AppThemeButton from "@/components/layout/AppThemeButton.vue";
 import { useAppStore } from "@/store/";
 import { errorNotif, successNotif } from "@/utils/notification";
-import { buildTimetableRouteParams, createTimetableContext, isGroupMissingForTimetable } from "@/utils/timetableContext";
-import { useRoute, useRouter } from "vue-router";
-import { useDisplay } from "vuetify";
-import { BASE_API_URL } from "@/api/api_requests";
+import {
+	buildTimetableRouteParams,
+	createTimetableContext,
+	isGroupMissingForTimetable,
+} from "@/utils/timetableContext";
 
 const { smAndUp, mobile } = useDisplay();
 const appStore = useAppStore();
@@ -44,70 +48,81 @@ const route = useRoute();
 const router = useRouter();
 
 const goToLastTimetable = async () => {
-  const context = createTimetableContext({
-    numUniv: appStore.numUniv,
-    groupId: appStore.groupId,
-    adeResources: appStore.adeResources,
-    resourceType: appStore.resourceType,
-  });
+	const context = createTimetableContext({
+		numUniv: appStore.numUniv,
+		groupId: appStore.groupId,
+		adeResources: appStore.adeResources,
+		resourceType: appStore.resourceType,
+	});
 
-  if (!context) {
-    if (isGroupMissingForTimetable({ resourceType: appStore.resourceType, groupId: appStore.groupId })) {
-      errorNotif({
-        message: "Aucun groupe n'est actuellement sélectionné.",
-      });
-    }
-    return;
-  }
+	if (!context) {
+		if (
+			isGroupMissingForTimetable({
+				resourceType: appStore.resourceType,
+				groupId: appStore.groupId,
+			})
+		) {
+			errorNotif({
+				message: "Aucun groupe n'est actuellement sélectionné.",
+			});
+		}
+		return;
+	}
 
-  await router.push({
-    name: "Timetable",
-    params: buildTimetableRouteParams(context),
-  });
+	await router.push({
+		name: "Timetable",
+		params: buildTimetableRouteParams(context),
+	});
 };
 
 const copyTimetableLink = async () => {
-    const context = createTimetableContext({
-        numUniv: appStore.numUniv,
-        groupId: appStore.groupId,
-        adeResources: appStore.adeResources,
-        resourceType: appStore.resourceType,
-    });
+	const context = createTimetableContext({
+		numUniv: appStore.numUniv,
+		groupId: appStore.groupId,
+		adeResources: appStore.adeResources,
+		resourceType: appStore.resourceType,
+	});
 
-    if (!context) {
-        if (isGroupMissingForTimetable({ resourceType: appStore.resourceType, groupId: appStore.groupId })) {
-            errorNotif({
-                message: "Aucun groupe n'est actuellement sélectionné.",
-            });
-            return;
-        }
+	if (!context) {
+		if (
+			isGroupMissingForTimetable({
+				resourceType: appStore.resourceType,
+				groupId: appStore.groupId,
+			})
+		) {
+			errorNotif({
+				message: "Aucun groupe n'est actuellement sélectionné.",
+			});
+			return;
+		}
 
-        errorNotif({
-            message: "Aucun emploi du temps n'est actuellement sélectionné.",
-        });
-        return;
-    }
+		errorNotif({
+			message: "Aucun emploi du temps n'est actuellement sélectionné.",
+		});
+		return;
+	}
 
-    if (!appStore.adeUrl) {
-        if (appStore.isTimetableLoading) {
-            errorNotif({
-                message: "L'emploi du temps est encore en cours de chargement.",
-            });
-        } else if (appStore.isTimetableError) {
-            errorNotif({
-                message: "Impossible de récupérer le lien ADE suite à une erreur.",
-            });
-        } else {
-            errorNotif({
-                message: "Lien ADE indisponible pour cet emploi du temps.",
-            });
-        }
-        return;
-    }
+	if (!appStore.adeUrl) {
+		if (appStore.isTimetableLoading) {
+			errorNotif({
+				message: "L'emploi du temps est encore en cours de chargement.",
+			});
+		} else if (appStore.isTimetableError) {
+			errorNotif({
+				message: "Impossible de récupérer le lien ADE suite à une erreur.",
+			});
+		} else {
+			errorNotif({
+				message: "Lien ADE indisponible pour cet emploi du temps.",
+			});
+		}
+		return;
+	}
 
-    await navigator.clipboard.writeText(appStore.adeUrl);
-    successNotif({
-        message: "Le lien direct de l'emploi du temps a été copié dans le presse-papier.",
-    });
+	await navigator.clipboard.writeText(appStore.adeUrl);
+	successNotif({
+		message:
+			"Le lien direct de l'emploi du temps a été copié dans le presse-papier.",
+	});
 };
 </script>

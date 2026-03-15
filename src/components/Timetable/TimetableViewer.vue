@@ -9,6 +9,16 @@
 </template>
 
 <script lang="ts" setup>
+import {
+	createCalendar,
+	createViewDay,
+	createViewMonthGrid,
+	createViewWeek,
+} from "@schedule-x/calendar";
+import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
+import { createCurrentTimePlugin } from "@schedule-x/current-time";
+import { createEventModalPlugin } from "@schedule-x/event-modal";
+import { createEventsServicePlugin } from "@schedule-x/events-service";
 import { buildResourceEventsRequest } from "@/api/resourceRequestFactory";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
@@ -16,13 +26,8 @@ import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
 import { getLanguage } from "@/utils/locale";
 import { errorNoDataFetchNotif, infoNotif } from "@/utils/notification";
-import { wrapFetch } from "@/utils/wrapFetch";
 import { createTimetableContext } from "@/utils/timetableContext";
-import { createCalendar, createViewDay, createViewMonthGrid, createViewWeek } from "@schedule-x/calendar";
-import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
-import { createCurrentTimePlugin } from "@schedule-x/current-time";
-import { createEventModalPlugin } from "@schedule-x/event-modal";
-import { createEventsServicePlugin } from "@schedule-x/events-service";
+import { wrapFetch } from "@/utils/wrapFetch";
 import "@schedule-x/theme-default/dist/index.css";
 import { ScheduleXCalendar } from "@schedule-x/vue";
 import { useQuery } from "@tanstack/vue-query";
@@ -38,108 +43,145 @@ const timetableViewStore = useTimetableViewStore();
 const eventsServicePlugin = createEventsServicePlugin();
 const calendarControls = createCalendarControlsPlugin();
 const calendarApp = shallowRef(
-    createCalendar({
-        selectedDate: getEventDate(timetableViewStore.calDate).split(" ")[0],
-        views: [createViewDay(), createViewWeek(), createViewMonthGrid()],
-        plugins: [createEventModalPlugin(), createCurrentTimePlugin(), calendarControls, eventsServicePlugin],
-        calendars: getCalendarsList(),
-        events: [],
-        defaultView: timetableViewStore.viewMode,
-        locale: getLanguage(true),
-        dayBoundaries: {
-            start: "08:00",
-            end: "20:00",
-        },
-        monthGridOptions: {
-            nEventsPerDay: 12,
-        },
-        weekOptions: {
-            gridHeight: 1000,
-            nDays: 5,
-            eventWidth: 98,
-        },
-        isDark: theme.global.name.value === "dark",
-        isResponsive: false,
-    }),
+	createCalendar({
+		selectedDate: getEventDate(timetableViewStore.calDate).split(" ")[0],
+		views: [createViewDay(), createViewWeek(), createViewMonthGrid()],
+		plugins: [
+			createEventModalPlugin(),
+			createCurrentTimePlugin(),
+			calendarControls,
+			eventsServicePlugin,
+		],
+		calendars: getCalendarsList(),
+		events: [],
+		defaultView: timetableViewStore.viewMode,
+		locale: getLanguage(true),
+		dayBoundaries: {
+			start: "08:00",
+			end: "20:00",
+		},
+		monthGridOptions: {
+			nEventsPerDay: 12,
+		},
+		weekOptions: {
+			gridHeight: 1000,
+			nDays: 5,
+			eventWidth: 98,
+		},
+		isDark: theme.global.name.value === "dark",
+		isResponsive: false,
+	}),
 );
 
-watchEffect(() => calendarApp.value.setTheme(theme.global.name.value === "dark" ? "dark" : "light"));
-watchEffect(() => calendarControls.setDate(getEventDate(timetableViewStore.calDate).split(" ")[0]));
+watchEffect(() =>
+	calendarApp.value.setTheme(
+		theme.global.name.value === "dark" ? "dark" : "light",
+	),
+);
+watchEffect(() =>
+	calendarControls.setDate(
+		getEventDate(timetableViewStore.calDate).split(" ")[0],
+	),
+);
 watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
 watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
-
 const timetableContext = computed(() =>
-    createTimetableContext({
-        numUniv: appStore.numUniv,
-        groupId: appStore.groupId,
-        adeResources: appStore.adeResources,
-        resourceType: appStore.resourceType,
-    }),
+	createTimetableContext({
+		numUniv: appStore.numUniv,
+		groupId: appStore.groupId,
+		adeResources: appStore.adeResources,
+		resourceType: appStore.resourceType,
+	}),
 );
 
 const evtsQuery = useQuery<IJsonEvent[]>({
-    queryKey: [
-        "timetableEvents",
-        appStore.numUniv,
-        appStore.groupId,
-        appStore.adeResources,
-        appStore.resourceType,
-    ],
-    queryFn: ({ signal }) =>
-        wrapFetch({
-            ...buildResourceEventsRequest({
-                numUniv: appStore.numUniv ?? 0,
-                groupId: appStore.groupId,
-                adeResources: appStore.adeResources ?? 0,
-                resourceType: appStore.resourceType,
-            }),
-            signal,
-        }),
-    enabled: computed(() => timetableContext.value !== undefined),
+	queryKey: [
+		"timetableEvents",
+		appStore.numUniv,
+		appStore.groupId,
+		appStore.adeResources,
+		appStore.resourceType,
+	],
+	queryFn: ({ signal }) =>
+		wrapFetch({
+			...buildResourceEventsRequest({
+				numUniv: appStore.numUniv ?? 0,
+				groupId: appStore.groupId,
+				adeResources: appStore.adeResources ?? 0,
+				resourceType: appStore.resourceType,
+			}),
+			signal,
+		}),
+	enabled: computed(() => timetableContext.value !== undefined),
 });
 
 const isFetchingEvents = computed(() => evtsQuery.isFetching.value);
 
 useQueryNotifications<IJsonEvent[]>({
-    contextName: "Timetable Events",
-    getError: () => evtsQuery.error.value,
-    getIsSuccess: () => evtsQuery.isSuccess.value,
-    getData: () => evtsQuery.data.value,
+	contextName: "Timetable Events",
+	getError: () => evtsQuery.error.value,
+	getIsSuccess: () => evtsQuery.isSuccess.value,
+	getData: () => evtsQuery.data.value,
 });
 
 watch(
-    () => [evtsQuery.error.value, evtsQuery.isSuccess.value, evtsQuery.data.value],
-    () => {
-        if (evtsQuery.error.value) return;
-        if (!evtsQuery.isSuccess.value) return;
-        if (!evtsQuery.data.value) return errorNoDataFetchNotif();
+	() => [
+		evtsQuery.error.value,
+		evtsQuery.isSuccess.value,
+		evtsQuery.data.value,
+	],
+	() => {
+		if (evtsQuery.error.value) return;
+		if (!evtsQuery.isSuccess.value) return;
+		if (!evtsQuery.data.value) return errorNoDataFetchNotif();
 
-        timetableViewStore.events.length = 0;
-        timetableViewStore.events.push(
-            ...evtsQuery.data.value.map((event, index) => ({
-                ...event,
-                id: index,
-                start: getEventDate(new Date(event.start)),
-                end: getEventDate(new Date(event.end)),
-                people: event.teacher.split(","),
-                calendarId: getColorByLessonTitle(event.title),
-            })),
-        );
+		timetableViewStore.events.length = 0;
+		timetableViewStore.events.push(
+			...evtsQuery.data.value.map((event, index) => ({
+				...event,
+				id: index,
+				start: getEventDate(new Date(event.start)),
+				end: getEventDate(new Date(event.end)),
+				people: event.teacher.split(","),
+				calendarId: getColorByLessonTitle(event.title),
+			})),
+		);
 
-        if (timetableData.lastUpdate.value) {
-            const date = new Date(timetableData.lastUpdate.value);
-            const datePart = new Intl.DateTimeFormat("fr", { year: "numeric", month: "numeric", day: "numeric" }).format(date);
-            const timePart = new Intl.DateTimeFormat("fr", { hour: "numeric", minute: "numeric", hourCycle: "h23" }).format(date).replace(":", "h");
+		if (timetableData.lastUpdate.value) {
+			const date = new Date(timetableData.lastUpdate.value);
+			const datePart = new Intl.DateTimeFormat("fr", {
+				year: "numeric",
+				month: "numeric",
+				day: "numeric",
+			}).format(date);
+			const timePart = new Intl.DateTimeFormat("fr", {
+				hour: "numeric",
+				minute: "numeric",
+				hourCycle: "h23",
+			})
+				.format(date)
+				.replace(":", "h");
 
-            infoNotif({ message: `Dernière mise à jour de l'emploi du temps le ${datePart} à ${timePart}` });
-        }
-    },
-    { immediate: true },
+			infoNotif({
+				message: `Dernière mise à jour de l'emploi du temps le ${datePart} à ${timePart}`,
+			});
+		}
+	},
+	{ immediate: true },
 );
 
 function getEventDate(date: Date) {
-    return new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(date).replace(",", "");
+	return new Intl.DateTimeFormat("en-CA", {
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: false,
+	})
+		.format(date)
+		.replace(",", "");
 }
 </script>
 

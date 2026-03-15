@@ -49,20 +49,20 @@
 </template>
 
 <script lang="ts" setup>
-import { contributors } from "@/data/contributors";
 import { useDisplay } from "vuetify";
+import { contributors } from "@/data/contributors";
 
 const { width } = useDisplay();
 
 function getRoleText(role: string): string {
-  switch (role) {
-    case "maintainer":
-      return "Mainteneur";
-    case "contributor":
-      return "Contributeur";
-    default:
-      return role;
-  }
+	switch (role) {
+		case "maintainer":
+			return "Mainteneur";
+		case "contributor":
+			return "Contributeur";
+		default:
+			return role;
+	}
 }
 </script>
 

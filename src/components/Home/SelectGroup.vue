@@ -39,15 +39,15 @@
 </template>
 
 <script lang="ts" setup>
+import { useQuery } from "@tanstack/vue-query";
+import { computed, ref } from "vue";
+import { useDisplay } from "vuetify";
 import { groupListRequest } from "@/api/api_requests";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store";
 import type { IGroup } from "@/types/APIType";
 import { wrapFetch } from "@/utils/wrapFetch";
-import { useQuery } from "@tanstack/vue-query";
-import { computed, ref } from "vue";
-import { useDisplay } from "vuetify";
 import BackSelectUniv from "./BackSelectUniv.vue";
 
 const { mobile } = useDisplay();
@@ -56,9 +56,10 @@ const { goToRooms, selectGroup: selectGroupInStore } = useResourceSelection();
 const selectingGroupId = ref<number | undefined>();
 
 const query = useQuery<IGroup[]>({
-  queryKey: ["groupList", appStore.numUniv],
-  queryFn: ({ signal }) => wrapFetch({ ...groupListRequest(appStore.numUniv ?? 0), signal }),
-  enabled: computed(() => appStore.numUniv !== undefined),
+	queryKey: ["groupList", appStore.numUniv],
+	queryFn: ({ signal }) =>
+		wrapFetch({ ...groupListRequest(appStore.numUniv ?? 0), signal }),
+	enabled: computed(() => appStore.numUniv !== undefined),
 });
 
 const groupList = computed(() => query.data.value ?? []);
@@ -66,16 +67,18 @@ const groupList = computed(() => query.data.value ?? []);
 const selectedUnivName = computed(() => appStore.univName ?? "");
 
 useQueryNotifications<IGroup[]>({
-  contextName: "Group List",
-  getError: () => query.error.value,
-  getIsSuccess: () => query.isSuccess.value,
-  getData: () => query.data.value,
+	contextName: "Group List",
+	getError: () => query.error.value,
+	getIsSuccess: () => query.isSuccess.value,
+	getData: () => query.data.value,
 });
 
 function selectGroup(id: number) {
-  selectingGroupId.value = id;
-  selectGroupInStore(id);
+	selectingGroupId.value = id;
+	selectGroupInStore(id);
 }
 
-const isFetching = computed(() => query.isFetching.value || query.isLoading.value);
+const isFetching = computed(
+	() => query.isFetching.value || query.isLoading.value,
+);
 </script>

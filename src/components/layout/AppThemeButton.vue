@@ -26,39 +26,39 @@ import { onUnmounted } from "vue";
 
 let themeUpdateTimer: ReturnType<typeof setTimeout> | null = null;
 const setTheme = (theme: ETheme | undefined) => {
-  if (themeUpdateTimer) clearTimeout(themeUpdateTimer);
-  themeUpdateTimer = setTimeout(() => {
-    themeStore.$patch({ theme: theme });
-    themeUpdateTimer = null;
-  }, 1);
+	if (themeUpdateTimer) clearTimeout(themeUpdateTimer);
+	themeUpdateTimer = setTimeout(() => {
+		themeStore.$patch({ theme: theme });
+		themeUpdateTimer = null;
+	}, 1);
 };
 
 onUnmounted(() => {
-  if (themeUpdateTimer) {
-    clearTimeout(themeUpdateTimer);
-    themeUpdateTimer = null;
-  }
+	if (themeUpdateTimer) {
+		clearTimeout(themeUpdateTimer);
+		themeUpdateTimer = null;
+	}
 });
 
 const getTooltip = (theme: string | undefined) => {
-    switch (theme) {
-        case ETheme.LIGHT:
-            return "Thème clair";
-        case ETheme.DARK:
-            return "Thème sombre";
-        default:
-            return "Thème du système";
-    }
+	switch (theme) {
+		case ETheme.LIGHT:
+			return "Thème clair";
+		case ETheme.DARK:
+			return "Thème sombre";
+		default:
+			return "Thème du système";
+	}
 };
 
 const getIcon = (theme: string | undefined) => {
-    switch (theme) {
-        case ETheme.LIGHT:
-            return "mdi-white-balance-sunny";
-        case ETheme.DARK:
-            return "mdi-moon-waxing-crescent";
-        default:
-            return "mdi-laptop";
-    }
+	switch (theme) {
+		case ETheme.LIGHT:
+			return "mdi-white-balance-sunny";
+		case ETheme.DARK:
+			return "mdi-moon-waxing-crescent";
+		default:
+			return "mdi-laptop";
+	}
 };
 </script>

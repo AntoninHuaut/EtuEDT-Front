@@ -10,11 +10,11 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import "@fontsource/roboto/900.css";
 
-import { useThemeStore } from "@/store/";
-import { ETheme } from "@/types/AppType";
 import { usePreferredDark } from "@vueuse/core";
 import { watchEffect } from "vue";
 import { useTheme } from "vuetify";
+import { useThemeStore } from "@/store/";
+import { ETheme } from "@/types/AppType";
 
 const themeStore = useThemeStore();
 const vuetifyTheme = useTheme();
@@ -22,10 +22,13 @@ const preferredDark = usePreferredDark();
 watchEffect(() => setTheme(themeStore.theme));
 
 function setTheme(currentTheme: string | undefined) {
-    if (currentTheme === ETheme.DARK || (preferredDark.value && currentTheme === ETheme.SYSTEM)) {
-        vuetifyTheme.change("dark");
-    } else {
-        vuetifyTheme.change("light");
-    }
+	if (
+		currentTheme === ETheme.DARK ||
+		(preferredDark.value && currentTheme === ETheme.SYSTEM)
+	) {
+		vuetifyTheme.change("dark");
+	} else {
+		vuetifyTheme.change("light");
+	}
 }
 </script>

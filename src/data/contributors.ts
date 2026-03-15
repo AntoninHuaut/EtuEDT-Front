@@ -4,7 +4,7 @@ export interface IContributor {
   github?: string;
   linkedin?: string;
   website?: string;
-  role?: "maintainer" | "contributor";
+  role: "maintainer" | "contributor";
 }
 
 export const contributors: IContributor[] = [

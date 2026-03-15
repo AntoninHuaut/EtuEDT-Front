@@ -22,11 +22,11 @@ import { univListRequest } from "@/api/api_requests";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useAppStore } from "@/store/";
 import type { IUniv } from "@/types/APIType";
+import { genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { useQuery } from "@tanstack/vue-query";
 import { computed, onMounted, ref } from "vue";
-import { useRouter, isNavigationFailure, NavigationFailureType } from "vue-router";
-import { genericError } from "@/utils/notification";
+import { isNavigationFailure, NavigationFailureType, useRouter } from "vue-router";
 import { useDisplay } from "vuetify";
 
 const { mobile } = useDisplay();
@@ -65,10 +65,10 @@ async function selectUniv(univ: IUniv) {
   });
   try {
     const navRes = await router.push({ name: "Home" });
-    if (isNavigationFailure(navRes)) {
-      if (navRes.type !== NavigationFailureType.duplicated) {
-        genericError(`Échec de la navigation vers l'accueil (${navRes.type}).`);
-      }
+    if (isNavigationFailure(navRes, NavigationFailureType.duplicated)) {
+      // Do nothing if it's a duplicated navigation
+    } else if (isNavigationFailure(navRes)) {
+      genericError(`Échec de la navigation vers l'accueil.`);
     }
   } catch (err: any) {
     genericError(err?.message ?? String(err));

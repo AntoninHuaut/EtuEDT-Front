@@ -1,8 +1,8 @@
 // Composables
 
+import { createTimetableContext } from "@/utils/timetableContext";
 import type { RouteLocationNormalized } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
-import { createTimetableContext } from "@/utils/timetableContext";
 
 const routes = [
 	{
@@ -37,9 +37,9 @@ const routes = [
 				},
 			},
 			{
-				path: "contributors",
-				name: "Contributors",
-				component: () => import("@/views/Contributors.vue"),
+				path: "about",
+				name: "About",
+				component: () => import("@/views/About.vue"),
 			},
 			{
 				path: "/:pathMatch(.*)*",

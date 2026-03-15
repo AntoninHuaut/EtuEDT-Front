@@ -23,7 +23,7 @@
       <AppBarButton to="/sync" icon="mdi-sync" tooltip="Synchroniser (ICS)" />
       <AppThemeButton />
       <AppBarButton :href="`${BASE_API_URL}/docs`" icon="mdi-book-open-variant" tooltip="Documentation API" />
-      <AppBarButton to="/contributors" icon="mdi-github" tooltip="À propos" />
+      <AppBarButton to="/about" icon="mdi-github" tooltip="À propos" />
     </template>
   </v-app-bar>
 </template>
@@ -31,6 +31,7 @@
 <script lang="ts" setup>
 import { useRoute, useRouter } from "vue-router";
 import { useDisplay } from "vuetify";
+
 import { BASE_API_URL } from "@/api/api_requests";
 import AppBarButton from "@/components/layout/AppBarButton.vue";
 import AppThemeButton from "@/components/layout/AppThemeButton.vue";

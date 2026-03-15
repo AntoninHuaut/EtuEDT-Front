@@ -4,8 +4,8 @@
       <v-card-item class="mx-1 my-3">
         <v-card-title class="text-primary mb-2 text-wrap">À propos</v-card-title>
         <v-card-subtitle class="text-wrap">
-          EtuEDT est un projet open-source développé par des étudiants pour des étudiants.
-          Mainteneur et contributeurs du projet, ainsi que les liens vers les dépôts sources, sont présentés ci-dessous.
+          EtuEDT est un projet open-source créé par et pour les étudiants.
+          Retrouvez ci-dessous les personnes ayant contribué au projet ainsi que les liens vers les dépôts GitHub.
         </v-card-subtitle>
       </v-card-item>
 
@@ -50,6 +50,7 @@
 
 <script lang="ts" setup>
 import { useDisplay } from "vuetify";
+
 import { contributors } from "@/data/contributors";
 
 const { width } = useDisplay();

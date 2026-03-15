@@ -6,8 +6,8 @@ import type { IRoom, ITimetable } from "@/types/APIType";
  * @returns A string like "Année 1A" or "Autres" if yearId <= 0
  */
 export function getYearTitle(yearId: number): string {
-    if (yearId <= 0) return "Autres";
-    return `Année ${yearId}A`;
+	if (yearId <= 0) return "Autres";
+	return `Année ${yearId}A`;
 }
 
 /**
@@ -16,19 +16,22 @@ export function getYearTitle(yearId: number): string {
  * @param resourceType The type of resource ("timetable" | "room")
  * @returns A formatted string or "?" if not available
  */
-export function getTimetableName(item: ITimetable | IRoom | undefined, resourceType: "timetable" | "room"): string {
-    if (!item) {
-        return "?";
-    }
+export function getTimetableName(
+	item: ITimetable | IRoom | undefined,
+	resourceType: "timetable" | "room",
+): string {
+	if (!item) {
+		return "?";
+	}
 
-    if (resourceType === "room") {
-        return item.label ?? "?";
-    }
+	if (resourceType === "room") {
+		return item.label ?? "?";
+	}
 
-    const timetable = item as ITimetable;
-    if (timetable.year < 0) {
-        return timetable.label ?? "?";
-    }
+	const timetable = item as ITimetable;
+	if (timetable.year < 0) {
+		return timetable.label ?? "?";
+	}
 
-    return `${timetable.year}A ${timetable.label}`;
+	return `${timetable.year}A ${timetable.label}`;
 }

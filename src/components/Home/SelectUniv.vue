@@ -18,16 +18,20 @@
 </template>
 
 <script lang="ts" setup>
+import { useQuery } from "@tanstack/vue-query";
+import { computed, onMounted, ref } from "vue";
+import {
+	isNavigationFailure,
+	NavigationFailureType,
+	useRouter,
+} from "vue-router";
+import { useDisplay } from "vuetify";
 import { univListRequest } from "@/api/api_requests";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useAppStore } from "@/store/";
 import type { IUniv } from "@/types/APIType";
 import { genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
-import { useQuery } from "@tanstack/vue-query";
-import { computed, onMounted, ref } from "vue";
-import { isNavigationFailure, NavigationFailureType, useRouter } from "vue-router";
-import { useDisplay } from "vuetify";
 
 const { mobile } = useDisplay();
 const appStore = useAppStore();
@@ -35,45 +39,47 @@ const selectingUniv = ref<number | undefined>();
 const router = useRouter();
 
 const univQuery = useQuery<IUniv[]>({
-  queryKey: ["univList"],
-  queryFn: ({ signal }) => wrapFetch({ ...univListRequest(), signal }),
-  enabled: false,
+	queryKey: ["univList"],
+	queryFn: ({ signal }) => wrapFetch({ ...univListRequest(), signal }),
+	enabled: false,
 });
 
-const isFetchingUnivs = computed(() => univQuery.isFetching.value || univQuery.isLoading.value);
+const isFetchingUnivs = computed(
+	() => univQuery.isFetching.value || univQuery.isLoading.value,
+);
 
 onMounted(() => univQuery.refetch());
 
 useQueryNotifications<IUniv[]>({
-  contextName: "Univ List",
-  getError: () => univQuery.error.value,
-  getIsSuccess: () => univQuery.isSuccess.value,
-  getData: () => univQuery.data.value,
+	contextName: "Univ List",
+	getError: () => univQuery.error.value,
+	getIsSuccess: () => univQuery.isSuccess.value,
+	getData: () => univQuery.data.value,
 });
 
 const univList = computed(() => univQuery.data.value ?? []);
 
 async function selectUniv(univ: IUniv) {
-  selectingUniv.value = univ.id;
-  appStore.$patch({
-    numUniv: univ.id,
-    univName: univ.name,
-    groupId: undefined,
-    adeResources: undefined,
-    adeUrl: undefined,
-    resourceType: "timetable",
-  });
-  try {
-    const navRes = await router.push({ name: "Home" });
-    if (isNavigationFailure(navRes, NavigationFailureType.duplicated)) {
-      // Do nothing if it's a duplicated navigation
-    } else if (isNavigationFailure(navRes)) {
-      genericError(`Échec de la navigation vers l'accueil.`);
-    }
-  } catch (err: any) {
-    genericError(err?.message ?? String(err));
-  } finally {
-    selectingUniv.value = undefined;
-  }
+	selectingUniv.value = univ.id;
+	appStore.$patch({
+		numUniv: univ.id,
+		univName: univ.name,
+		groupId: undefined,
+		adeResources: undefined,
+		adeUrl: undefined,
+		resourceType: "timetable",
+	});
+	try {
+		const navRes = await router.push({ name: "Home" });
+		if (isNavigationFailure(navRes, NavigationFailureType.duplicated)) {
+			// Do nothing if it's a duplicated navigation
+		} else if (isNavigationFailure(navRes)) {
+			genericError(`Échec de la navigation vers l'accueil.`);
+		}
+	} catch (err: any) {
+		genericError(err?.message ?? String(err));
+	} finally {
+		selectingUniv.value = undefined;
+	}
 }
 </script>

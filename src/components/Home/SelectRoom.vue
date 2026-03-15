@@ -46,15 +46,15 @@
 </template>
 
 <script lang="ts" setup>
+import { useQuery } from "@tanstack/vue-query";
+import { computed, ref, watchEffect } from "vue";
+import { useDisplay, useTheme } from "vuetify";
 import { roomListRequest } from "@/api/api_requests";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store/";
 import type { IRoom } from "@/types/APIType";
 import { wrapFetch } from "@/utils/wrapFetch";
-import { useQuery } from "@tanstack/vue-query";
-import { computed, ref, watchEffect } from "vue";
-import { useDisplay, useTheme } from "vuetify";
 import { selectColorsList } from "../Timetable/helper";
 import BackSelectUniv from "./BackSelectUniv.vue";
 import RoomGridButton from "./RoomGridButton.vue";
@@ -62,45 +62,46 @@ import RoomGridButton from "./RoomGridButton.vue";
 const { mobile } = useDisplay();
 const appStore = useAppStore();
 const theme = useTheme();
-const { goToGroups, goToTimetables} = useResourceSelection();
+const { goToGroups, goToTimetables } = useResourceSelection();
 const searchQuery = ref("");
 const colorList = ref(selectColorsList);
 
-
 const roomsQuery = useQuery<IRoom[]>({
-  queryKey: ["roomList", appStore.numUniv],
-  queryFn: ({ signal }) =>
-    wrapFetch({
-      ...roomListRequest(appStore.numUniv ?? 0),
-      signal,
-    }),
-  enabled: computed(() => appStore.numUniv !== undefined),
+	queryKey: ["roomList", appStore.numUniv],
+	queryFn: ({ signal }) =>
+		wrapFetch({
+			...roomListRequest(appStore.numUniv ?? 0),
+			signal,
+		}),
+	enabled: computed(() => appStore.numUniv !== undefined),
 });
 
 const filteredRooms = computed(() => {
-  const list = roomsQuery.data.value ?? [];
-  if (!searchQuery.value) return list;
-  return list.filter((room) => room.label.toLowerCase().includes(searchQuery.value.toLowerCase()));
+	const list = roomsQuery.data.value ?? [];
+	if (!searchQuery.value) return list;
+	return list.filter((room) =>
+		room.label.toLowerCase().includes(searchQuery.value.toLowerCase()),
+	);
 });
 
-
-
 watchEffect(() => {
-  if (theme.global.name.value === "dark") {
-    colorList.value = selectColorsList.map((color) => `${color}AA`);
-  } else {
-    colorList.value = selectColorsList;
-  }
+	if (theme.global.name.value === "dark") {
+		colorList.value = selectColorsList.map((color) => `${color}AA`);
+	} else {
+		colorList.value = selectColorsList;
+	}
 });
 
 useQueryNotifications<IRoom[]>({
-  contextName: "Room List",
-  getError: () => roomsQuery.error.value,
-  getIsSuccess: () => roomsQuery.isSuccess.value,
-  getData: () => roomsQuery.data.value,
+	contextName: "Room List",
+	getError: () => roomsQuery.error.value,
+	getIsSuccess: () => roomsQuery.isSuccess.value,
+	getData: () => roomsQuery.data.value,
 });
 
-const isFetching = computed(() => roomsQuery.isFetching.value || roomsQuery.isLoading.value);
+const isFetching = computed(
+	() => roomsQuery.isFetching.value || roomsQuery.isLoading.value,
+);
 </script>
 
 <style scoped>

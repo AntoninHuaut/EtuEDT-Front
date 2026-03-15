@@ -1,35 +1,50 @@
-import { useDateHelper } from "@/hooks/useDateHelper";
-import { ETheme, type TViewMode } from "@/types/AppType";
 import type { CalendarEvent } from "@schedule-x/calendar";
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useDisplay } from "vuetify";
+import { useDateHelper } from "@/hooks/useDateHelper";
+import { ETheme, type TViewMode } from "@/types/AppType";
 
 export const useAppStore = defineStore("app", () => {
-    const adeResources = useLocalStorage<number | undefined>("adeResources", undefined);
-    const adeUrl = useLocalStorage<string | undefined>("adeUrl", undefined);
-    const isTimetableLoading = ref(false);
-    const isTimetableError = ref(false);
-    const numUniv = useLocalStorage<number | undefined>("numUniv", undefined);
-    const univName = useLocalStorage<string | undefined>("univName", undefined);
-    const groupId = useLocalStorage<number | undefined>("groupId", undefined);
-    const resourceType = useLocalStorage<"timetable" | "room">("resourceType", "timetable");
-    return { adeResources, adeUrl, isTimetableLoading, isTimetableError, numUniv, univName, groupId, resourceType };
+	const adeResources = useLocalStorage<number | undefined>(
+		"adeResources",
+		undefined,
+	);
+	const adeUrl = useLocalStorage<string | undefined>("adeUrl", undefined);
+	const isTimetableLoading = ref(false);
+	const isTimetableError = ref(false);
+	const numUniv = useLocalStorage<number | undefined>("numUniv", undefined);
+	const univName = useLocalStorage<string | undefined>("univName", undefined);
+	const groupId = useLocalStorage<number | undefined>("groupId", undefined);
+	const resourceType = useLocalStorage<"timetable" | "room">(
+		"resourceType",
+		"timetable",
+	);
+	return {
+		adeResources,
+		adeUrl,
+		isTimetableLoading,
+		isTimetableError,
+		numUniv,
+		univName,
+		groupId,
+		resourceType,
+	};
 });
 
 export const useThemeStore = defineStore("theme", () => {
-    const theme = useLocalStorage<string | undefined>("theme", ETheme.SYSTEM);
-    return { theme };
+	const theme = useLocalStorage<string | undefined>("theme", ETheme.SYSTEM);
+	return { theme };
 });
 
 export const useTimetableViewStore = defineStore("timetableView", () => {
-    const { mobile } = useDisplay();
-    const dateHelper = useDateHelper();
+	const { mobile } = useDisplay();
+	const dateHelper = useDateHelper();
 
-    const calDate = ref(dateHelper.skipWeekend(new Date(), "next")); // If weekend, go to monday
-    const events = ref<CalendarEvent[]>([]);
-    const viewMode = ref<TViewMode>(mobile.value ? "day" : "week");
-    const weekdays = ref([1, 2, 3, 4, 5]);
-    return { calDate, events, viewMode, weekdays };
+	const calDate = ref(dateHelper.skipWeekend(new Date(), "next")); // If weekend, go to monday
+	const events = ref<CalendarEvent[]>([]);
+	const viewMode = ref<TViewMode>(mobile.value ? "day" : "week");
+	const weekdays = ref([1, 2, 3, 4, 5]);
+	return { calDate, events, viewMode, weekdays };
 });

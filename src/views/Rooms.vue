@@ -9,8 +9,8 @@
 </template>
 
 <script lang="ts" setup>
-import SelectRoom from "@/components/Home/SelectRoom.vue";
 import { useDisplay } from "vuetify";
+import SelectRoom from "@/components/Home/SelectRoom.vue";
 
 const { mdAndDown } = useDisplay();
 </script>

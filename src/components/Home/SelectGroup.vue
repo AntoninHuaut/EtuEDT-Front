@@ -56,7 +56,7 @@ const { goToRooms, selectGroup: selectGroupInStore } = useResourceSelection();
 const selectingGroupId = ref<number | undefined>();
 
 const query = useQuery<IGroup[]>({
-  queryKey: ["groupList", computed(() => appStore.numUniv)],
+  queryKey: ["groupList", appStore.numUniv],
   queryFn: ({ signal }) => wrapFetch({ ...groupListRequest(appStore.numUniv ?? 0), signal }),
   enabled: computed(() => appStore.numUniv !== undefined),
 });

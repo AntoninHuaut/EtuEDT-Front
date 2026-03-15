@@ -21,7 +21,9 @@ export function useQueryNotifications<TData>(params: IQueryNotificationsParams<T
     watch(
         () => params.getIsSuccess(),
         (isSuccess) => {
-            if (isSuccess && !params.getData()) {
+            if (!isSuccess) return;
+            const data = params.getData();
+            if (!data) {
                 errorNoDataFetchNotif();
             }
         },

@@ -41,8 +41,7 @@ const buttonAttrs = computed(() => {
 
 const btnSize = computed(() => {
     if (props.text) {
-        // If button contains text
-        return mobile.value ? undefined : "large"; // undefined is default value for v-btn
+        return mobile.value ? undefined : "large"; 
     }
     return mobile.value ? "small" : "48";
 });

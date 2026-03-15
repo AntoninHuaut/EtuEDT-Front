@@ -1,6 +1,6 @@
 import { useAppStore } from "@/store";
 import { buildTimetableRouteParams, createTimetableContext } from "@/utils/timetableContext";
-import { useRouter } from "vue-router";
+import { isNavigationFailure, useRouter } from "vue-router";
 
 type ResourceType = "timetable" | "room";
 
@@ -18,23 +18,27 @@ export const useResourceSelection = () => {
 
         if (!context) {
             await router.push({ name: "Home" });
-            return;
+            return false;
         }
 
-        await router.push({
+        const navigationResult = await router.push({
             name: "Timetable",
             params: buildTimetableRouteParams(context),
         });
+
+        return !isNavigationFailure(navigationResult);
     }
 
     async function selectTimetable(adeResources: number) {
         appStore.$patch({ adeResources, resourceType: "timetable" });
-        await navigateToResource("timetable", adeResources);
+           const didNavigate = await navigateToResource("timetable", adeResources);
+           return didNavigate;
     }
 
     async function selectRoom(adeResources: number) {
         appStore.$patch({ adeResources, resourceType: "room" });
-        await navigateToResource("room", adeResources);
+           const didNavigate = await navigateToResource("room", adeResources);
+           return didNavigate;
     }
 
     function selectGroup(groupId: number) {

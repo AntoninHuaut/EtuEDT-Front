@@ -22,11 +22,23 @@ import AppBarButton from "./AppBarButton.vue";
 const themeStore = useThemeStore();
 const availableThemes = [ETheme.LIGHT, ETheme.DARK, ETheme.SYSTEM];
 
+import { onUnmounted } from "vue";
+
+let themeUpdateTimer: ReturnType<typeof setTimeout> | null = null;
 const setTheme = (theme: ETheme | undefined) => {
-    setTimeout(() => {
-        themeStore.$patch({ theme: theme });
-    }, 1);
+  if (themeUpdateTimer) clearTimeout(themeUpdateTimer);
+  themeUpdateTimer = setTimeout(() => {
+    themeStore.$patch({ theme: theme });
+    themeUpdateTimer = null;
+  }, 1);
 };
+
+onUnmounted(() => {
+  if (themeUpdateTimer) {
+    clearTimeout(themeUpdateTimer);
+    themeUpdateTimer = null;
+  }
+});
 
 const getTooltip = (theme: string | undefined) => {
     switch (theme) {

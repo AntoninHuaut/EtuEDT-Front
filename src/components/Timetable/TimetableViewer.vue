@@ -1,10 +1,10 @@
 <template>
   <div class="d-flex flex-column mt-3">
-    <div v-if="evtsQuery.isLoading" class="mt-5 pt-5 text-center">
+        <div v-if="isFetchingEvents" class="mt-5 pt-5 text-center">
       <v-progress-circular :size="128" :width="12" color="primary" indeterminate />
     </div>
 
-    <ScheduleXCalendar :class="evtsQuery.isLoading ? 'hidden' : ''" :calendar-app="calendarApp" />
+        <ScheduleXCalendar :class="isFetchingEvents ? 'hidden' : ''" :calendar-app="calendarApp" />
   </div>
 </template>
 
@@ -16,8 +16,8 @@ import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
 import { getLanguage } from "@/utils/locale";
 import { errorNoDataFetchNotif, infoNotif } from "@/utils/notification";
-import { createTimetableContext } from "@/utils/timetableContext";
 import { wrapFetch } from "@/utils/wrapFetch";
+import { createTimetableContext } from "@/utils/timetableContext";
 import { createCalendar, createViewDay, createViewMonthGrid, createViewWeek } from "@schedule-x/calendar";
 import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
 import { createCurrentTimePlugin } from "@schedule-x/current-time";
@@ -26,8 +26,7 @@ import { createEventsServicePlugin } from "@schedule-x/events-service";
 import "@schedule-x/theme-default/dist/index.css";
 import { ScheduleXCalendar } from "@schedule-x/vue";
 import { useQuery } from "@tanstack/vue-query";
-import { onMounted, ref, shallowRef, watch, watchEffect } from "vue";
-import { useRouter } from "vue-router";
+import { computed, onMounted, shallowRef, watch, watchEffect } from "vue";
 import { useTheme } from "vuetify";
 import { getCalendarsList, getColorByLessonTitle } from "./helper";
 
@@ -35,7 +34,6 @@ const appStore = useAppStore();
 const theme = useTheme();
 const timetableData = useTimetable();
 const timetableViewStore = useTimetableViewStore();
-const router = useRouter();
 
 const eventsServicePlugin = createEventsServicePlugin();
 const calendarControls = createCalendarControlsPlugin();
@@ -70,55 +68,56 @@ watchEffect(() => calendarControls.setDate(getEventDate(timetableViewStore.calDa
 watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
 watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
-const evtsQuery = ref(
-    useQuery<IJsonEvent[]>({
-        queryKey: ["timetableEvents", appStore.numUniv, appStore.groupId, appStore.adeResources, appStore.resourceType],
-        queryFn: ({ signal }) =>
-            wrapFetch({
-                ...buildResourceEventsRequest({
-                    numUniv: appStore.numUniv ?? 0,
-                    groupId: appStore.groupId,
-                    adeResources: appStore.adeResources ?? 0,
-                    resourceType: appStore.resourceType,
-                }),
-                signal,
-            }),
-        enabled: false,
-    }),
-);
 
-useQueryNotifications<IJsonEvent[]>({
-    contextName: "Timetable Events",
-    getError: () => evtsQuery.value.error,
-    getIsSuccess: () => evtsQuery.value.isSuccess,
-    getData: () => evtsQuery.value.data,
-});
-
-onMounted(() => {
-    const context = createTimetableContext({
+const timetableContext = computed(() =>
+    createTimetableContext({
         numUniv: appStore.numUniv,
         groupId: appStore.groupId,
         adeResources: appStore.adeResources,
         resourceType: appStore.resourceType,
-    });
+    }),
+);
 
-    if (context) {
-        evtsQuery.value.refetch();
-    } else {
-        router.push({ name: "Home" });
-    }
+const evtsQuery = useQuery<IJsonEvent[]>({
+    queryKey: [
+        "timetableEvents",
+        appStore.numUniv,
+        appStore.groupId,
+        appStore.adeResources,
+        appStore.resourceType,
+    ],
+    queryFn: ({ signal }) =>
+        wrapFetch({
+            ...buildResourceEventsRequest({
+                numUniv: appStore.numUniv ?? 0,
+                groupId: appStore.groupId,
+                adeResources: appStore.adeResources ?? 0,
+                resourceType: appStore.resourceType,
+            }),
+            signal,
+        }),
+    enabled: computed(() => timetableContext.value !== undefined),
+});
+
+const isFetchingEvents = computed(() => evtsQuery.isFetching.value);
+
+useQueryNotifications<IJsonEvent[]>({
+    contextName: "Timetable Events",
+    getError: () => evtsQuery.error.value,
+    getIsSuccess: () => evtsQuery.isSuccess.value,
+    getData: () => evtsQuery.data.value,
 });
 
 watch(
-    () => evtsQuery.value.isLoading,
+    () => [evtsQuery.error.value, evtsQuery.isSuccess.value, evtsQuery.data.value],
     () => {
-        if (evtsQuery.value.error) return;
-        if (!evtsQuery.value.isSuccess) return;
-        if (!evtsQuery.value.data) return errorNoDataFetchNotif();
+        if (evtsQuery.error.value) return;
+        if (!evtsQuery.isSuccess.value) return;
+        if (!evtsQuery.data.value) return errorNoDataFetchNotif();
 
         timetableViewStore.events.length = 0;
         timetableViewStore.events.push(
-            ...evtsQuery.value.data.map((event, index) => ({
+            ...evtsQuery.data.value.map((event, index) => ({
                 ...event,
                 id: index,
                 start: getEventDate(new Date(event.start)),

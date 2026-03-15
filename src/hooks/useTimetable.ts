@@ -1,6 +1,6 @@
 import { buildResourceDetailsRequest } from "@/api/resourceRequestFactory";
 import { useAppStore } from "@/store/";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import type { IRoom, ITimetable } from "@/types/APIType";
 import { createTimetableContext } from "@/utils/timetableContext";
@@ -13,43 +13,48 @@ export const useTimetable = () => {
 
     const timetable = ref<ITimetable | IRoom | undefined>();
 
-    const ttQuery = ref(
-        useQuery<ITimetable | IRoom>({
-            queryKey: ["fetchTimetable", appStore.numUniv, appStore.groupId, appStore.adeResources, appStore.resourceType],
-            queryFn: ({ signal }) =>
-                wrapFetch({
-                    ...buildResourceDetailsRequest({
-                        numUniv: appStore.numUniv ?? 0,
-                        groupId: appStore.groupId,
-                        adeResources: appStore.adeResources ?? 0,
-                        resourceType: appStore.resourceType,
-                    }),
-                    signal,
+    const ttQuery = useQuery<ITimetable | IRoom>({
+        queryKey: [
+            "fetchTimetable",
+            appStore.numUniv,
+            appStore.groupId,
+            appStore.adeResources,
+            appStore.resourceType,
+        ],
+        queryFn: ({ signal }) =>
+            wrapFetch({
+                ...buildResourceDetailsRequest({
+                    numUniv: appStore.numUniv ?? 0,
+                    groupId: appStore.groupId,
+                    adeResources: appStore.adeResources ?? 0,
+                    resourceType: appStore.resourceType,
                 }),
-            enabled: false,
-        }),
-    );
+                signal,
+            }),
+        enabled: false,
+    });
 
-    watch(
-        () => ttQuery.value.isLoading,
-        () => {
-            appStore.isTimetableLoading = ttQuery.value.isLoading;
-            if (ttQuery.value.error) {
-                console.error(ttQuery.value.error);
+    watchEffect(() => {
+        appStore.isTimetableLoading = ttQuery.isLoading.value;
 
-                timetable.value = undefined;
-                appStore.adeUrl = undefined;
-                appStore.isTimetableError = true;
-            } else {
-                appStore.isTimetableError = false;
-            }
-            if (ttQuery.value.data) {
-                timetable.value = ttQuery.value.data;
-                appStore.adeUrl = ttQuery.value.data.adeUrl;
-            }
-        },
-        { immediate: true },
-    );
+        const error = ttQuery.error.value;
+        if (error) {
+            console.error(error);
+
+            timetable.value = undefined;
+            appStore.adeUrl = undefined;
+            appStore.isTimetableError = true;
+            return;
+        }
+
+        appStore.isTimetableError = false;
+
+        const data = ttQuery.data.value;
+        if (data) {
+            timetable.value = data;
+            appStore.adeUrl = data.adeUrl;
+        }
+    });
 
     watchEffect(() => {
         const context = createTimetableContext({
@@ -60,7 +65,7 @@ export const useTimetable = () => {
         });
 
         if (context) {
-            ttQuery.value.refetch();
+            ttQuery.refetch();
         }
     });
 

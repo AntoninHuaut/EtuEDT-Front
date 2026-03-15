@@ -7,7 +7,7 @@
     hover
     ripple
   >
-    <v-card-text class="pa-2 font-weight-bold text-truncate w-100">
+    <v-card-text class="pa-2 font-weight-bold room-label w-100">
       {{ room.label }}
     </v-card-text>
   </v-card>
@@ -38,12 +38,19 @@ const navigateToRoom = async () => {
 
 <style scoped>
 .room-card {
-  height: 60px;
-  min-width: 100px;
+  flex: 1 1 auto;
+  height: 100% !important;
+  min-height: 44px;
+  width: 100%;
   transition: transform 0.2s ease-in-out;
 }
 
 .room-card:hover {
   transform: translateY(-2px);
+}
+
+.room-label {
+  white-space: normal;
+  word-break: break-word;
 }
 </style>

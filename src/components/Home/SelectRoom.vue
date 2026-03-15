@@ -33,8 +33,8 @@
       <h4 v-if="mobile" class="mb-1">{{ appStore.univName ?? "" }}</h4>
       <h2 v-else class="mb-1">{{ appStore.univName ?? "" }}</h2>
 
-      <v-row justify="center" class="pa-2 px-4 px-sm-6">
-        <v-col v-for="(room, i) in filteredRooms" :key="room.adeResources" cols="6" sm="4" md="3" lg="2" class="pa-1">
+      <v-row justify="center" class="pa-2 px-4 px-sm-6 align-stretch room-grid-row">
+        <v-col v-for="(room, i) in filteredRooms" :key="room.adeResources" cols="6" sm="4" md="3" lg="2" class="pa-1 d-flex room-grid-col">
           <RoomGridButton :room="room" :colorHex="colorList[i % colorList.length]" />
         </v-col>
         <v-col v-if="filteredRooms.length === 0" class="text-center mt-2">
@@ -66,8 +66,9 @@ const { goToGroups, goToTimetables} = useResourceSelection();
 const searchQuery = ref("");
 const colorList = ref(selectColorsList);
 
+
 const roomsQuery = useQuery<IRoom[]>({
-  queryKey: ["roomList", computed(() => appStore.numUniv)],
+  queryKey: ["roomList", appStore.numUniv],
   queryFn: ({ signal }) =>
     wrapFetch({
       ...roomListRequest(appStore.numUniv ?? 0),
@@ -101,3 +102,13 @@ useQueryNotifications<IRoom[]>({
 
 const isFetching = computed(() => roomsQuery.isFetching.value || roomsQuery.isLoading.value);
 </script>
+
+<style scoped>
+.room-grid-row {
+  align-items: stretch;
+}
+
+.room-grid-col {
+  align-self: stretch;
+}
+</style>

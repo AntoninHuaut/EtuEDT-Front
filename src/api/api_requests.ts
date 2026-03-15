@@ -48,17 +48,13 @@ export const roomDetailsRequest = (univId: number, adeResources: number) => {
 export const timetableEventsRequest = (univId: number, groupId: number, adeResources: number) => {
     return {
         url: `${API_URL_V3}/univs/${univId}/groups/${groupId}/${adeResources}/events`,
-        options: {
-            method: HttpMethod.GET
-        },
+        options: { method: HttpMethod.GET },
     };
 };
 
 export const roomEventsRequest = (univId: number, adeResources: number) => {
     return {
         url: `${API_URL_V3}/univs/${univId}/rooms/${adeResources}/events`,
-        options: {
-            method: HttpMethod.GET
-        },
+        options: { method: HttpMethod.GET },
     };
 };

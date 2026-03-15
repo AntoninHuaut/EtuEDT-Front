@@ -13,7 +13,7 @@ const theme = useTheme();
 const route = useRoute();
 const router = useRouter();
 
-const backToUnivList = () => {
+const backToUnivList = async () => {
     const resetTimetableContext = {
         adeResources: undefined,
         adeUrl: undefined,
@@ -22,7 +22,7 @@ const backToUnivList = () => {
 
     if (route.name === "Rooms") {
         appStore.$patch(resetTimetableContext);
-        router.push({ name: "Home" });
+        await router.push({ name: "Home" });
         return;
     }
 

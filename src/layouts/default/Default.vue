@@ -8,18 +8,12 @@
       <div class="row content">
         <DefaultView />
       </div>
-
-      <div class="row footer">
-
-        <FooterBar />
-      </div>
     </v-app>
   </div>
 </template>
 
 <script lang="ts" setup>
 import DefaultBar from "./AppBar.vue";
-import FooterBar from "./FooterBar.vue";
 import DefaultView from "./View.vue";
 </script>
 
@@ -42,9 +36,5 @@ import DefaultView from "./View.vue";
 
 .box .row.content {
   flex: 1 1 auto;
-}
-
-.box .row.footer {
-  flex: 0 1 40px;
 }
 </style>

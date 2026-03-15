@@ -1,11 +1,23 @@
 export interface ITimetable {
-    numUniv: number;
-    nameUniv: string;
-    descTT: string;
-    numYearTT: number;
     adeResources: number;
     adeProjectId: number;
+    year: number;
+    label: string;
+    adeUrl?: string;
     lastUpdate: string;
+}
+
+export interface IRoom {
+    adeResources: number;
+    adeProjectId: number;
+    label: string;
+    adeUrl?: string;
+    lastUpdate: string;
+}
+
+export interface IGroup {
+    id: number;
+    name: string;
 }
 
 export interface IJsonEvent {
@@ -18,7 +30,6 @@ export interface IJsonEvent {
 }
 
 export interface IUniv {
-    numUniv: number;
-    nameUniv: string;
-    adeUniv: string;
+    id: number;
+    name: string;
 }

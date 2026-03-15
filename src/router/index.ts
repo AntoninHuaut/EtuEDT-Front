@@ -1,5 +1,7 @@
 // Composables
 import { createRouter, createWebHistory } from "vue-router";
+import type { RouteLocationNormalized } from "vue-router";
+import { createTimetableContext } from "@/utils/timetableContext";
 
 const routes = [
     {
@@ -12,19 +14,31 @@ const routes = [
                 component: () => import("@/views/Home.vue"),
             },
             {
-                path: "swagger",
-                name: "Swagger",
-                component: () => import("@/views/Swagger.vue"),
-            },
-            {
                 path: "sync",
                 name: "Sync",
                 component: () => import("@/views/Sync.vue"),
             },
             {
-                path: "edt/:numUniv?/:adeResources?",
+                path: "rooms",
+                name: "Rooms",
+                component: () => import("@/views/Rooms.vue"),
+            },
+            {
+                path: "edt/:numUniv(\\d+)?/:groupId(\\d+)?/:resourceType(timetable|room)?/:adeResources(\\d+)?",
                 name: "Timetable",
                 component: () => import("@/views/Timetable.vue"),
+                beforeEnter: (to: RouteLocationNormalized) => {
+                    if (createTimetableContext(to.params)) {
+                        return true;
+                    }
+
+                    return { name: "Home" };
+                },
+            },
+            {
+                path: "contributors",
+                name: "Contributors",
+                component: () => import("@/views/Contributors.vue"),
             },
             {
                 path: "/:pathMatch(.*)*",

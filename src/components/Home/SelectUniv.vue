@@ -3,13 +3,14 @@
 
   <v-divider class="mt-3 mb-3"></v-divider>
 
-  <v-progress-circular v-if="univQuery.isLoading" class="mt-5" color="primary" indeterminate :size="128" :width="12"></v-progress-circular>
+  <v-progress-circular v-if="isFetchingUnivs" class="mt-5" color="primary" indeterminate :size="128" :width="12"></v-progress-circular>
 
   <div v-else>
-    <v-col class="mx-auto" v-for="(univ) in univList" :key="univ.numUniv">
+    <v-col class="mx-auto" v-for="(univ) in univList" :key="univ.id">
       <v-row justify="center">
-        <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" color="#1565C0" @click="selectUniv(univ)">
-          {{ univ.nameUniv }}
+        <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" color="#1565C0"
+          :loading="selectingUniv === univ.id" @click="selectUniv(univ)">
+          {{ univ.name }}
         </v-btn>
       </v-row>
     </v-col>
@@ -18,46 +19,61 @@
 
 <script lang="ts" setup>
 import { univListRequest } from "@/api/api_requests";
+import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useAppStore } from "@/store/";
 import type { IUniv } from "@/types/APIType";
-import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 import { useQuery } from "@tanstack/vue-query";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useRouter, isNavigationFailure, NavigationFailureType } from "vue-router";
+import { genericError } from "@/utils/notification";
 import { useDisplay } from "vuetify";
 
 const { mobile } = useDisplay();
 const appStore = useAppStore();
-const univList = ref<IUniv[]>([]);
+const selectingUniv = ref<number | undefined>();
+const router = useRouter();
 
-const univQuery = ref(
-    useQuery<IUniv[]>({
-        queryKey: ["univList"],
-        queryFn: ({ signal }) => wrapFetch({ ...univListRequest(), signal }),
-        enabled: false,
-    }),
-);
+const univQuery = useQuery<IUniv[]>({
+  queryKey: ["univList"],
+  queryFn: ({ signal }) => wrapFetch({ ...univListRequest(), signal }),
+  enabled: false,
+});
 
-onMounted(() => univQuery.value.refetch());
+const isFetchingUnivs = computed(() => univQuery.isFetching.value || univQuery.isLoading.value);
 
-watch(
-    () => univQuery.value.isLoading,
-    () => {
-        if (univQuery.value.error) {
-            console.error("Failed to get Univ List, got", univQuery.value.error);
-            genericError(univQuery.value.error.message);
-            return;
-        }
-        if (!univQuery.value.isSuccess) return;
-        if (!univQuery.value.data) return errorNoDataFetchNotif();
+onMounted(() => univQuery.refetch());
 
-        univList.value.length = 0;
-        univList.value.push(...univQuery.value.data);
-    },
-    { immediate: true },
-);
+useQueryNotifications<IUniv[]>({
+  contextName: "Univ List",
+  getError: () => univQuery.error.value,
+  getIsSuccess: () => univQuery.isSuccess.value,
+  getData: () => univQuery.data.value,
+});
 
-function selectUniv(univ: IUniv) {
-    appStore.$patch({ numUniv: univ.numUniv, adeResources: undefined });
+const univList = computed(() => univQuery.data.value ?? []);
+
+async function selectUniv(univ: IUniv) {
+  selectingUniv.value = univ.id;
+  appStore.$patch({
+    numUniv: univ.id,
+    univName: univ.name,
+    groupId: undefined,
+    adeResources: undefined,
+    adeUrl: undefined,
+    resourceType: "timetable",
+  });
+  try {
+    const navRes = await router.push({ name: "Home" });
+    if (isNavigationFailure(navRes)) {
+      if (navRes.type !== NavigationFailureType.duplicated) {
+        genericError(`Échec de la navigation vers l'accueil (${navRes.type}).`);
+      }
+    }
+  } catch (err: any) {
+    genericError(err?.message ?? String(err));
+  } finally {
+    selectingUniv.value = undefined;
+  }
 }
 </script>

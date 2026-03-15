@@ -12,6 +12,7 @@ import { useDateHelper } from "@/hooks/useDateHelper";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store/";
+import { createTimetableContext } from "@/utils/timetableContext";
 import { onMounted, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 
@@ -19,11 +20,14 @@ const appStore = useAppStore();
 const dateHelper = useDateHelper();
 const timetableViewStore = useTimetableViewStore();
 const route = useRoute();
-const { adeResources, numUniv } = route.params;
-if (adeResources && numUniv && !Number.isNaN(+adeResources) && !Number.isNaN(+numUniv)) {
+const timetableContext = createTimetableContext(route.params);
+
+if (timetableContext) {
   appStore.$patch({
-    adeResources: +adeResources,
-    numUniv: +numUniv,
+    adeResources: timetableContext.adeResources,
+    numUniv: timetableContext.numUniv,
+    groupId: timetableContext.groupId,
+    resourceType: timetableContext.resourceType,
   });
 }
 

@@ -34,12 +34,4 @@ export default {
     server: {
         port: 3000,
     },
-    optimizeDeps: {
-        include: ["@/assets/swagger-ui/swagger-ui-es-bundle.js"],
-    },
-    build: {
-        commonjsOptions: {
-            include: [/assets\/swagger-ui\/swagger-ui-es-bundle.js$/],
-        },
-    },
 };

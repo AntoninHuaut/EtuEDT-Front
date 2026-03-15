@@ -8,8 +8,14 @@ import { useDisplay } from "vuetify";
 
 export const useAppStore = defineStore("app", () => {
     const adeResources = useLocalStorage<number | undefined>("adeResources", undefined);
+    const adeUrl = useLocalStorage<string | undefined>("adeUrl", undefined);
+    const isTimetableLoading = ref(false);
+    const isTimetableError = ref(false);
     const numUniv = useLocalStorage<number | undefined>("numUniv", undefined);
-    return { adeResources, numUniv };
+    const univName = useLocalStorage<string | undefined>("univName", undefined);
+    const groupId = useLocalStorage<number | undefined>("groupId", undefined);
+    const resourceType = useLocalStorage<"timetable" | "room">("resourceType", "timetable");
+    return { adeResources, adeUrl, isTimetableLoading, isTimetableError, numUniv, univName, groupId, resourceType };
 });
 
 export const useThemeStore = defineStore("theme", () => {

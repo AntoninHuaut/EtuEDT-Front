@@ -43,7 +43,10 @@ watchEffect(() =>
 
 onMounted(() => {
 	timetableViewStore.$patch({
-		calDate: dateHelper.skipWeekend(new Date(), "next"),
+		calDate: dateHelper.skipWeekend(
+			Temporal.Now.zonedDateTimeISO().toPlainDate(),
+			"next",
+		),
 	});
 });
 </script>

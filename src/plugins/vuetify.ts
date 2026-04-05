@@ -2,11 +2,11 @@ import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
 
 import { createVuetify } from "vuetify";
-import { getLanguage } from "@/utils/locale";
 
 export default createVuetify({
 	locale: {
-		locale: getLanguage(false),
+		locale: window.navigator.language.split("-")[0],
+		fallback: "fr",
 	},
 	display: {
 		thresholds: {

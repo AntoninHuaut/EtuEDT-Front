@@ -19,32 +19,34 @@ import { createCalendarControlsPlugin } from "@schedule-x/calendar-controls";
 import { createCurrentTimePlugin } from "@schedule-x/current-time";
 import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createEventsServicePlugin } from "@schedule-x/events-service";
+import "@schedule-x/theme-default/dist/index.css";
+import { ScheduleXCalendar } from "@schedule-x/vue";
+import { useQuery } from "@tanstack/vue-query";
+import { computed, shallowRef, watch, watchEffect } from "vue";
+import { useTheme } from "vuetify";
+
 import { buildResourceEventsRequest } from "@/api/resourceRequestFactory";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
-import { getLanguage } from "@/utils/locale";
 import { errorNoDataFetchNotif, infoNotif } from "@/utils/notification";
 import { createTimetableContext } from "@/utils/timetableContext";
 import { wrapFetch } from "@/utils/wrapFetch";
-import "@schedule-x/theme-default/dist/index.css";
-import { ScheduleXCalendar } from "@schedule-x/vue";
-import { useQuery } from "@tanstack/vue-query";
-import { computed, onMounted, shallowRef, watch, watchEffect } from "vue";
-import { useTheme } from "vuetify";
+
 import { getCalendarsList, getColorByLessonTitle } from "./helper";
 
 const appStore = useAppStore();
 const theme = useTheme();
 const timetableData = useTimetable();
 const timetableViewStore = useTimetableViewStore();
+const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 const eventsServicePlugin = createEventsServicePlugin();
 const calendarControls = createCalendarControlsPlugin();
 const calendarApp = shallowRef(
 	createCalendar({
-		selectedDate: getEventDate(timetableViewStore.calDate).split(" ")[0],
+		selectedDate: timetableViewStore.calDate,
 		views: [createViewDay(), createViewWeek(), createViewMonthGrid()],
 		plugins: [
 			createEventModalPlugin(),
@@ -55,7 +57,8 @@ const calendarApp = shallowRef(
 		calendars: getCalendarsList(),
 		events: [],
 		defaultView: timetableViewStore.viewMode,
-		locale: getLanguage(true),
+		locale: navigator.language,
+		timezone: browserTimeZone,
 		dayBoundaries: {
 			start: "08:00",
 			end: "20:00",
@@ -78,11 +81,7 @@ watchEffect(() =>
 		theme.global.name.value === "dark" ? "dark" : "light",
 	),
 );
-watchEffect(() =>
-	calendarControls.setDate(
-		getEventDate(timetableViewStore.calDate).split(" ")[0],
-	),
-);
+watchEffect(() => calendarControls.setDate(timetableViewStore.calDate));
 watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
 watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
@@ -141,26 +140,26 @@ watch(
 			...evtsQuery.data.value.map((event, index) => ({
 				...event,
 				id: index,
-				start: getEventDate(new Date(event.start)),
-				end: getEventDate(new Date(event.end)),
+				start: toCalendarDateTime(event.start),
+				end: toCalendarDateTime(event.end),
 				people: event.teacher.split(","),
 				calendarId: getColorByLessonTitle(event.title),
 			})),
 		);
 
 		if (timetableData.lastUpdate.value) {
-			const date = new Date(timetableData.lastUpdate.value);
-			const datePart = new Intl.DateTimeFormat("fr", {
+			const dateTime = toCalendarDateTime(timetableData.lastUpdate.value);
+			const datePart = dateTime.toLocaleString(navigator.language, {
 				year: "numeric",
 				month: "numeric",
 				day: "numeric",
-			}).format(date);
-			const timePart = new Intl.DateTimeFormat("fr", {
-				hour: "numeric",
-				minute: "numeric",
-				hourCycle: "h23",
-			})
-				.format(date)
+			});
+			const timePart = dateTime
+				.toLocaleString(navigator.language, {
+					hour: "numeric",
+					minute: "numeric",
+					hourCycle: "h23",
+				})
 				.replace(":", "h");
 
 			infoNotif({
@@ -171,17 +170,8 @@ watch(
 	{ immediate: true },
 );
 
-function getEventDate(date: Date) {
-	return new Intl.DateTimeFormat("en-CA", {
-		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
-		hour: "2-digit",
-		minute: "2-digit",
-		hour12: false,
-	})
-		.format(date)
-		.replace(",", "");
+function toCalendarDateTime(value: string): Temporal.ZonedDateTime {
+	return Temporal.Instant.from(value).toZonedDateTimeISO(browserTimeZone);
 }
 </script>
 

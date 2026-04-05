@@ -42,7 +42,12 @@ export const useTimetableViewStore = defineStore("timetableView", () => {
 	const { mobile } = useDisplay();
 	const dateHelper = useDateHelper();
 
-	const calDate = ref(dateHelper.skipWeekend(new Date(), "next")); // If weekend, go to monday
+	const calDate = ref(
+		dateHelper.skipWeekend(
+			Temporal.Now.zonedDateTimeISO().toPlainDate(),
+			"next",
+		),
+	); // If weekend, go to monday
 	const events = ref<CalendarEvent[]>([]);
 	const viewMode = ref<TViewMode>(mobile.value ? "day" : "week");
 	const weekdays = ref([1, 2, 3, 4, 5]);

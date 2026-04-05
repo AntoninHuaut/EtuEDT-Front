@@ -2,46 +2,56 @@
 	"name": "etuedt-vue3",
 	"version": "1.0.0",
 	"private": true,
-	"packageManager": "pnpm@10.32.1",
+	"packageManager": "pnpm@10.33.0",
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
 		"dev": "vite",
 		"build": "vue-tsc --noEmit && vite build",
 		"preview": "vite preview",
 		"lint": "biome check .",
-		"format": "biome format ."
+		"lint:fix": "biome check . --fix",
+		"format": "biome format .",
+		"format:fix": "biome format . --fix"
 	},
 	"dependencies": {
 		"@fontsource/roboto": "^5.2.10",
 		"@mdi/font": "7.4.47",
-		"@preact/signals": "^2.8.2",
-		"@schedule-x/calendar": "^2.36.0",
-		"@schedule-x/calendar-controls": "^2.36.0",
-		"@schedule-x/current-time": "^2.36.0",
-		"@schedule-x/event-modal": "^2.36.0",
-		"@schedule-x/events-service": "^2.36.0",
-		"@schedule-x/theme-default": "^2.36.0",
-		"@schedule-x/vue": "^2.34.0",
-		"@tanstack/vue-query": "^5.92.9",
+		"@preact/signals": "^2.9.0",
+		"@schedule-x/calendar": "^4.3.1",
+		"@schedule-x/calendar-controls": "^4.3.1",
+		"@schedule-x/current-time": "^4.3.1",
+		"@schedule-x/event-modal": "^4.3.1",
+		"@schedule-x/events-service": "^4.3.1",
+		"@schedule-x/theme-default": "^4.3.1",
+		"@schedule-x/vue": "^4.1.0",
+		"@tanstack/vue-query": "^5.96.2",
 		"@vueuse/core": "^14.2.1",
 		"pinia": "^3.0.4",
-		"preact": "^10.29.0",
-		"vue": "^3.5.30",
-		"vue-router": "^5.0.3",
+		"preact": "^10.29.1",
+		"temporal-polyfill": "^0.3.2",
+		"vue": "^3.5.32",
+		"vue-router": "^5.0.4",
 		"vue3-toastify": "^0.2.9",
 		"vuetify": "^3.12.3"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.4.7",
-		"@types/node": "^25.5.0",
+		"@biomejs/biome": "2.4.10",
+		"@types/node": "^25.5.2",
 		"@vitejs/plugin-vue": "^6.0.5",
-		"sass": "^1.98.0",
-		"typescript": "^5.9.3",
-		"vite": "^8.0.0",
+		"sass": "^1.99.0",
+		"typescript": "^6.0.2",
+		"vite": "^8.0.3",
 		"vite-plugin-vuetify": "^2.1.3",
-		"vue-tsc": "^3.2.5"
+		"vue-tsc": "^3.2.6"
 	},
 	"pnpm": {
+		"packageExtensions": {
+			"@schedule-x/calendar@4.3.1": {
+				"peerDependencies": {
+					"temporal-polyfill": "0.3.2"
+				}
+			}
+		},
 		"onlyBuiltDependencies": [
 			"@parcel/watcher",
 			"esbuild",

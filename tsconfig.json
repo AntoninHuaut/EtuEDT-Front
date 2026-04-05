@@ -1,9 +1,9 @@
 {
 	"compilerOptions": {
-		"baseUrl": ".",
 		"target": "esnext",
 		"useDefineForClassFields": true,
 		"allowSyntheticDefaultImports": true,
+		"allowArbitraryExtensions": true,
 		"composite": false,
 		"module": "esnext",
 		"moduleResolution": "bundler",
@@ -16,7 +16,7 @@
 		"lib": ["esnext", "dom"],
 		"types": ["node", "vuetify", "vue3-toastify/global"],
 		"paths": {
-			"@/*": ["src/*"]
+			"@/*": ["./src/*"]
 		},
 		"isolatedModules": true
 	},

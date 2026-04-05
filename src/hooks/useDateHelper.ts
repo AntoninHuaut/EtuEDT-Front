@@ -1,19 +1,19 @@
-import { useDate } from "vuetify";
-
 export const useDateHelper = () => {
-	const adapter = useDate();
-
 	const skipWeekend = (
-		date: Date,
+		date: Temporal.PlainDate,
 		navigationType: "prev" | "today" | "next",
-	): Date => {
-		if (date.getDay() === 6) {
+	): Temporal.PlainDate => {
+		if (date.dayOfWeek === 6) {
 			// Saturday
-			return adapter.addDays(date, navigationType === "prev" ? -1 : 2) as Date;
+			return navigationType === "prev"
+				? date.subtract({ days: 1 })
+				: date.add({ days: 2 });
 		}
-		if (date.getDay() === 0) {
+		if (date.dayOfWeek === 7) {
 			// Sunday
-			return adapter.addDays(date, navigationType === "prev" ? -2 : 1) as Date;
+			return navigationType === "prev"
+				? date.subtract({ days: 2 })
+				: date.add({ days: 1 });
 		}
 		return date;
 	};

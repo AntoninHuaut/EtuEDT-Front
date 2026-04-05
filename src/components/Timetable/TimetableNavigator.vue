@@ -52,14 +52,13 @@
 <script lang="ts" setup>
 import { onKeyStroke, useSwipe } from "@vueuse/core";
 import { watch } from "vue";
-import { useDate, useDisplay } from "vuetify";
+import { useDisplay } from "vuetify";
 import { useDateHelper } from "@/hooks/useDateHelper";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useTimetableViewStore } from "@/store";
 
 const timetableData = useTimetable();
 const timetableViewStore = useTimetableViewStore();
-const adapter = useDate();
 const dateHelper = useDateHelper();
 const { xs } = useDisplay();
 const { isSwiping, direction } = useSwipe(document.body);
@@ -74,30 +73,27 @@ function setDate(
 ) {
 	evt?.preventDefault();
 
-	let newCalDate: Date;
+	let newCalDate: Temporal.PlainDate;
 	if (navigationType === "today") {
-		newCalDate = new Date();
+		newCalDate = Temporal.Now.zonedDateTimeISO().toPlainDate();
 	} else {
 		const invertIfPrev = navigationType === "prev" ? -1 : 1;
 
 		switch (timetableViewStore.viewMode) {
 			case "month-grid":
-				newCalDate = adapter.addMonths(
-					timetableViewStore.calDate,
-					1 * invertIfPrev,
-				) as Date;
+				newCalDate = timetableViewStore.calDate.add({
+					months: 1 * invertIfPrev,
+				});
 				break;
 			case "week":
-				newCalDate = adapter.addDays(
-					timetableViewStore.calDate,
-					7 * invertIfPrev,
-				) as Date;
+				newCalDate = timetableViewStore.calDate.add({
+					days: 7 * invertIfPrev,
+				});
 				break;
 			case "day":
-				newCalDate = adapter.addDays(
-					timetableViewStore.calDate,
-					1 * invertIfPrev,
-				) as Date;
+				newCalDate = timetableViewStore.calDate.add({
+					days: 1 * invertIfPrev,
+				});
 				break;
 			default:
 				return;
@@ -108,12 +104,12 @@ function setDate(
 	timetableViewStore.$patch({ calDate: newCalDate });
 }
 
-function getDisplayedDate(date: Date) {
-	return new Intl.DateTimeFormat(navigator.language, {
-		month: "long",
-		year: "numeric",
-	})
-		.format(date)
+function getDisplayedDate(date: Temporal.PlainDate) {
+	return date
+		.toLocaleString(navigator.language, {
+			month: "long",
+			year: "numeric",
+		})
 		.replace(/^\w/, (c) => c.toUpperCase());
 }
 

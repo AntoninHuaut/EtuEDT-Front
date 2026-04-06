@@ -18,5 +18,8 @@ export const useDateHelper = () => {
 		return date;
 	};
 
-	return { skipWeekend };
+	const getCurrentWeekday = () =>
+		skipWeekend(Temporal.Now.zonedDateTimeISO().toPlainDate(), "next");
+
+	return { skipWeekend, getCurrentWeekday };
 };

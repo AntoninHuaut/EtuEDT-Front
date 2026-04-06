@@ -1,10 +1,10 @@
 <template>
   <div class="d-flex flex-column mt-3">
-        <div v-if="isFetchingEvents" class="mt-5 pt-5 text-center">
-      <v-progress-circular :size="128" :width="12" color="primary" indeterminate />
+	<div v-if="isInitialLoadingEvents" class="mt-5 pt-5 text-center">
+  	    <v-progress-circular :size="128" :width="12" color="primary" indeterminate />
     </div>
 
-        <ScheduleXCalendar :class="isFetchingEvents ? 'hidden' : ''" :calendar-app="calendarApp" />
+	<ScheduleXCalendar :class="{ hidden: isInitialLoadingEvents, 'calendar--xs': xs }" :calendar-app="calendarApp" />
   </div>
 </template>
 
@@ -23,7 +23,7 @@ import "@schedule-x/theme-default/dist/index.css";
 import { ScheduleXCalendar } from "@schedule-x/vue";
 import { useQuery } from "@tanstack/vue-query";
 import { computed, shallowRef, watch, watchEffect } from "vue";
-import { useTheme } from "vuetify";
+import { useDisplay, useTheme } from "vuetify";
 
 import { buildResourceEventsRequest } from "@/api/resourceRequestFactory";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
@@ -31,13 +31,13 @@ import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
 import { errorNoDataFetchNotif, infoNotif } from "@/utils/notification";
-import { createTimetableContext } from "@/utils/timetableContext";
 import { wrapFetch } from "@/utils/wrapFetch";
 
 import { getCalendarsList, getColorByLessonTitle } from "./helper";
 
 const appStore = useAppStore();
 const theme = useTheme();
+const { xs } = useDisplay();
 const timetableData = useTimetable();
 const timetableViewStore = useTimetableViewStore();
 const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -85,37 +85,30 @@ watchEffect(() => calendarControls.setDate(timetableViewStore.calDate));
 watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
 watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
-const timetableContext = computed(() =>
-	createTimetableContext({
-		numUniv: appStore.numUniv,
-		groupId: appStore.groupId,
-		adeResources: appStore.adeResources,
-		resourceType: appStore.resourceType,
-	}),
-);
-
 const evtsQuery = useQuery<IJsonEvent[]>({
-	queryKey: [
+	queryKey: computed(() => [
 		"timetableEvents",
 		appStore.numUniv,
 		appStore.groupId,
 		appStore.adeResources,
 		appStore.resourceType,
-	],
-	queryFn: ({ signal }) =>
-		wrapFetch({
-			...buildResourceEventsRequest({
-				numUniv: appStore.numUniv ?? 0,
-				groupId: appStore.groupId,
-				adeResources: appStore.adeResources ?? 0,
-				resourceType: appStore.resourceType,
-			}),
+	]),
+	queryFn: ({ signal }) => {
+		const context = appStore.getSelectedResourceContext();
+
+		if (!context) {
+			throw new Error("Missing timetable context");
+		}
+
+		return wrapFetch({
+			...buildResourceEventsRequest(context),
 			signal,
-		}),
-	enabled: computed(() => timetableContext.value !== undefined),
+		});
+	},
+	enabled: computed(() => appStore.canLoadSelectedResource),
 });
 
-const isFetchingEvents = computed(() => evtsQuery.isFetching.value);
+const isInitialLoadingEvents = computed(() => evtsQuery.isLoading.value);
 
 useQueryNotifications<IJsonEvent[]>({
 	contextName: "Timetable Events",
@@ -180,6 +173,10 @@ function toCalendarDateTime(value: string): Temporal.ZonedDateTime {
  visibility: hidden;
 }
 
+.sx__calendar {
+  --sx-color-primary: rgb(var(--v-theme-primary));
+}
+
 .sx__calendar-header {
   display: none;
 }
@@ -191,15 +188,11 @@ function toCalendarDateTime(value: string): Temporal.ZonedDateTime {
 }
 
 .sx__week-grid__date {
-    padding: 8px; 
+    padding: 4px; 
 }
 
 .sx__week-grid__date-number {
-    height: 1.25em;
-    width: 1.25em;
-}
-
-.sx__current-time-indicator {
-    z-index: 10;
+    height: 1.2em;
+    width: 1.2em;
 }
 </style>

@@ -16,8 +16,8 @@
               <v-avatar size="100" class="mx-auto mb-3">
                 <v-img :src="contributor.avatar" :alt="contributor.name"></v-img>
               </v-avatar>
-              <div class="text-h6">{{ contributor.name }}</div>
-              <div class="text-caption">{{ getRoleText(contributor.role) }}</div>
+              <div class="text-title-large">{{ contributor.name }}</div>
+              <div class="text-body-small">{{ getRoleText(contributor.role) }}</div>
               <v-card-actions class="justify-center">
                 <v-btn v-if="contributor.github" icon="mdi-github" variant="text" :href="contributor.github" target="_blank"
                   rel="noopener noreferrer"></v-btn>
@@ -33,7 +33,7 @@
         <v-divider class="my-6"></v-divider>
 
         <div class="text-center mb-4">
-          <div class="text-subtitle-1 mb-2">Code Source</div>
+          <div class="text-body-large mb-2">Code Source</div>
           <v-btn class="ma-2" prepend-icon="mdi-github" variant="tonal" href="https://github.com/AntoninHuaut/EtuEDT-Back" target="_blank"
             rel="noopener noreferrer">
             Back-end
@@ -55,21 +55,19 @@ import { contributors } from "@/data/contributors";
 
 const { width } = useDisplay();
 
-function getRoleText(role: string): string {
+function getRoleText(role: "maintainer" | "contributor"): string {
 	switch (role) {
 		case "maintainer":
 			return "Mainteneur";
 		case "contributor":
 			return "Contributeur";
-		default:
-			return role;
 	}
 }
 </script>
 
 <style scoped>
 .v-card-title {
-  font-size: 1.5rem !important;
+  font-size: 1.5rem;
   font-weight: 600;
 }
 </style>

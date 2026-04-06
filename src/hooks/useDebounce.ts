@@ -31,13 +31,6 @@ export function useDebounce<T>(source: Ref<T>, delay = 250) {
 	return {
 		debounced,
 		isDebouncing,
-		cancel: () => {
-			if (timer) {
-				clearTimeout(timer);
-				timer = null;
-				isDebouncing.value = false;
-			}
-		},
 	};
 }
 

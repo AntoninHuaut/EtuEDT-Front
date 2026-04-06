@@ -1,26 +1,25 @@
 import type { CalendarConfig } from "@schedule-x/calendar";
 import colors from "vuetify/util/colors";
 
-export const selectColorsList = [
-	colors.blue.darken3,
-	colors.blue.base,
-	colors.green.darken2,
-	colors.green.lighten1,
-	colors.orange.darken2,
-	colors.orange.lighten1,
-];
-const viewingColorList: string[] = [];
+const calendarPalette = createCalendarPalette();
+const viewingColorList = calendarPalette.colorKeys;
 const lessonTitleHashToColor: Record<string, number> = {};
 
 export function getCalendarsList(): CalendarConfig["calendars"] {
+	return calendarPalette.calendars;
+}
+
+function createCalendarPalette() {
 	const calendarList: CalendarConfig["calendars"] = {};
+	const colorKeys: string[] = [];
+
 	for (const [colorKey, colorValue] of Object.entries(colors)) {
 		if (!("lighten3" in colorValue) || !("darken3" in colorValue)) continue;
 
 		const lighten = colorValue.lighten3.replace("#", "").toUpperCase();
 		const darken = colorValue.darken3.replace("#", "").toUpperCase();
 
-		viewingColorList.push(colorKey);
+		colorKeys.push(colorKey);
 		calendarList[colorKey] = {
 			colorName: colorKey,
 			lightColors: {
@@ -36,17 +35,24 @@ export function getCalendarsList(): CalendarConfig["calendars"] {
 		};
 	}
 
-	return calendarList;
+	return {
+		calendars: calendarList,
+		colorKeys,
+	};
 }
 
 export function getColorByLessonTitle(lessonTitle: string): string {
+	if (viewingColorList.length === 0) {
+		return "blue";
+	}
+
 	for (const get of ["TD", "TP", "CM", "CC", "CTP"]) {
 		lessonTitle = lessonTitle.replace(/ /g, "").replace(get, "");
 	}
 
 	if (lessonTitleHashToColor[lessonTitle] === undefined) {
 		lessonTitleHashToColor[lessonTitle] =
-			hashString(lessonTitle) % Object.keys(viewingColorList).length;
+			hashString(lessonTitle) % viewingColorList.length;
 	}
 
 	return viewingColorList[lessonTitleHashToColor[lessonTitle]];

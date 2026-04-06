@@ -2,39 +2,32 @@
   <v-container fluid class="full-height">
     <v-row class="text-center">
       <v-col class="mx-auto" :cols="mdAndDown ? '12' : '6'">
-        <SelectUniv v-if="toDisplay === 'selectUniv'" />
-        <SelectGroup v-else-if="toDisplay === 'selectGroup'" />
-        <SelectTimetable v-else-if="toDisplay === 'selectTimetable'" />
+        <component :is="currentComponent" />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script lang="ts" setup>
-import { type Ref, ref, watchEffect } from "vue";
+import { computed } from "vue";
 import { useDisplay } from "vuetify";
-import SelectGroup from "@/components/Home/SelectGroup.vue";
-import SelectTimetable from "@/components/Home/SelectTimetable.vue";
-import SelectUniv from "@/components/Home/SelectUniv.vue";
+import SelectGroup from "@/components/Home/selectors/SelectGroup.vue";
+import SelectRoom from "@/components/Home/selectors/SelectRoom.vue";
+import SelectTimetable from "@/components/Home/selectors/SelectTimetable.vue";
+import SelectUniv from "@/components/Home/selectors/SelectUniv.vue";
 import { useAppStore } from "@/store/";
 
 const { mdAndDown } = useDisplay();
 const appStore = useAppStore();
-const toDisplay: Ref<"selectUniv" | "selectGroup" | "selectTimetable"> =
-	ref("selectUniv");
 
-function displaySelectComponent(
-	univ: number | undefined,
-	groupId: number | undefined,
-) {
-	if (univ === undefined) {
-		toDisplay.value = "selectUniv";
-	} else if (groupId === undefined) {
-		toDisplay.value = "selectGroup";
-	} else {
-		toDisplay.value = "selectTimetable";
-	}
+function getCurrentComponent() {
+	if (appStore.numUniv === undefined) return SelectUniv;
+	if (appStore.resourceType === "room") return SelectRoom;
+	if (appStore.groupId === undefined) return SelectGroup;
+	if (appStore.resourceType === "timetable") return SelectTimetable;
+
+	throw new Error(`Unknown resource type: ${appStore.resourceType}`);
 }
 
-watchEffect(() => displaySelectComponent(appStore.numUniv, appStore.groupId));
+const currentComponent = computed(() => getCurrentComponent());
 </script>

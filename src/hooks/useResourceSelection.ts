@@ -31,7 +31,7 @@ export const useResourceSelection = () => {
 
 	async function goToRooms() {
 		appStore.setResourceSelection("room");
-		await router.push({ name: "Rooms" });
+		await router.push({ name: "Home" });
 	}
 
 	async function goToGroups() {

@@ -1,22 +1,26 @@
 <template>
-  <v-icon @click="backToUnivList" :class="'pr-3 align-self-center ' + (theme.global.name.value === 'dark' ? 'text-white' : 'text-black')" icon="mdi-arrow-left-circle"
-    v-bind="$attrs" />
+  <v-btn
+    icon
+    variant="plain"
+    @click="backAction"
+    :class="'pr-3 align-self-center ' + (theme.global.name.value === 'dark' ? 'text-white' : 'text-black')"
+    aria-label="Back to university list"
+    v-bind="$attrs"
+  >
+    <v-icon icon="mdi-arrow-left-circle" />
+  </v-btn>
 </template>
 
 <script lang="ts" setup>
-import { useRoute, useRouter } from "vue-router";
 import { useTheme } from "vuetify";
 import { useAppStore } from "@/store/";
 
 const appStore = useAppStore();
 const theme = useTheme();
-const route = useRoute();
-const router = useRouter();
 
-const backToUnivList = async () => {
-	if (route.name === "Rooms") {
+const backAction = async () => {
+	if (appStore.resourceType === "room") {
 		appStore.selectGroup(undefined);
-		await router.push({ name: "Home" });
 		return;
 	}
 

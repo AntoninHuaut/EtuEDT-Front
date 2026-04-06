@@ -24,9 +24,7 @@ function getCurrentComponent() {
 	if (appStore.numUniv === undefined) return SelectUniv;
 	if (appStore.resourceType === "room") return SelectRoom;
 	if (appStore.groupId === undefined) return SelectGroup;
-	if (appStore.resourceType === "timetable") return SelectTimetable;
-
-	throw new Error(`Unknown resource type: ${appStore.resourceType}`);
+	return SelectTimetable;
 }
 
 const currentComponent = computed(() => getCurrentComponent());

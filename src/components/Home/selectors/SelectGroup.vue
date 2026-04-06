@@ -1,32 +1,32 @@
 <template>
-  <div class="d-flex justify-center align-center">
-    <BackSelectUniv :size="mobile ? 24 : 32" />
-    <p :class="`text-h${mobile ? '5' : '4'}` + ' mt-3'">Choix du groupe</p>
-    <v-spacer v-if="!mobile"></v-spacer>
-    <v-btn class="mt-3 ml-3" prepend-icon="mdi-door-open" variant="tonal" color="primary" @click="goToRooms">
-      Salles
-    </v-btn>
-  </div>
+  <SelectHeader
+    title="Choix du groupe"
+    :show-back="true"
+    :action="{
+      prependIcon: 'mdi-door-open',
+      variant: 'tonal',
+      color: 'primary',
+      onClick: goToRooms,
+      text: 'Salles',
+    }"
+  />
 
   <v-divider class="mt-3 mb-3"></v-divider>
 
-  <div v-if="isFetching" class="mt-5">
-    <v-progress-circular color="primary" indeterminate :size="128" :width="12" />
-  </div>
+  <SelectionLoadingBlock v-if="isInitialLoading" />
 
   <div v-else>
-    <h4 v-if="mobile" class="mb-4">{{ selectedUnivName }}</h4>
-    <h2 v-else class="mb-4">{{ selectedUnivName }}</h2>
+    <UniversityTitle :title="selectedUnivName" class-name="mb-4" />
 
     <v-col class="mx-auto" v-for="group in groupList" :key="group.id">
-      <v-row justify="center">
-        <v-btn
-          size="x-large"
-          :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'"
-          color="#1565C0"
-          :loading="selectingGroupId === group.id"
-          @click="selectGroup(group.id)"
-        >
+		<v-row class="justify-center">
+		  <v-btn
+			:size="smAndDown ? 'large' : 'x-large'"
+			:class="`text-subtitle-${smAndDown ? '2' : '1'}` + ` ${smAndDown ? 'pl-8 pr-8' : 'pl-12 pr-12'} mb-5`"
+			color="#1565C0"
+			:loading="selectingGroupId === group.id"
+			@click="selectGroup(group.id)"
+		  >
           {{ group.name }}
         </v-btn>
       </v-row>
@@ -48,9 +48,11 @@ import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store";
 import type { IGroup } from "@/types/APIType";
 import { wrapFetch } from "@/utils/wrapFetch";
-import BackSelectUniv from "./BackSelectUniv.vue";
+import SelectHeader from "../shared/SelectHeader.vue";
+import SelectionLoadingBlock from "../shared/SelectionLoadingBlock.vue";
+import UniversityTitle from "../shared/UniversityTitle.vue";
 
-const { mobile } = useDisplay();
+const { smAndDown } = useDisplay();
 const appStore = useAppStore();
 const { goToRooms, selectGroup: selectGroupInStore } = useResourceSelection();
 const selectingGroupId = ref<number | undefined>();
@@ -75,10 +77,9 @@ useQueryNotifications<IGroup[]>({
 
 function selectGroup(id: number) {
 	selectingGroupId.value = id;
-	selectGroupInStore(id);
+	const selectedGroup = groupList.value.find((group) => group.id === id);
+	selectGroupInStore(id, selectedGroup?.name ?? "");
 }
 
-const isFetching = computed(
-	() => query.isFetching.value || query.isLoading.value,
-);
+const isInitialLoading = computed(() => query.isLoading.value);
 </script>

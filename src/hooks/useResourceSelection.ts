@@ -1,85 +1,48 @@
-import { isNavigationFailure, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { useAppStore } from "@/store";
-import {
-	buildTimetableRouteParams,
-	createTimetableContext,
-} from "@/utils/timetableContext";
-
-type ResourceType = "timetable" | "room";
+import type { ResourceType } from "@/types/AppType";
 
 export const useResourceSelection = () => {
 	const appStore = useAppStore();
 	const router = useRouter();
 
-	async function navigateToResource(
+	async function navigateToResource() {
+		if (!appStore.canLoadSelectedResource) {
+			await router.push({ name: "Home" });
+			return;
+		}
+
+		await router.push({
+			name: "Timetable",
+		});
+	}
+
+	function selectGroup(groupId: number, groupName: string) {
+		appStore.selectGroup(groupId, groupName);
+	}
+
+	async function selectResource(
 		resourceType: ResourceType,
 		adeResources: number,
 	) {
-		const context = createTimetableContext({
-			numUniv: appStore.numUniv,
-			groupId: appStore.groupId,
-			adeResources,
-			resourceType,
-		});
-
-		if (!context) {
-			await router.push({ name: "Home" });
-			return false;
-		}
-
-		const navigationResult = await router.push({
-			name: "Timetable",
-			params: buildTimetableRouteParams(context),
-		});
-
-		return !isNavigationFailure(navigationResult);
-	}
-
-	async function selectTimetable(adeResources: number) {
-		appStore.$patch({ adeResources, resourceType: "timetable" });
-		const didNavigate = await navigateToResource("timetable", adeResources);
-		return didNavigate;
-	}
-
-	async function selectRoom(adeResources: number) {
-		appStore.$patch({ adeResources, resourceType: "room" });
-		const didNavigate = await navigateToResource("room", adeResources);
-		return didNavigate;
-	}
-
-	function selectGroup(groupId: number) {
-		appStore.$patch({
-			groupId,
-			adeResources: undefined,
-			resourceType: "timetable",
-		});
+		appStore.setResourceSelection(resourceType, adeResources);
+		await navigateToResource();
 	}
 
 	async function goToRooms() {
-		appStore.$patch({ adeResources: undefined, resourceType: "room" });
+		appStore.setResourceSelection("room");
 		await router.push({ name: "Rooms" });
 	}
 
 	async function goToGroups() {
-		appStore.$patch({
-			groupId: undefined,
-			adeResources: undefined,
-			resourceType: "timetable",
-		});
-		await router.push({ name: "Home" });
-	}
-
-	async function goToTimetables() {
-		appStore.$patch({ adeResources: undefined, resourceType: "timetable" });
+		appStore.selectGroup(undefined);
 		await router.push({ name: "Home" });
 	}
 
 	return {
 		selectGroup,
-		selectRoom,
-		selectTimetable,
+		selectResource,
 		goToGroups,
 		goToRooms,
-		goToTimetables,
 	};
 };

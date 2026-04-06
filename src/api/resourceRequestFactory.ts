@@ -4,17 +4,9 @@ import {
 	timetableDetailsRequest,
 	timetableEventsRequest,
 } from "@/api/api_requests";
+import type { IResourceSelection } from "@/types/AppType";
 
-type ResourceType = "timetable" | "room";
-
-export interface IResourceRequestContext {
-	numUniv: number;
-	groupId?: number;
-	adeResources: number;
-	resourceType: ResourceType;
-}
-
-export function buildResourceDetailsRequest(context: IResourceRequestContext) {
+export function buildResourceDetailsRequest(context: IResourceSelection) {
 	if (context.resourceType === "room") {
 		return roomDetailsRequest(context.numUniv, context.adeResources);
 	}
@@ -26,7 +18,7 @@ export function buildResourceDetailsRequest(context: IResourceRequestContext) {
 	);
 }
 
-export function buildResourceEventsRequest(context: IResourceRequestContext) {
+export function buildResourceEventsRequest(context: IResourceSelection) {
 	if (context.resourceType === "room") {
 		return roomEventsRequest(context.numUniv, context.adeResources);
 	}

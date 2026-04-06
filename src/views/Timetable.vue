@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container class="pa-2" fluid>
     <TimetableNavigator />
     <TimetableViewer />
   </v-container>
@@ -7,32 +7,28 @@
 
 <script lang="ts" setup>
 import { onMounted, watchEffect } from "vue";
-import { useRoute } from "vue-router";
 import TimetableNavigator from "@/components/Timetable/TimetableNavigator.vue";
 import TimetableViewer from "@/components/Timetable/TimetableViewer.vue";
 import { useDateHelper } from "@/hooks/useDateHelper";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store/";
-import { createTimetableContext } from "@/utils/timetableContext";
 
 const appStore = useAppStore();
 const dateHelper = useDateHelper();
 const timetableViewStore = useTimetableViewStore();
-const route = useRoute();
-const timetableContext = createTimetableContext(route.params);
-
-if (timetableContext) {
-	appStore.$patch({
-		adeResources: timetableContext.adeResources,
-		numUniv: timetableContext.numUniv,
-		groupId: timetableContext.groupId,
-		resourceType: timetableContext.resourceType,
-	});
-}
 
 const timetableData = useTimetable();
 const { setPageTitle } = usePageTitle();
+
+watchEffect(() => {
+	appStore.setTimetableStatus({
+		adeUrl: timetableData.adeUrl.value,
+		isLoading: timetableData.isLoading.value,
+		isError: !!timetableData.error.value,
+	});
+});
+
 watchEffect(() =>
 	setPageTitle(
 		timetableData.nameTT.value === "?"
@@ -42,11 +38,6 @@ watchEffect(() =>
 );
 
 onMounted(() => {
-	timetableViewStore.$patch({
-		calDate: dateHelper.skipWeekend(
-			Temporal.Now.zonedDateTimeISO().toPlainDate(),
-			"next",
-		),
-	});
+	timetableViewStore.setCalDate(dateHelper.getCurrentWeekday());
 });
 </script>

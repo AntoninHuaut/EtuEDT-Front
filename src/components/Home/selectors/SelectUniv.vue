@@ -1,5 +1,8 @@
 <template>
-  <p :class="`text-h${mobile ? '5' : '4'}` + ' mt-3'">Choix de l'établissement</p>
+  <SelectHeader
+    title="Choix de l'établissement"
+    :show-back="false"
+  />
 
   <v-divider class="mt-3 mb-3"></v-divider>
 
@@ -7,19 +10,19 @@
 
   <div v-else>
     <v-col class="mx-auto" v-for="(univ) in univList" :key="univ.id">
-      <v-row justify="center">
-        <v-btn size='x-large' :class="`text-subtitle-${mobile ? '2' : '1'}` + ' pl-12 pr-12 mb-5'" color="#1565C0"
-          :loading="selectingUniv === univ.id" @click="selectUniv(univ)">
-          {{ univ.name }}
-        </v-btn>
-      </v-row>
+		<v-row class="justify-center">
+		  <v-btn :size="smAndDown ? 'large' : 'x-large'" :class="`text-subtitle-${smAndDown ? '2' : '1'}` + ` ${smAndDown ? 'pl-8 pr-8' : 'pl-12 pr-12'} mb-5`" color="#1565C0"
+			:loading="selectingUniv === univ.id" @click="selectUniv(univ)">
+			{{ univ.name }}
+		  </v-btn>
+		</v-row>
     </v-col>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useQuery } from "@tanstack/vue-query";
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import {
 	isNavigationFailure,
 	NavigationFailureType,
@@ -32,8 +35,9 @@ import { useAppStore } from "@/store/";
 import type { IUniv } from "@/types/APIType";
 import { genericError } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
+import SelectHeader from "../shared/SelectHeader.vue";
 
-const { mobile } = useDisplay();
+const { smAndDown } = useDisplay();
 const appStore = useAppStore();
 const selectingUniv = ref<number | undefined>();
 const router = useRouter();
@@ -41,14 +45,11 @@ const router = useRouter();
 const univQuery = useQuery<IUniv[]>({
 	queryKey: ["univList"],
 	queryFn: ({ signal }) => wrapFetch({ ...univListRequest(), signal }),
-	enabled: false,
 });
 
 const isFetchingUnivs = computed(
 	() => univQuery.isFetching.value || univQuery.isLoading.value,
 );
-
-onMounted(() => univQuery.refetch());
 
 useQueryNotifications<IUniv[]>({
 	contextName: "Univ List",
@@ -61,14 +62,7 @@ const univList = computed(() => univQuery.data.value ?? []);
 
 async function selectUniv(univ: IUniv) {
 	selectingUniv.value = univ.id;
-	appStore.$patch({
-		numUniv: univ.id,
-		univName: univ.name,
-		groupId: undefined,
-		adeResources: undefined,
-		adeUrl: undefined,
-		resourceType: "timetable",
-	});
+	appStore.selectUniversity(univ.id, univ.name);
 	try {
 		const navRes = await router.push({ name: "Home" });
 		if (isNavigationFailure(navRes, NavigationFailureType.duplicated)) {
@@ -76,8 +70,9 @@ async function selectUniv(univ: IUniv) {
 		} else if (isNavigationFailure(navRes)) {
 			genericError(`Échec de la navigation vers l'accueil.`);
 		}
-	} catch (err: any) {
-		genericError(err?.message ?? String(err));
+	} catch (err: unknown) {
+		const errorMessage = err instanceof Error ? err.message : String(err);
+		genericError(errorMessage);
 	} finally {
 		selectingUniv.value = undefined;
 	}

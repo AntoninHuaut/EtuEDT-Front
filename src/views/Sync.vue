@@ -9,7 +9,7 @@
     </v-card-item>
 
     <v-card-text>
-      <p class="text-subtitle-2 mb-1">Exemple avec Google et Outlook :</p>
+      <p class="text-title-small mb-1">Exemple avec Google et Outlook :</p>
       <div>
         <ol>
           <li>
@@ -27,11 +27,11 @@
             <ul>
               <li>
                 <span class="text-primary">Google</span> :
-                <span class="text-subtitle-2">"Autres agendas +"</span> puis <span class="text-subtitle-2">"À partir de l'URL"</span>.
+                <span class="text-title-small">"Autres agendas +"</span> puis <span class="text-title-small">"À partir de l'URL"</span>.
               </li>
               <li>
                 <span class="text-primary">Outlook</span> :
-                <span class="text-subtitle-2">"Ajouter un calendrier"</span> puis <span class="text-subtitle-2">"S'abonner à partir du
+                <span class="text-title-small">"Ajouter un calendrier"</span> puis <span class="text-title-small">"S'abonner à partir du
                   web"</span>.
               </li>
             </ul>

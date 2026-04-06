@@ -1,6 +1,6 @@
 <template>
   <v-menu transition="slide-y-transition">
-    <template v-slot:activator="{ props: propsMenu }">
+    <template #activator="{ props: propsMenu }">
       <AppBarButton v-bind="propsMenu" :icon="getIcon(themeStore.theme)" :tooltip="getTooltip(themeStore.theme)" />
     </template>
 
@@ -28,7 +28,7 @@ let themeUpdateTimer: ReturnType<typeof setTimeout> | null = null;
 const setTheme = (theme: ETheme | undefined) => {
 	if (themeUpdateTimer) clearTimeout(themeUpdateTimer);
 	themeUpdateTimer = setTimeout(() => {
-		themeStore.$patch({ theme: theme });
+		themeStore.setTheme(theme);
 		themeUpdateTimer = null;
 	}, 1);
 };

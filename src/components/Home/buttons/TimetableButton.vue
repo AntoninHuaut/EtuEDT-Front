@@ -1,34 +1,33 @@
 <template>
   <!-- :size='undefined' is the default size -->
-  <v-btn @click="navigateToTimetable(timetable)" :size="mobile ? undefined : 'x-large'"
-    :class="(mobile ? 'text-subtitle-2' : 'text-subtitle-1') + ' text-white w-100 h-100 timetable-btn'" :color="colorHex"
+  <v-btn @click="navigateToTimetable(timetable)" :size="smAndDown ? 'small' : 'x-large'"
+    :style="smAndDown ? { minHeight: '36px', paddingTop: '6px', paddingBottom: '6px' } : undefined"
+  class="text-white w-100 h-100 timetable-btn"
+    :class="{ 'text-body-2': smAndDown, 'text-body-large': !smAndDown }" :color="colorHex"
     :loading="isLoading" block>
     <span class="timetable-btn__label">{{ timetable.label }}</span>
   </v-btn>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { computed } from "vue";
 import { useDisplay } from "vuetify";
-import { useResourceSelection } from "@/hooks/useResourceSelection";
+import { useSelectResourceAction } from "@/hooks/useSelectResourceAction";
 import type { ITimetable } from "@/types/APIType";
 
-defineProps<{
+const props = defineProps<{
 	timetable: ITimetable;
 	colorHex: string;
 }>();
 
-const { mobile } = useDisplay();
-const { selectTimetable } = useResourceSelection();
-const isLoading = ref(false);
+const { smAndDown } = useDisplay();
+const { select, loadingResourceId } = useSelectResourceAction();
+const isLoading = computed(
+	() => loadingResourceId.value === props.timetable.adeResources,
+);
 
 const navigateToTimetable = async (timetable: ITimetable) => {
-	isLoading.value = true;
-	try {
-		await selectTimetable(timetable.adeResources);
-	} finally {
-		isLoading.value = false;
-	}
+	await select("timetable", timetable.adeResources);
 };
 </script>
 
@@ -36,7 +35,7 @@ const navigateToTimetable = async (timetable: ITimetable) => {
 .timetable-btn {
   display: flex;
   flex: 1 1 auto;
-  height: 100% !important;
+  height: 100%;
   min-height: 48px;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -51,11 +50,4 @@ const navigateToTimetable = async (timetable: ITimetable) => {
   width: 100%;
 }
 
-@media (max-width: 600px) {
-  .timetable-btn {
-    min-height: 36px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-}
 </style>

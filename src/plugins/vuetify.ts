@@ -2,25 +2,38 @@ import "@mdi/font/css/materialdesignicons.css";
 import "vuetify/styles";
 
 import { createVuetify } from "vuetify";
+import { md3 } from "vuetify/blueprints";
+import { aliases, mdi } from "vuetify/iconsets/mdi";
+import { en, fr } from "vuetify/locale";
+
+const lang = window.navigator.language.split("-")[0];
+const locale = ["fr", "en"].includes(lang) ? lang : "en";
 
 export default createVuetify({
-	locale: {
-		locale: window.navigator.language.split("-")[0],
-		fallback: "fr",
-	},
-	display: {
-		thresholds: {
-			sm: 650, // Default is 600
+	blueprint: md3,
+	icons: {
+		defaultSet: "mdi",
+		aliases,
+		sets: {
+			mdi,
 		},
 	},
+	locale: {
+		locale: locale,
+		fallback: "en",
+		messages: { fr, en },
+	},
 	theme: {
+		defaultTheme: "system",
 		themes: {
 			light: {
+				dark: false,
 				colors: {
 					primary: "#1976d2",
 				},
 			},
 			dark: {
+				dark: true,
 				colors: {
 					primary: "#145ea8",
 				},

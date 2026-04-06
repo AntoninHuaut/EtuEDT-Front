@@ -2,7 +2,8 @@
 
 import type { RouteLocationNormalized } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
-import { createTimetableContext } from "@/utils/timetableContext";
+import pinia from "@/plugins/pinia";
+import { useAppStore } from "@/store";
 
 const routes = [
 	{
@@ -22,19 +23,14 @@ const routes = [
 			{
 				path: "rooms",
 				name: "Rooms",
-				component: () => import("@/views/Rooms.vue"),
+				component: () => import("@/views/Home.vue"),
 			},
 			{
-				path: "edt/:numUniv(\\d+)?/:groupId(\\d+)?/:resourceType(timetable|room)?/:adeResources(\\d+)?",
+				path: "edt",
+				alias:
+					"edt/:numUniv(\\d+)?/:groupId(\\d+)?/:resourceType(timetable|room)?/:adeResources(\\d+)?",
 				name: "Timetable",
 				component: () => import("@/views/Timetable.vue"),
-				beforeEnter: (to: RouteLocationNormalized) => {
-					if (createTimetableContext(to.params)) {
-						return true;
-					}
-
-					return { name: "Home" };
-				},
 			},
 			{
 				path: "about",
@@ -53,6 +49,19 @@ const routes = [
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes,
+});
+
+router.beforeEach((to: RouteLocationNormalized) => {
+	if (to.name !== "Timetable") {
+		return true;
+	}
+
+	const appStore = useAppStore(pinia);
+	if (!appStore.canLoadSelectedResource) {
+		return { name: "Home" };
+	}
+
+	return true;
 });
 
 export default router;

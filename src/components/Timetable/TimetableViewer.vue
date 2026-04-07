@@ -190,11 +190,17 @@ function toCalendarDateTime(value: string): Temporal.ZonedDateTime {
 }
 
 .sx__week-grid__date {
-    padding: 4px; 
+    padding: 4px;
 }
 
 .sx__week-grid__date-number {
     height: 1.2em;
     width: 1.2em;
+}
+.sx__current-time-indicator,
+.sx__time-grid-current-time-indicator,
+.sx__time-grid-day-selection {
+  z-index: 10 !important;
+  pointer-events: none;
 }
 </style>

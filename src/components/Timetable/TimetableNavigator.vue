@@ -77,10 +77,12 @@ import { useDisplay } from "vuetify";
 import { useDateHelper } from "@/hooks/useDateHelper";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useTimetableViewStore } from "@/store";
+import { getLocale } from "@/utils/locale";
 
 const timetableData = useTimetable();
 const timetableViewStore = useTimetableViewStore();
 const dateHelper = useDateHelper();
+const browserLocale = getLocale();
 const { xs, smAndDown } = useDisplay();
 const { isSwiping, direction } = useSwipe(document.body);
 
@@ -127,7 +129,7 @@ function setDate(
 
 function getDisplayedDate(date: Temporal.PlainDate) {
 	return date
-		.toLocaleString(navigator.language, {
+		.toLocaleString(browserLocale, {
 			month: "long",
 			year: "numeric",
 		})

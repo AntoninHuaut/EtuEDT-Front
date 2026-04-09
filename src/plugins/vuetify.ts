@@ -5,9 +5,9 @@ import { createVuetify } from "vuetify";
 import { md3 } from "vuetify/blueprints";
 import { aliases, mdi } from "vuetify/iconsets/mdi";
 import { en, fr } from "vuetify/locale";
+import { getLanguage } from "@/utils/locale";
 
-const lang = window.navigator.language.split("-")[0];
-const locale = ["fr", "en"].includes(lang) ? lang : "en";
+const locale = getLanguage();
 
 export default createVuetify({
 	blueprint: md3,

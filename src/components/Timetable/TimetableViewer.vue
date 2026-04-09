@@ -30,6 +30,7 @@ import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
+import { getLocale } from "@/utils/locale";
 import { errorNoDataFetchNotif, infoNotif } from "@/utils/notification";
 import { wrapFetch } from "@/utils/wrapFetch";
 
@@ -41,6 +42,7 @@ const { xs } = useDisplay();
 const timetableData = useTimetable();
 const timetableViewStore = useTimetableViewStore();
 const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const browserLocale = getLocale();
 
 const eventsServicePlugin = createEventsServicePlugin();
 const calendarControls = createCalendarControlsPlugin();
@@ -57,7 +59,7 @@ const calendarApp = shallowRef(
 		calendars: getCalendarsList(),
 		events: [],
 		defaultView: timetableViewStore.viewMode,
-		locale: navigator.language,
+		locale: browserLocale,
 		timezone: browserTimeZone,
 		dayBoundaries: {
 			start: "08:00",
@@ -142,13 +144,13 @@ watch(
 
 		if (timetableData.lastUpdate.value) {
 			const dateTime = toCalendarDateTime(timetableData.lastUpdate.value);
-			const datePart = dateTime.toLocaleString(navigator.language, {
+			const datePart = dateTime.toLocaleString(browserLocale, {
 				year: "numeric",
 				month: "numeric",
 				day: "numeric",
 			});
 			const timePart = dateTime
-				.toLocaleString(navigator.language, {
+				.toLocaleString(browserLocale, {
 					hour: "numeric",
 					minute: "numeric",
 					hourCycle: "h23",

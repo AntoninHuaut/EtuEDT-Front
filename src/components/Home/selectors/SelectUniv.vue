@@ -31,6 +31,7 @@ import {
 import { useDisplay } from "vuetify";
 import { univListRequest } from "@/api/api_requests";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
+import { ROUTE_NAME } from "@/router/routeNames";
 import { useAppStore } from "@/store/";
 import type { IUniv } from "@/types/APIType";
 import { genericError } from "@/utils/notification";
@@ -64,7 +65,7 @@ async function selectUniv(univ: IUniv) {
 	selectingUniv.value = univ.id;
 	appStore.selectUniversity(univ.id, univ.name);
 	try {
-		const navRes = await router.push({ name: "Home" });
+		const navRes = await router.push({ name: ROUTE_NAME.HOME });
 		if (isNavigationFailure(navRes, NavigationFailureType.duplicated)) {
 			// Do nothing if it's a duplicated navigation
 		} else if (isNavigationFailure(navRes)) {

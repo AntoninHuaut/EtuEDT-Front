@@ -18,14 +18,14 @@ export const useTimetable = () => {
 			appStore.resourceType,
 		]),
 		queryFn: ({ signal }) => {
-			const context = appStore.getSelectedResourceContext();
+			const selectedResource = appStore.selectedResource;
 
-			if (!context) {
-				throw new Error("Missing timetable context");
+			if (!selectedResource) {
+				throw new Error("Missing selected resource");
 			}
 
 			return wrapFetch({
-				...buildResourceDetailsRequest(context),
+				...buildResourceDetailsRequest(selectedResource),
 				signal,
 			});
 		},

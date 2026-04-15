@@ -13,8 +13,11 @@
 		  </v-row>
     </v-app-bar-title>
 
-    <template #append>
-		<AppBarButton v-if="route.name === 'Timetable'" icon="mdi-link" :on-click="copyTimetableLink"
+	<template #append>
+		<AppBarButton
+			v-if="isTimetableRoute"
+			icon="mdi-link"
+			:on-click="copyTimetableLink"
 			tooltip="Obtenir le lien de l'emploi du temps" />
       <AppBarButton to="/sync" icon="mdi-sync" tooltip="Synchroniser (ICS)" />
       <AppThemeButton />
@@ -25,12 +28,15 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
 import { useDisplay } from "vuetify";
 
 import { BASE_API_URL } from "@/api/api_requests";
 import AppBarButton from "@/components/layout/app-bar/AppBarButton.vue";
 import AppThemeButton from "@/components/layout/app-bar/AppThemeButton.vue";
+import { ROUTE_NAME } from "@/router/routeNames";
 import { useAppStore } from "@/store/";
 import { errorNotif, successNotif } from "@/utils/notification";
 
@@ -39,7 +45,13 @@ const appStore = useAppStore();
 const route = useRoute();
 const router = useRouter();
 
-const goToHome = async () => await router.push({ name: "Home" });
+const isTimetableRoute = computed(
+	() =>
+		route.name === ROUTE_NAME.TIMETABLE_GROUP ||
+		route.name === ROUTE_NAME.TIMETABLE_ROOM,
+);
+
+const goToHome = async () => await router.push({ name: ROUTE_NAME.HOME });
 
 const copyTimetableLink = async () => {
 	if (!appStore.hasSelectedResource || !appStore.canLoadSelectedResource) {

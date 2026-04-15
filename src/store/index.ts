@@ -7,6 +7,7 @@ import { useDateHelper } from "@/hooks/useDateHelper";
 import {
 	ETheme,
 	type IResourceSelection,
+	type IResourceSelectionWithNames,
 	type ResourceType,
 	type TViewMode,
 } from "@/types/AppType";
@@ -32,21 +33,7 @@ export const useAppStore = defineStore("app", () => {
 		() => numUniv.value !== undefined && adeResources.value !== undefined,
 	);
 
-	const canLoadSelectedResource = computed(
-		() =>
-			hasSelectedResource.value &&
-			(resourceType.value === "room" || groupId.value !== undefined),
-	);
-
-	const isGroupMissingForTimetable = computed(
-		() => resourceType.value === "timetable" && groupId.value === undefined,
-	);
-
-	function getSelectedResourceContext(): IResourceSelection | undefined {
-		if (!canLoadSelectedResource.value) {
-			return undefined;
-		}
-
+	const selectedResource = computed<IResourceSelection | undefined>(() => {
 		if (numUniv.value === undefined || adeResources.value === undefined) {
 			return undefined;
 		}
@@ -69,7 +56,40 @@ export const useAppStore = defineStore("app", () => {
 			adeResources: adeResources.value,
 			resourceType: "timetable",
 		};
-	}
+	});
+
+	const selectedResourceWithNames = computed<
+		IResourceSelectionWithNames | undefined
+	>(() => {
+		const resourceSelection = selectedResource.value;
+		if (!resourceSelection) {
+			return undefined;
+		}
+
+		if (resourceSelection.resourceType === "room") {
+			return {
+				...resourceSelection,
+				universityName: univName.value ?? "",
+			};
+		}
+
+		return {
+			...resourceSelection,
+			universityName: univName.value ?? "",
+			groupName: groupName.value ?? "",
+		};
+	});
+
+	const canLoadSelectedResource = computed(
+		() => selectedResource.value !== undefined,
+	);
+
+	const isGroupMissingForTimetable = computed(
+		() =>
+			resourceType.value === "timetable" &&
+			hasSelectedResource.value &&
+			groupId.value === undefined,
+	);
 
 	function resetTimetableResource() {
 		adeResources.value = undefined;
@@ -87,7 +107,7 @@ export const useAppStore = defineStore("app", () => {
 		resourceType.value = "timetable";
 	}
 
-	function selectUniversity(universityId: number, universityName: string) {
+	function selectUniversity(universityId: number, universityName?: string) {
 		resetTimetableResource();
 		numUniv.value = universityId;
 		univName.value = universityName;
@@ -106,13 +126,31 @@ export const useAppStore = defineStore("app", () => {
 		resourceType.value = "timetable";
 	}
 
-	function setResourceSelection(
+	function setSelectedResource(
 		nextResourceType: ResourceType,
 		nextAdeResources?: number,
 	) {
 		resetTimetableResource();
 		resourceType.value = nextResourceType;
 		adeResources.value = nextAdeResources;
+	}
+
+	function applyRouteSelection(
+		routeSelection: IResourceSelectionWithNames,
+	): void {
+		resetTimetableResource();
+		numUniv.value = routeSelection.numUniv;
+		univName.value = routeSelection.universityName;
+		resourceType.value = routeSelection.resourceType;
+		adeResources.value = routeSelection.adeResources;
+
+		if (routeSelection.resourceType === "room") {
+			groupId.value = undefined;
+			groupName.value = undefined;
+		} else {
+			groupId.value = routeSelection.groupId;
+			groupName.value = routeSelection.groupName;
+		}
 	}
 
 	function setTimetableStatus(params: {
@@ -136,13 +174,15 @@ export const useAppStore = defineStore("app", () => {
 		groupName,
 		resourceType,
 		hasSelectedResource,
+		selectedResource,
+		selectedResourceWithNames,
 		canLoadSelectedResource,
 		isGroupMissingForTimetable,
-		getSelectedResourceContext,
 		clearUniversitySelection,
 		selectUniversity,
 		selectGroup,
-		setResourceSelection,
+		setSelectedResource,
+		applyRouteSelection,
 		setTimetableStatus,
 	};
 });

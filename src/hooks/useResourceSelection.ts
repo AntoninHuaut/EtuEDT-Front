@@ -1,4 +1,6 @@
 import { useRouter } from "vue-router";
+import { getResourceRouteLocation } from "@/router/resourceRoute";
+import { ROUTE_NAME } from "@/router/routeNames";
 import { useAppStore } from "@/store";
 import type { ResourceType } from "@/types/AppType";
 
@@ -7,14 +9,9 @@ export const useResourceSelection = () => {
 	const router = useRouter();
 
 	async function navigateToResource() {
-		if (!appStore.canLoadSelectedResource) {
-			await router.push({ name: "Home" });
-			return;
-		}
-
-		await router.push({
-			name: "Timetable",
-		});
+		await router.push(
+			getResourceRouteLocation(appStore.selectedResourceWithNames),
+		);
 	}
 
 	function selectGroup(groupId: number, groupName: string) {
@@ -25,18 +22,18 @@ export const useResourceSelection = () => {
 		resourceType: ResourceType,
 		adeResources: number,
 	) {
-		appStore.setResourceSelection(resourceType, adeResources);
+		appStore.setSelectedResource(resourceType, adeResources);
 		await navigateToResource();
 	}
 
 	async function goToRooms() {
-		appStore.setResourceSelection("room");
-		await router.push({ name: "Home" });
+		appStore.setSelectedResource("room");
+		await router.push({ name: ROUTE_NAME.HOME });
 	}
 
 	async function goToGroups() {
 		appStore.selectGroup(undefined);
-		await router.push({ name: "Home" });
+		await router.push({ name: ROUTE_NAME.HOME });
 	}
 
 	return {

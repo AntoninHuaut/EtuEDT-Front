@@ -36,7 +36,12 @@ function parseRequiredStringQuery(
 		return undefined;
 	}
 
-	return raw.trim();
+	const trimmed = raw.trim();
+	if (!trimmed) {
+		return undefined;
+	}
+
+	return trimmed;
 }
 
 function parsePositiveIntQuery(

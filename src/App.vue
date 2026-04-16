@@ -13,7 +13,7 @@ import "@fontsource/roboto/900.css";
 import { usePreferredDark } from "@vueuse/core";
 import { watchEffect } from "vue";
 import { useTheme } from "vuetify";
-import { useThemeStore } from "@/store/";
+import { useThemeStore } from "@/store";
 import { ETheme } from "@/types/AppType";
 
 const themeStore = useThemeStore();

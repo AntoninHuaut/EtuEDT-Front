@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useThemeStore } from "@/store/";
+import { useThemeStore } from "@/store";
 import { ETheme } from "@/types/AppType";
 import AppBarButton from "./AppBarButton.vue";
 

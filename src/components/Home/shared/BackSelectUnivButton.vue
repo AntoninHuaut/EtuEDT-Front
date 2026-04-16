@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
 import { useTheme } from "vuetify";
-import { useAppStore } from "@/store/";
+import { useAppStore } from "@/store";
 
 const appStore = useAppStore();
 const theme = useTheme();

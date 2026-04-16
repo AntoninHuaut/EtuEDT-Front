@@ -12,7 +12,6 @@ export const useTimetableViewStore = defineStore("timetableView", () => {
 	const calDate = ref(dateHelper.getCurrentWeekday());
 	const events = ref<CalendarEvent[]>([]);
 	const viewMode = ref<TViewMode>(mobile.value ? "day" : "week");
-	const weekdays = ref([1, 2, 3, 4, 5]);
 
 	function setCalDate(date: Temporal.PlainDate) {
 		calDate.value = date;
@@ -30,7 +29,6 @@ export const useTimetableViewStore = defineStore("timetableView", () => {
 		calDate,
 		events,
 		viewMode,
-		weekdays,
 		setCalDate,
 		setViewMode,
 		replaceEvents,

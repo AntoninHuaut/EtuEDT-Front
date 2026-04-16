@@ -21,14 +21,15 @@ import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createEventsServicePlugin } from "@schedule-x/events-service";
 import "@schedule-x/theme-default/dist/index.css";
 import { ScheduleXCalendar } from "@schedule-x/vue";
-import { computed, shallowRef, watch, watchEffect } from "vue";
+import { computed, ref, shallowRef, watch, watchEffect } from "vue";
 import { useDisplay, useTheme } from "vuetify";
 
+import { getSelectedResourceIdentity } from "@/hooks/queries/queryKeys";
 import { mapTimetableEvents } from "@/hooks/timetable/useMappedTimetableEvents";
 import { useTimetableEventsQuery } from "@/hooks/timetable/useTimetableEventsQuery";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
-import { useTimetableViewStore } from "@/store";
+import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
 import { getLocale } from "@/utils/locale";
 import { infoNotif } from "@/utils/notification";
@@ -37,10 +38,25 @@ import { getCalendarsList } from "./helper";
 
 const theme = useTheme();
 const { xs } = useDisplay();
+const appStore = useAppStore();
 const timetableData = useTimetable();
 const timetableViewStore = useTimetableViewStore();
 const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const browserLocale = getLocale();
+const selectedResourceIdentity = computed(() =>
+	getSelectedResourceIdentity(appStore.selectedResource),
+);
+const lastNotifiedUpdateKey = ref<string | undefined>(undefined);
+const currentUpdateKey = computed(() => {
+	if (!timetableData.lastUpdate.value) {
+		return undefined;
+	}
+
+	return [
+		...selectedResourceIdentity.value,
+		timetableData.lastUpdate.value,
+	].join("|");
+});
 
 const eventsServicePlugin = createEventsServicePlugin();
 const calendarControls = createCalendarControlsPlugin();
@@ -98,20 +114,37 @@ useQueryNotifications<IJsonEvent[]>({
 
 watch(
 	() => [
+		selectedResourceIdentity.value,
+		currentUpdateKey.value,
 		evtsQuery.error.value,
 		evtsQuery.isSuccess.value,
 		evtsQuery.data.value,
 	],
 	() => {
-		if (evtsQuery.error.value) return;
+		if (evtsQuery.error.value) {
+			timetableViewStore.replaceEvents([]);
+			return;
+		}
 		if (!evtsQuery.isSuccess.value) return;
-		if (!evtsQuery.data.value) return;
+		if (!evtsQuery.data.value) {
+			timetableViewStore.replaceEvents([]);
+			return;
+		}
 
 		timetableViewStore.replaceEvents(
 			mapTimetableEvents(evtsQuery.data.value, browserTimeZone),
 		);
 
 		if (timetableData.lastUpdate.value) {
+			const updateKey = currentUpdateKey.value;
+			if (!updateKey) {
+				return;
+			}
+			if (lastNotifiedUpdateKey.value === updateKey) {
+				return;
+			}
+
+			lastNotifiedUpdateKey.value = updateKey;
 			const dateTime = toCalendarDateTime(timetableData.lastUpdate.value);
 			const datePart = dateTime.toLocaleString(browserLocale, {
 				year: "numeric",
@@ -133,6 +166,11 @@ watch(
 	},
 	{ immediate: true },
 );
+
+watch(selectedResourceIdentity, () => {
+	timetableViewStore.replaceEvents([]);
+	lastNotifiedUpdateKey.value = undefined;
+});
 
 function toCalendarDateTime(value: string): Temporal.ZonedDateTime {
 	return Temporal.Instant.from(value).toZonedDateTimeISO(browserTimeZone);

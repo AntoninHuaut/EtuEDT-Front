@@ -21,7 +21,7 @@ const vuetifyTheme = useTheme();
 const preferredDark = usePreferredDark();
 watchEffect(() => setTheme(themeStore.theme));
 
-function setTheme(currentTheme: string | undefined) {
+function setTheme(currentTheme: ETheme | undefined) {
 	if (
 		currentTheme === ETheme.DARK ||
 		(preferredDark.value && currentTheme === ETheme.SYSTEM)

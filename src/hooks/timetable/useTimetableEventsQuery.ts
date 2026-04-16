@@ -1,25 +1,34 @@
 import { useQuery } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { buildResourceEventsRequest } from "@/api/resourceRequestFactory";
-import { queryKeys } from "@/hooks/queries/queryKeys";
+import {
+	getSelectedResourceFromIdentity,
+	getSelectedResourceIdentity,
+	queryKeys,
+	type SelectedResourceIdentity,
+} from "@/hooks/queries/queryKeys";
 import { useAppStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
 import { wrapFetch } from "@/utils/wrapFetch";
 
 export function useTimetableEventsQuery() {
 	const appStore = useAppStore();
+	const selectedResource = computed(() => appStore.selectedResource);
+	const selectedResourceIdentity = computed(() =>
+		getSelectedResourceIdentity(selectedResource.value),
+	);
 
 	return useQuery<IJsonEvent[]>({
 		queryKey: computed(() =>
-			queryKeys.timetableEvents(
-				appStore.numUniv,
-				appStore.groupId,
-				appStore.adeResources,
-				appStore.resourceType,
-			),
+			queryKeys.timetableEvents(selectedResourceIdentity.value),
 		),
-		queryFn: ({ signal }) => {
-			const selectedResource = appStore.selectedResource;
+		queryFn: ({ signal, queryKey }) => {
+			const [, ...identity] = queryKey as ReturnType<
+				typeof queryKeys.timetableEvents
+			>;
+			const selectedResource = getSelectedResourceFromIdentity(
+				identity as SelectedResourceIdentity,
+			);
 
 			if (!selectedResource) {
 				throw new Error("Missing selected resource");
@@ -30,6 +39,6 @@ export function useTimetableEventsQuery() {
 				signal,
 			});
 		},
-		enabled: computed(() => appStore.canLoadSelectedResource),
+		enabled: computed(() => selectedResource.value !== undefined),
 	});
 }

@@ -84,7 +84,8 @@ const timetableViewStore = useTimetableViewStore();
 const dateHelper = useDateHelper();
 const browserLocale = getLocale();
 const { xs, smAndDown } = useDisplay();
-const { isSwiping, direction } = useSwipe(document.body);
+const swipeTarget = typeof document !== "undefined" ? document.body : undefined;
+const { isSwiping, direction } = useSwipe(swipeTarget);
 
 function getBtnSize() {
 	return xs.value ? "small" : undefined;

@@ -52,7 +52,13 @@ export function genericNotif({
 	type: ToastType;
 	width?: string | number;
 }): number {
-	width = Math.min(width, document.documentElement.clientWidth);
+	const requestedWidth =
+		typeof width === "number" ? width : Number.parseInt(width, 10);
+	const viewportWidth =
+		typeof document !== "undefined"
+			? document.documentElement.clientWidth
+			: requestedWidth;
+	width = Math.min(requestedWidth || 450, viewportWidth || 450);
 	toast(message, {
 		type,
 		autoClose,

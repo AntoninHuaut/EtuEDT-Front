@@ -40,7 +40,7 @@ onUnmounted(() => {
 	}
 });
 
-const getTooltip = (theme: string | undefined) => {
+const getTooltip = (theme: ETheme | undefined) => {
 	switch (theme) {
 		case ETheme.LIGHT:
 			return "Thème clair";
@@ -51,7 +51,7 @@ const getTooltip = (theme: string | undefined) => {
 	}
 };
 
-const getIcon = (theme: string | undefined) => {
+const getIcon = (theme: ETheme | undefined) => {
 	switch (theme) {
 		case ETheme.LIGHT:
 			return "mdi-white-balance-sunny";

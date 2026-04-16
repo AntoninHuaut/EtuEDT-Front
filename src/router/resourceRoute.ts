@@ -44,7 +44,7 @@ function parseRequiredStringQuery(
 	return trimmed;
 }
 
-function parsePositiveIntQuery(
+function parseStrictPositiveIntQuery(
 	query: LocationQuery,
 	key: string,
 ): number | undefined {
@@ -55,7 +55,7 @@ function parsePositiveIntQuery(
 	}
 
 	const parsed = Number.parseInt(raw, 10);
-	if (!Number.isSafeInteger(parsed) || parsed < 0) {
+	if (!Number.isSafeInteger(parsed) || parsed <= 0) {
 		return undefined;
 	}
 
@@ -114,9 +114,9 @@ function parseTimetableRouteSelection(
 	query: LocationQuery,
 	resourceType: "timetable",
 ): ITimetableSelectionWithNames | undefined {
-	const universityId = parsePositiveIntQuery(query, "universityId");
-	const groupId = parsePositiveIntQuery(query, "groupId");
-	const resourceId = parsePositiveIntQuery(query, "resourceId");
+	const universityId = parseStrictPositiveIntQuery(query, "universityId");
+	const groupId = parseStrictPositiveIntQuery(query, "groupId");
+	const resourceId = parseStrictPositiveIntQuery(query, "resourceId");
 	const universityName = parseRequiredStringQuery(query, "universityName");
 	const groupName = parseRequiredStringQuery(query, "groupName");
 
@@ -144,8 +144,8 @@ function parseRoomRouteSelection(
 	query: LocationQuery,
 	resourceType: "room",
 ): IRoomSelectionWithNames | undefined {
-	const universityId = parsePositiveIntQuery(query, "universityId");
-	const resourceId = parsePositiveIntQuery(query, "resourceId");
+	const universityId = parseStrictPositiveIntQuery(query, "universityId");
+	const resourceId = parseStrictPositiveIntQuery(query, "resourceId");
 	const universityName = parseRequiredStringQuery(query, "universityName");
 
 	if (

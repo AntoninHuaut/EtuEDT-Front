@@ -21,20 +21,19 @@ import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createEventsServicePlugin } from "@schedule-x/events-service";
 import "@schedule-x/theme-default/dist/index.css";
 import { ScheduleXCalendar } from "@schedule-x/vue";
-import { useQuery } from "@tanstack/vue-query";
 import { computed, shallowRef, watch, watchEffect } from "vue";
 import { useDisplay, useTheme } from "vuetify";
 
-import { buildResourceEventsRequest } from "@/api/resourceRequestFactory";
+import { mapTimetableEvents } from "@/hooks/timetable/useMappedTimetableEvents";
+import { useTimetableEventsQuery } from "@/hooks/timetable/useTimetableEventsQuery";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useAppStore, useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
 import { getLocale } from "@/utils/locale";
-import { errorNoDataFetchNotif, infoNotif } from "@/utils/notification";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { infoNotif } from "@/utils/notification";
 
-import { getCalendarsList, getColorByLessonTitle } from "./helper";
+import { getCalendarsList } from "./helper";
 
 const appStore = useAppStore();
 const theme = useTheme();
@@ -87,28 +86,7 @@ watchEffect(() => calendarControls.setDate(timetableViewStore.calDate));
 watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
 watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
-const evtsQuery = useQuery<IJsonEvent[]>({
-	queryKey: computed(() => [
-		"timetableEvents",
-		appStore.numUniv,
-		appStore.groupId,
-		appStore.adeResources,
-		appStore.resourceType,
-	]),
-	queryFn: ({ signal }) => {
-		const selectedResource = appStore.selectedResource;
-
-		if (!selectedResource) {
-			throw new Error("Missing selected resource");
-		}
-
-		return wrapFetch({
-			...buildResourceEventsRequest(selectedResource),
-			signal,
-		});
-	},
-	enabled: computed(() => appStore.canLoadSelectedResource),
-});
+const evtsQuery = useTimetableEventsQuery();
 
 const isInitialLoadingEvents = computed(() => evtsQuery.isLoading.value);
 
@@ -128,18 +106,10 @@ watch(
 	() => {
 		if (evtsQuery.error.value) return;
 		if (!evtsQuery.isSuccess.value) return;
-		if (!evtsQuery.data.value) return errorNoDataFetchNotif();
+		if (!evtsQuery.data.value) return;
 
-		timetableViewStore.events.length = 0;
-		timetableViewStore.events.push(
-			...evtsQuery.data.value.map((event, index) => ({
-				...event,
-				id: index,
-				start: toCalendarDateTime(event.start),
-				end: toCalendarDateTime(event.end),
-				people: event.teacher.split(","),
-				calendarId: getColorByLessonTitle(event.title),
-			})),
+		timetableViewStore.replaceEvents(
+			mapTimetableEvents(evtsQuery.data.value, browserTimeZone),
 		);
 
 		if (timetableData.lastUpdate.value) {

@@ -1,22 +1,35 @@
 import { useQuery } from "@tanstack/vue-query";
-import { computed } from "vue";
+import { computed, type Ref, unref } from "vue";
 import { buildResourceDetailsRequest } from "@/api/resourceRequestFactory";
-import { useAppStore } from "@/store/";
+import { queryKeys } from "@/hooks/queries/queryKeys";
+import { useAppStore } from "@/store";
 import type { IRoom, ITimetable } from "@/types/APIType";
 import { getTimetableName } from "@/utils/timetable";
 import { wrapFetch } from "@/utils/wrapFetch";
 
-export const useTimetable = () => {
+interface UseTimetableOptions {
+	enabled?: boolean | Ref<boolean>;
+}
+
+export const useTimetable = (options?: UseTimetableOptions) => {
 	const appStore = useAppStore();
+	const queryEnabled = computed(() => {
+		const enabled = options?.enabled;
+		return (
+			appStore.canLoadSelectedResource &&
+			(enabled === undefined || Boolean(unref(enabled)))
+		);
+	});
 
 	const ttQuery = useQuery<ITimetable | IRoom>({
-		queryKey: computed(() => [
-			"fetchTimetable",
-			appStore.numUniv,
-			appStore.groupId,
-			appStore.adeResources,
-			appStore.resourceType,
-		]),
+		queryKey: computed(() =>
+			queryKeys.timetable(
+				appStore.numUniv,
+				appStore.groupId,
+				appStore.adeResources,
+				appStore.resourceType,
+			),
+		),
 		queryFn: ({ signal }) => {
 			const selectedResource = appStore.selectedResource;
 
@@ -29,7 +42,7 @@ export const useTimetable = () => {
 				signal,
 			});
 		},
-		enabled: computed(() => appStore.canLoadSelectedResource),
+		enabled: queryEnabled,
 	});
 
 	const timetable = computed(() => ttQuery.data.value);

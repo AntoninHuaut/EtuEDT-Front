@@ -43,6 +43,7 @@ import { useQuery } from "@tanstack/vue-query";
 import { computed, ref } from "vue";
 import { useDisplay } from "vuetify";
 import { groupListRequest } from "@/api/api_requests";
+import { queryKeys } from "@/hooks/queries/queryKeys";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store";
@@ -58,7 +59,7 @@ const { goToRooms, selectGroup: selectGroupInStore } = useResourceSelection();
 const selectingGroupId = ref<number | undefined>();
 
 const query = useQuery<IGroup[]>({
-	queryKey: ["groupList", appStore.numUniv],
+	queryKey: queryKeys.groupList(appStore.numUniv),
 	queryFn: ({ signal }) =>
 		wrapFetch({ ...groupListRequest(appStore.numUniv ?? 0), signal }),
 	enabled: computed(() => appStore.numUniv !== undefined),

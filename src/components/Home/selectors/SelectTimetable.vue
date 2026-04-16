@@ -63,11 +63,12 @@ import { useQuery } from "@tanstack/vue-query";
 import { computed, watch } from "vue";
 import { useDisplay } from "vuetify";
 import { timetableListRequest } from "@/api/api_requests";
+import { queryKeys } from "@/hooks/queries/queryKeys";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { matchesSearchQuery, useSearch } from "@/hooks/useSearch";
 import { useSelectionColors } from "@/hooks/useSelectionColors";
-import { useAppStore } from "@/store/";
+import { useAppStore } from "@/store";
 import type { ITimetable } from "@/types/APIType";
 import { getYearTitle } from "@/utils/timetable";
 import { wrapFetch } from "@/utils/wrapFetch";
@@ -85,7 +86,7 @@ const { colors: colorList } = useSelectionColors();
 const { searchQuery, debouncedQuery, isDebouncing, clearSearch } = useSearch();
 
 const timetableQuery = useQuery<ITimetable[]>({
-	queryKey: ["timetableList", appStore.numUniv, appStore.groupId],
+	queryKey: queryKeys.timetableList(appStore.numUniv, appStore.groupId),
 	queryFn: ({ signal }) =>
 		wrapFetch({
 			...timetableListRequest(appStore.numUniv ?? 0, appStore.groupId ?? 0),

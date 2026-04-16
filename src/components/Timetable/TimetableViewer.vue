@@ -28,14 +28,13 @@ import { mapTimetableEvents } from "@/hooks/timetable/useMappedTimetableEvents";
 import { useTimetableEventsQuery } from "@/hooks/timetable/useTimetableEventsQuery";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
-import { useAppStore, useTimetableViewStore } from "@/store";
+import { useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
 import { getLocale } from "@/utils/locale";
 import { infoNotif } from "@/utils/notification";
 
 import { getCalendarsList } from "./helper";
 
-const appStore = useAppStore();
 const theme = useTheme();
 const { xs } = useDisplay();
 const timetableData = useTimetable();

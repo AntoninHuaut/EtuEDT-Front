@@ -1,7 +1,6 @@
-import { useAppStore } from "@/store";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
-import { getResourceRouteSelectionFromQuery } from "./resourceRoute";
+import { guards } from "./guards";
 import { ROUTE_NAME } from "./routeNames";
 
 const routes: RouteRecordRaw[] = [
@@ -23,39 +22,13 @@ const routes: RouteRecordRaw[] = [
 				path: "timetable",
 				name: ROUTE_NAME.TIMETABLE_GROUP,
 				component: () => import("@/views/Timetable.vue"),
-				beforeEnter: (to) => {
-					const appStore = useAppStore();
-					const selection = getResourceRouteSelectionFromQuery(
-						to.query,
-						"timetable",
-					);
-
-					if (!selection) {
-						return { name: ROUTE_NAME.NOT_FOUND };
-					}
-
-					appStore.applyRouteSelection(selection);
-					return true;
-				},
+				beforeEnter: guards.timetable,
 			},
 			{
 				path: "room",
 				name: ROUTE_NAME.TIMETABLE_ROOM,
 				component: () => import("@/views/Timetable.vue"),
-				beforeEnter: (to) => {
-					const appStore = useAppStore();
-					const selection = getResourceRouteSelectionFromQuery(
-						to.query,
-						"room",
-					);
-
-					if (!selection) {
-						return { name: ROUTE_NAME.NOT_FOUND };
-					}
-
-					appStore.applyRouteSelection(selection);
-					return true;
-				},
+				beforeEnter: guards.room,
 			},
 			{
 				path: "about",

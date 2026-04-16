@@ -36,8 +36,9 @@ import { useDisplay } from "vuetify";
 import { BASE_API_URL } from "@/api/api_requests";
 import AppBarButton from "@/components/layout/app-bar/AppBarButton.vue";
 import AppThemeButton from "@/components/layout/app-bar/AppThemeButton.vue";
+import { useAppStore } from "@/store";
+import { useTimetable } from "@/hooks/useTimetable";
 import { ROUTE_NAME } from "@/router/routeNames";
-import { useAppStore } from "@/store/";
 import { errorNotif, successNotif } from "@/utils/notification";
 
 const { smAndDown, smAndUp } = useDisplay();
@@ -50,6 +51,7 @@ const isTimetableRoute = computed(
 		route.name === ROUTE_NAME.TIMETABLE_GROUP ||
 		route.name === ROUTE_NAME.TIMETABLE_ROOM,
 );
+const timetableData = useTimetable({ enabled: isTimetableRoute });
 
 const goToHome = async () => await router.push({ name: ROUTE_NAME.HOME });
 
@@ -68,12 +70,12 @@ const copyTimetableLink = async () => {
 		return;
 	}
 
-	if (!appStore.adeUrl) {
-		if (appStore.isTimetableLoading) {
+	if (!timetableData.adeUrl.value) {
+		if (timetableData.isLoading.value) {
 			errorNotif({
 				message: "L'emploi du temps est encore en cours de chargement.",
 			});
-		} else if (appStore.isTimetableError) {
+		} else if (timetableData.error.value) {
 			errorNotif({
 				message: "Impossible de récupérer le lien ADE suite à une erreur.",
 			});
@@ -85,10 +87,24 @@ const copyTimetableLink = async () => {
 		return;
 	}
 
-	await navigator.clipboard.writeText(appStore.adeUrl);
-	successNotif({
-		message:
-			"Le lien direct de l'emploi du temps a été copié dans le presse-papier.",
-	});
+	if (!navigator.clipboard?.writeText) {
+		errorNotif({
+			message: "Le presse-papier n'est pas disponible dans ce navigateur.",
+		});
+		return;
+	}
+
+	try {
+		await navigator.clipboard.writeText(timetableData.adeUrl.value);
+		successNotif({
+			message:
+				"Le lien direct de l'emploi du temps a été copié dans le presse-papier.",
+		});
+	} catch {
+		errorNotif({
+			message:
+				"Impossible de copier le lien. Vérifiez les permissions du presse-papier.",
+		});
+	}
 };
 </script>

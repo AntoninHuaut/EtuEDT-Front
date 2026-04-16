@@ -12,22 +12,13 @@ import TimetableViewer from "@/components/Timetable/TimetableViewer.vue";
 import { useDateHelper } from "@/hooks/useDateHelper";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useTimetable } from "@/hooks/useTimetable";
-import { useAppStore, useTimetableViewStore } from "@/store/";
+import { useTimetableViewStore } from "@/store";
 
-const appStore = useAppStore();
 const dateHelper = useDateHelper();
 const timetableViewStore = useTimetableViewStore();
 
 const timetableData = useTimetable();
 const { setPageTitle } = usePageTitle();
-
-watchEffect(() => {
-	appStore.setTimetableStatus({
-		adeUrl: timetableData.adeUrl.value,
-		isLoading: timetableData.isLoading.value,
-		isError: !!timetableData.error.value,
-	});
-});
 
 watchEffect(() =>
 	setPageTitle(

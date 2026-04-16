@@ -1,4 +1,5 @@
 import { watch } from "vue";
+import { isApiError } from "@/utils/apiError";
 import { errorNoDataFetchNotif, genericError } from "@/utils/notification";
 
 interface IQueryNotificationsParams<TData> {
@@ -16,6 +17,12 @@ export function useQueryNotifications<TData>(
 		(error) => {
 			if (!error) return;
 			console.error(`Failed to get ${params.contextName}, got`, error);
+
+			if (isApiError(error)) {
+				genericError(error.message);
+				return;
+			}
+
 			genericError(error.message);
 		},
 	);

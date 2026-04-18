@@ -36,12 +36,13 @@ import { useDisplay } from "vuetify";
 import { BASE_API_URL } from "@/api/api_requests";
 import AppBarButton from "@/components/layout/app-bar/AppBarButton.vue";
 import AppThemeButton from "@/components/layout/app-bar/AppThemeButton.vue";
+import { useTimetable } from "@/hooks/useTimetable";
+import { getResourceRouteSelectionFromQuery } from "@/router/resourceRoute";
 import { ROUTE_NAME } from "@/router/routeNames";
-import { useAppStore } from "@/store/";
+import type { ResourceType } from "@/types/AppType";
 import { errorNotif, successNotif } from "@/utils/notification";
 
 const { smAndDown, smAndUp } = useDisplay();
-const appStore = useAppStore();
 const route = useRoute();
 const router = useRouter();
 
@@ -51,11 +52,39 @@ const isTimetableRoute = computed(
 		route.name === ROUTE_NAME.TIMETABLE_ROOM,
 );
 
+const routeResourceType = computed<ResourceType | undefined>(() => {
+	if (route.name === ROUTE_NAME.TIMETABLE_GROUP) {
+		return "timetable";
+	}
+
+	if (route.name === ROUTE_NAME.TIMETABLE_ROOM) {
+		return "room";
+	}
+
+	return undefined;
+});
+
+const selectedResource = computed(() => {
+	if (!routeResourceType.value) {
+		return undefined;
+	}
+
+	return getResourceRouteSelectionFromQuery(
+		route.query,
+		routeResourceType.value,
+	);
+});
+
+const timetableData = useTimetable({
+	selectedResource,
+	enabled: isTimetableRoute,
+});
+
 const goToHome = async () => await router.push({ name: ROUTE_NAME.HOME });
 
 const copyTimetableLink = async () => {
-	if (!appStore.hasSelectedResource || !appStore.canLoadSelectedResource) {
-		if (appStore.isGroupMissingForTimetable) {
+	if (!selectedResource.value) {
+		if (route.name === ROUTE_NAME.TIMETABLE_GROUP) {
 			errorNotif({
 				message: "Aucun groupe n'est actuellement sélectionné.",
 			});
@@ -68,12 +97,12 @@ const copyTimetableLink = async () => {
 		return;
 	}
 
-	if (!appStore.adeUrl) {
-		if (appStore.isTimetableLoading) {
+	if (!timetableData.adeUrl.value) {
+		if (timetableData.isLoading.value) {
 			errorNotif({
 				message: "L'emploi du temps est encore en cours de chargement.",
 			});
-		} else if (appStore.isTimetableError) {
+		} else if (timetableData.error.value) {
 			errorNotif({
 				message: "Impossible de récupérer le lien ADE suite à une erreur.",
 			});
@@ -85,10 +114,24 @@ const copyTimetableLink = async () => {
 		return;
 	}
 
-	await navigator.clipboard.writeText(appStore.adeUrl);
-	successNotif({
-		message:
-			"Le lien direct de l'emploi du temps a été copié dans le presse-papier.",
-	});
+	if (!navigator.clipboard?.writeText) {
+		errorNotif({
+			message: "Le presse-papier n'est pas disponible dans ce navigateur.",
+		});
+		return;
+	}
+
+	try {
+		await navigator.clipboard.writeText(timetableData.adeUrl.value);
+		successNotif({
+			message:
+				"Le lien direct de l'emploi du temps a été copié dans le presse-papier.",
+		});
+	} catch {
+		errorNotif({
+			message:
+				"Impossible de copier le lien. Vérifiez les permissions du presse-papier.",
+		});
+	}
 };
 </script>

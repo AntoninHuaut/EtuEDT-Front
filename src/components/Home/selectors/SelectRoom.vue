@@ -53,13 +53,14 @@
 import { useQuery } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { roomListRequest } from "@/api/api_requests";
+import { queryKeys } from "@/hooks/queries/queryKeys";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { matchesSearchQuery, useSearch } from "@/hooks/useSearch";
 import { useSelectionColors } from "@/hooks/useSelectionColors";
-import { useAppStore } from "@/store/";
+import { useAppStore } from "@/store";
 import type { IRoom } from "@/types/APIType";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import RoomGridButton from "../buttons/RoomGridButton.vue";
 import SearchBarWithDebounce from "../shared/SearchBarWithDebounce.vue";
 import SelectHeader from "../shared/SelectHeader.vue";
@@ -72,12 +73,12 @@ const { searchQuery, debouncedQuery, isDebouncing } = useSearch();
 const { colors: colorList } = useSelectionColors();
 
 const roomsQuery = useQuery<IRoom[]>({
-	queryKey: ["roomList", appStore.numUniv],
+	queryKey: queryKeys.roomList(appStore.numUniv),
 	queryFn: ({ signal }) =>
-		wrapFetch({
+		wrapFetchTyped<IRoom[]>({
 			...roomListRequest(appStore.numUniv ?? 0),
 			signal,
-		}),
+		}).then((data) => data ?? []),
 	enabled: computed(() => appStore.numUniv !== undefined),
 });
 

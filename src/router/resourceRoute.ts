@@ -5,9 +5,9 @@ import type {
 	RouteLocationRaw,
 } from "vue-router";
 import type {
-	IResourceSelectionWithNames,
-	IRoomSelectionWithNames,
-	ITimetableSelectionWithNames,
+	IResourceSelection,
+	IRoomSelection,
+	ITimetableSelection,
 	ResourceType,
 } from "@/types/AppType";
 import { ROUTE_NAME } from "./routeNames";
@@ -26,25 +26,7 @@ function getQueryStringValue(
 	return value;
 }
 
-function parseRequiredStringQuery(
-	query: LocationQuery,
-	key: string,
-): string | undefined {
-	const raw = getQueryStringValue(query[key]);
-
-	if (raw === undefined) {
-		return undefined;
-	}
-
-	const trimmed = raw.trim();
-	if (!trimmed) {
-		return undefined;
-	}
-
-	return trimmed;
-}
-
-function parsePositiveIntQuery(
+function parseStrictPositiveIntQuery(
 	query: LocationQuery,
 	key: string,
 ): number | undefined {
@@ -55,7 +37,7 @@ function parsePositiveIntQuery(
 	}
 
 	const parsed = Number.parseInt(raw, 10);
-	if (!Number.isSafeInteger(parsed) || parsed < 0) {
+	if (!Number.isSafeInteger(parsed) || parsed <= 0) {
 		return undefined;
 	}
 
@@ -67,14 +49,12 @@ function setQueryValue(query: LocationQueryRaw, key: string, value: string) {
 }
 
 function buildTimetableRouteLocation(
-	selection: ITimetableSelectionWithNames,
+	selection: ITimetableSelection,
 ): RouteLocationRaw {
 	const query: LocationQueryRaw = {};
 	setQueryValue(query, "universityId", String(selection.numUniv));
 	setQueryValue(query, "groupId", String(selection.groupId));
 	setQueryValue(query, "resourceId", String(selection.adeResources));
-	setQueryValue(query, "universityName", selection.universityName);
-	setQueryValue(query, "groupName", selection.groupName);
 
 	return {
 		name: ROUTE_NAME.TIMETABLE_GROUP,
@@ -82,13 +62,10 @@ function buildTimetableRouteLocation(
 	};
 }
 
-function buildRoomRouteLocation(
-	selection: IRoomSelectionWithNames,
-): RouteLocationRaw {
+function buildRoomRouteLocation(selection: IRoomSelection): RouteLocationRaw {
 	const query: LocationQueryRaw = {};
 	setQueryValue(query, "universityId", String(selection.numUniv));
 	setQueryValue(query, "resourceId", String(selection.adeResources));
-	setQueryValue(query, "universityName", selection.universityName);
 
 	return {
 		name: ROUTE_NAME.TIMETABLE_ROOM,
@@ -97,7 +74,7 @@ function buildRoomRouteLocation(
 }
 
 export function getResourceRouteLocation(
-	selection: IResourceSelectionWithNames | undefined,
+	selection: IResourceSelection | undefined,
 ): RouteLocationRaw {
 	if (!selection) {
 		return { name: ROUTE_NAME.HOME };
@@ -113,19 +90,15 @@ export function getResourceRouteLocation(
 function parseTimetableRouteSelection(
 	query: LocationQuery,
 	resourceType: "timetable",
-): ITimetableSelectionWithNames | undefined {
-	const universityId = parsePositiveIntQuery(query, "universityId");
-	const groupId = parsePositiveIntQuery(query, "groupId");
-	const resourceId = parsePositiveIntQuery(query, "resourceId");
-	const universityName = parseRequiredStringQuery(query, "universityName");
-	const groupName = parseRequiredStringQuery(query, "groupName");
+): ITimetableSelection | undefined {
+	const universityId = parseStrictPositiveIntQuery(query, "universityId");
+	const groupId = parseStrictPositiveIntQuery(query, "groupId");
+	const resourceId = parseStrictPositiveIntQuery(query, "resourceId");
 
 	if (
 		universityId === undefined ||
 		groupId === undefined ||
-		resourceId === undefined ||
-		universityName === undefined ||
-		groupName === undefined
+		resourceId === undefined
 	) {
 		return undefined;
 	}
@@ -135,24 +108,17 @@ function parseTimetableRouteSelection(
 		groupId,
 		adeResources: resourceId,
 		resourceType,
-		universityName,
-		groupName,
 	};
 }
 
 function parseRoomRouteSelection(
 	query: LocationQuery,
 	resourceType: "room",
-): IRoomSelectionWithNames | undefined {
-	const universityId = parsePositiveIntQuery(query, "universityId");
-	const resourceId = parsePositiveIntQuery(query, "resourceId");
-	const universityName = parseRequiredStringQuery(query, "universityName");
+): IRoomSelection | undefined {
+	const universityId = parseStrictPositiveIntQuery(query, "universityId");
+	const resourceId = parseStrictPositiveIntQuery(query, "resourceId");
 
-	if (
-		universityId === undefined ||
-		resourceId === undefined ||
-		universityName === undefined
-	) {
+	if (universityId === undefined || resourceId === undefined) {
 		return undefined;
 	}
 
@@ -160,17 +126,56 @@ function parseRoomRouteSelection(
 		numUniv: universityId,
 		adeResources: resourceId,
 		resourceType,
-		universityName,
 	};
 }
 
 export function getResourceRouteSelectionFromQuery(
 	query: LocationQuery,
 	resourceType: ResourceType,
-): IResourceSelectionWithNames | undefined {
+): IResourceSelection | undefined {
 	if (resourceType === "room") {
 		return parseRoomRouteSelection(query, "room");
 	}
 
 	return parseTimetableRouteSelection(query, "timetable");
+}
+
+function hasRouteSelectionQueryKeys(
+	query: LocationQuery,
+	resourceType: ResourceType,
+): boolean {
+	if (resourceType === "room") {
+		return query.universityId !== undefined || query.resourceId !== undefined;
+	}
+
+	return (
+		query.universityId !== undefined ||
+		query.groupId !== undefined ||
+		query.resourceId !== undefined
+	);
+}
+
+export function resolveResourceRouteSelection(
+	query: LocationQuery,
+	resourceType: ResourceType,
+	fallbackSelection: IResourceSelection | undefined,
+): IResourceSelection | undefined {
+	const selectionFromQuery = getResourceRouteSelectionFromQuery(
+		query,
+		resourceType,
+	);
+
+	if (selectionFromQuery) {
+		return selectionFromQuery;
+	}
+
+	if (hasRouteSelectionQueryKeys(query, resourceType)) {
+		return undefined;
+	}
+
+	if (!fallbackSelection || fallbackSelection.resourceType !== resourceType) {
+		return undefined;
+	}
+
+	return fallbackSelection;
 }

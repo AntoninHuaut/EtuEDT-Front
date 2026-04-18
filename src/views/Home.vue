@@ -15,7 +15,7 @@ import SelectGroup from "@/components/Home/selectors/SelectGroup.vue";
 import SelectRoom from "@/components/Home/selectors/SelectRoom.vue";
 import SelectTimetable from "@/components/Home/selectors/SelectTimetable.vue";
 import SelectUniv from "@/components/Home/selectors/SelectUniv.vue";
-import { useAppStore } from "@/store/";
+import { useAppStore } from "@/store";
 
 const { mdAndDown } = useDisplay();
 const appStore = useAppStore();

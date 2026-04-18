@@ -36,7 +36,7 @@ import { ROUTE_NAME } from "@/router/routeNames";
 import { useAppStore } from "@/store";
 import type { IUniv } from "@/types/APIType";
 import { genericError } from "@/utils/notification";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import SelectHeader from "../shared/SelectHeader.vue";
 
 const { smAndDown } = useDisplay();
@@ -46,7 +46,10 @@ const router = useRouter();
 
 const univQuery = useQuery<IUniv[]>({
 	queryKey: queryKeys.univList(),
-	queryFn: ({ signal }) => wrapFetch({ ...univListRequest(), signal }),
+	queryFn: ({ signal }) =>
+		wrapFetchTyped<IUniv[]>({ ...univListRequest(), signal }).then(
+			(data) => data ?? [],
+		),
 });
 
 const isFetchingUnivs = computed(

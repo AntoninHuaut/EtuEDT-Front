@@ -29,22 +29,28 @@ import { mapTimetableEvents } from "@/hooks/timetable/useMappedTimetableEvents";
 import { useTimetableEventsQuery } from "@/hooks/timetable/useTimetableEventsQuery";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
-import { useAppStore, useTimetableViewStore } from "@/store";
+import { useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
+import type { IResourceSelection } from "@/types/AppType";
 import { getLocale } from "@/utils/locale";
-import { infoNotif } from "@/utils/notification";
+import { errorNotif, infoNotif } from "@/utils/notification";
 
 import { getCalendarsList } from "./helper";
 
+const props = defineProps<{
+	selectedResource: IResourceSelection;
+}>();
+
 const theme = useTheme();
 const { xs } = useDisplay();
-const appStore = useAppStore();
-const timetableData = useTimetable();
+const timetableData = useTimetable({
+	selectedResource: computed(() => props.selectedResource),
+});
 const timetableViewStore = useTimetableViewStore();
 const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 const browserLocale = getLocale();
 const selectedResourceIdentity = computed(() =>
-	getSelectedResourceIdentity(appStore.selectedResource),
+	getSelectedResourceIdentity(props.selectedResource),
 );
 const lastNotifiedUpdateKey = ref<string | undefined>(undefined);
 const currentUpdateKey = computed(() => {
@@ -101,7 +107,9 @@ watchEffect(() => calendarControls.setDate(timetableViewStore.calDate));
 watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
 watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
-const evtsQuery = useTimetableEventsQuery();
+const evtsQuery = useTimetableEventsQuery({
+	selectedResource: computed(() => props.selectedResource),
+});
 
 const isInitialLoadingEvents = computed(() => evtsQuery.isLoading.value);
 
@@ -131,9 +139,18 @@ watch(
 			return;
 		}
 
-		timetableViewStore.replaceEvents(
-			mapTimetableEvents(evtsQuery.data.value, browserTimeZone),
-		);
+		try {
+			timetableViewStore.replaceEvents(
+				mapTimetableEvents(evtsQuery.data.value, browserTimeZone),
+			);
+		} catch (error) {
+			console.error("Failed to map timetable events", error);
+			timetableViewStore.replaceEvents([]);
+			errorNotif({
+				message: "Impossible d'afficher les seances de cet emploi du temps.",
+			});
+			return;
+		}
 
 		if (timetableData.lastUpdate.value) {
 			const updateKey = currentUpdateKey.value;
@@ -146,6 +163,9 @@ watch(
 
 			lastNotifiedUpdateKey.value = updateKey;
 			const dateTime = toCalendarDateTime(timetableData.lastUpdate.value);
+			if (!dateTime) {
+				return;
+			}
 			const datePart = dateTime.toLocaleString(browserLocale, {
 				year: "numeric",
 				month: "numeric",
@@ -172,8 +192,13 @@ watch(selectedResourceIdentity, () => {
 	lastNotifiedUpdateKey.value = undefined;
 });
 
-function toCalendarDateTime(value: string): Temporal.ZonedDateTime {
-	return Temporal.Instant.from(value).toZonedDateTimeISO(browserTimeZone);
+function toCalendarDateTime(value: string): Temporal.ZonedDateTime | undefined {
+	try {
+		return Temporal.Instant.from(value).toZonedDateTimeISO(browserTimeZone);
+	} catch {
+		console.error("Invalid lastUpdate datetime", value);
+		return undefined;
+	}
 }
 </script>
 

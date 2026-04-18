@@ -7,23 +7,26 @@ import {
 	queryKeys,
 	type SelectedResourceIdentity,
 } from "@/hooks/queries/queryKeys";
-import { useAppStore } from "@/store";
 import type { IRoom, ITimetable } from "@/types/APIType";
+import type { IResourceSelection } from "@/types/AppType";
 import { getTimetableName } from "@/utils/timetable";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 
 interface UseTimetableOptions {
+	selectedResource:
+		| IResourceSelection
+		| undefined
+		| Readonly<Ref<IResourceSelection | undefined>>;
 	enabled?: boolean | Ref<boolean>;
 }
 
-export const useTimetable = (options?: UseTimetableOptions) => {
-	const appStore = useAppStore();
-	const selectedResource = computed(() => appStore.selectedResource);
+export const useTimetable = (options: UseTimetableOptions) => {
+	const selectedResource = computed(() => unref(options.selectedResource));
 	const selectedResourceIdentity = computed(() =>
 		getSelectedResourceIdentity(selectedResource.value),
 	);
 	const queryEnabled = computed(() => {
-		const enabled = options?.enabled;
+		const enabled = options.enabled;
 		return (
 			selectedResource.value !== undefined &&
 			(enabled === undefined || Boolean(unref(enabled)))
@@ -35,7 +38,7 @@ export const useTimetable = (options?: UseTimetableOptions) => {
 
 	const ttQuery = useQuery<ITimetable | IRoom>({
 		queryKey: timetableQueryKey,
-		queryFn: ({ signal, queryKey }) => {
+		queryFn: async ({ signal, queryKey }) => {
 			const [, ...identity] = queryKey as ReturnType<
 				typeof queryKeys.timetable
 			>;
@@ -47,17 +50,23 @@ export const useTimetable = (options?: UseTimetableOptions) => {
 				throw new Error("Missing selected resource");
 			}
 
-			return wrapFetch({
+			const details = await wrapFetchTyped<ITimetable | IRoom>({
 				...buildResourceDetailsRequest(resourceSelection),
 				signal,
 			});
+
+			if (!details) {
+				throw new Error("Missing timetable details response");
+			}
+
+			return details;
 		},
 		enabled: queryEnabled,
 	});
 
 	const timetable = computed(() => ttQuery.data.value);
 	const currentResourceType = computed(
-		() => selectedResource.value?.resourceType ?? appStore.resourceType,
+		() => selectedResource.value?.resourceType ?? "timetable",
 	);
 
 	const nameTT = computed(() =>

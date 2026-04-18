@@ -71,7 +71,7 @@ import { useSelectionColors } from "@/hooks/useSelectionColors";
 import { useAppStore } from "@/store";
 import type { ITimetable } from "@/types/APIType";
 import { getYearTitle } from "@/utils/timetable";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import TimetableButton from "../buttons/TimetableButton.vue";
 import SearchBarWithDebounce from "../shared/SearchBarWithDebounce.vue";
 import SelectHeader from "../shared/SelectHeader.vue";
@@ -88,10 +88,10 @@ const { searchQuery, debouncedQuery, isDebouncing, clearSearch } = useSearch();
 const timetableQuery = useQuery<ITimetable[]>({
 	queryKey: queryKeys.timetableList(appStore.numUniv, appStore.groupId),
 	queryFn: ({ signal }) =>
-		wrapFetch({
+		wrapFetchTyped<ITimetable[]>({
 			...timetableListRequest(appStore.numUniv ?? 0, appStore.groupId ?? 0),
 			signal,
-		}),
+		}).then((data) => data ?? []),
 	enabled: computed(
 		() => appStore.numUniv !== undefined && appStore.groupId !== undefined,
 	),

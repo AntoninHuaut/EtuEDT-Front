@@ -48,7 +48,7 @@ import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store";
 import type { IGroup } from "@/types/APIType";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import SelectHeader from "../shared/SelectHeader.vue";
 import SelectionLoadingBlock from "../shared/SelectionLoadingBlock.vue";
 import UniversityTitle from "../shared/UniversityTitle.vue";
@@ -61,7 +61,10 @@ const selectingGroupId = ref<number | undefined>();
 const query = useQuery<IGroup[]>({
 	queryKey: queryKeys.groupList(appStore.numUniv),
 	queryFn: ({ signal }) =>
-		wrapFetch({ ...groupListRequest(appStore.numUniv ?? 0), signal }),
+		wrapFetchTyped<IGroup[]>({
+			...groupListRequest(appStore.numUniv ?? 0),
+			signal,
+		}).then((data) => data ?? []),
 	enabled: computed(() => appStore.numUniv !== undefined),
 });
 

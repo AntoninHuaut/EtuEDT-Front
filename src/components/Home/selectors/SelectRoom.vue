@@ -60,7 +60,7 @@ import { matchesSearchQuery, useSearch } from "@/hooks/useSearch";
 import { useSelectionColors } from "@/hooks/useSelectionColors";
 import { useAppStore } from "@/store";
 import type { IRoom } from "@/types/APIType";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import RoomGridButton from "../buttons/RoomGridButton.vue";
 import SearchBarWithDebounce from "../shared/SearchBarWithDebounce.vue";
 import SelectHeader from "../shared/SelectHeader.vue";
@@ -75,10 +75,10 @@ const { colors: colorList } = useSelectionColors();
 const roomsQuery = useQuery<IRoom[]>({
 	queryKey: queryKeys.roomList(appStore.numUniv),
 	queryFn: ({ signal }) =>
-		wrapFetch({
+		wrapFetchTyped<IRoom[]>({
 			...roomListRequest(appStore.numUniv ?? 0),
 			signal,
-		}),
+		}).then((data) => data ?? []),
 	enabled: computed(() => appStore.numUniv !== undefined),
 });
 

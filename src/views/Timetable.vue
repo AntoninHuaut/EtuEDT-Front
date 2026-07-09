@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, watchEffect } from "vue";
+import { computed, watchEffect } from "vue";
 import TimetableNavigator from "@/components/Timetable/TimetableNavigator.vue";
 import TimetableViewer from "@/components/Timetable/TimetableViewer.vue";
 import { useCalendarQuerySync } from "@/hooks/useCalendarQuerySync";
@@ -19,6 +19,7 @@ const props = defineProps<{
 }>();
 
 const { initCalendarFromQuery } = useCalendarQuerySync();
+initCalendarFromQuery();
 
 const timetableData = useTimetable({
 	selectedResource: computed(() => props.selectedResource),
@@ -32,8 +33,4 @@ watchEffect(() =>
 			: timetableData.nameTT.value,
 	),
 );
-
-onMounted(() => {
-	initCalendarFromQuery();
-});
 </script>

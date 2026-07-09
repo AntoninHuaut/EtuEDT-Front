@@ -48,10 +48,9 @@ export function useCalendarQuerySync() {
 		([calDate, viewMode]) => {
 			const nextCalendarQuery = buildCalendarRouteQuery(calDate, viewMode);
 
-			if (
-				route.query.date === nextCalendarQuery.date &&
-				route.query.view === nextCalendarQuery.view
-			) {
+			const currentDate = parseCalDateQuery(route.query);
+			const currentView = parseViewModeQuery(route.query);
+			if (currentDate?.equals(calDate) && currentView === viewMode) {
 				return;
 			}
 

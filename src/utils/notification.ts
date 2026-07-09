@@ -40,7 +40,7 @@ export function successNotif(params: NotifParams): number {
 	});
 }
 
-export function genericNotif({
+function genericNotif({
 	autoClose = 3000,
 	message,
 	position = "top-center",

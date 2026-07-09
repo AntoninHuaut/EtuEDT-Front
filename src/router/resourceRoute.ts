@@ -140,7 +140,7 @@ export function getResourceRouteSelectionFromQuery(
 	return parseTimetableRouteSelection(query, "timetable");
 }
 
-function hasRouteSelectionQueryKeys(
+export function hasRouteSelectionQueryKeys(
 	query: LocationQuery,
 	resourceType: ResourceType,
 ): boolean {

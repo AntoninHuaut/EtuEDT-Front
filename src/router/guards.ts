@@ -1,13 +1,10 @@
-import type {
-	LocationQuery,
-	NavigationGuardReturn,
-	NavigationGuardWithThis,
-} from "vue-router";
+import type { LocationQuery, NavigationGuardReturn } from "vue-router";
 import { useAppStore } from "@/store";
 import type { ResourceType } from "@/types/AppType";
 import {
 	getResourceRouteLocation,
 	getResourceRouteSelectionFromQuery,
+	hasRouteSelectionQueryKeys,
 	resolveResourceRouteSelection,
 } from "./resourceRoute";
 import { ROUTE_NAME } from "./routeNames";
@@ -37,21 +34,13 @@ export function resolveResourceGuard(
 		return getResourceRouteLocation(selection);
 	}
 
+	if (hasRouteSelectionQueryKeys(query, resourceType)) {
+		return { name: ROUTE_NAME.NOT_FOUND };
+	}
+
 	if (fallbackSelection) {
 		return getResourceRouteLocation(fallbackSelection);
 	}
 
 	return { name: ROUTE_NAME.HOME };
 }
-
-function createResourceGuard(resourceType: ResourceType) {
-	const guard: NavigationGuardWithThis<undefined> = (to) =>
-		resolveResourceGuard(to.query, resourceType);
-
-	return guard;
-}
-
-export const guards = {
-	timetable: createResourceGuard("timetable"),
-	room: createResourceGuard("room"),
-};

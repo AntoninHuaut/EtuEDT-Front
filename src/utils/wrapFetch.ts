@@ -55,34 +55,6 @@ async function parseSuccessPayload(
 	}
 }
 
-export async function wrapFetch({
-	url,
-	options,
-	signal,
-}: IRequestParams & { signal?: AbortSignal }): Promise<unknown> {
-	const response = await fetch(url, {
-		...options,
-		signal,
-	});
-
-	if (!response.ok) {
-		const payload = await parseErrorPayload(response);
-		throw new ApiError({
-			message: buildApiErrorMessage({
-				status: response.status,
-				statusText: response.statusText,
-				payload,
-			}),
-			status: response.status,
-			statusText: response.statusText,
-			url,
-			payload,
-		});
-	}
-
-	return parseSuccessPayload(response, true);
-}
-
 export async function wrapFetchTyped<T>({
 	url,
 	options,

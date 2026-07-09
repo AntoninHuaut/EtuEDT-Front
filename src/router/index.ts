@@ -1,7 +1,7 @@
+import { useAppStore } from "@/store";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
-import { useAppStore } from "@/store";
-import { guards, resolveResourceGuard } from "./guards";
+import { resolveResourceGuard } from "./guards";
 import { resolveResourceRouteSelection } from "./resourceRoute";
 import { ROUTE_NAME } from "./routeNames";
 import { getStoreFallbackSelection } from "./storeFallbackSelection";
@@ -39,7 +39,6 @@ const routes: RouteRecordRaw[] = [
 						),
 					};
 				},
-				beforeEnter: guards.timetable,
 			},
 			{
 				path: "room",
@@ -56,7 +55,6 @@ const routes: RouteRecordRaw[] = [
 						),
 					};
 				},
-				beforeEnter: guards.room,
 			},
 			{
 				path: "about",

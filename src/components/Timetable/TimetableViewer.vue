@@ -52,16 +52,20 @@ const browserLocale = getLocale();
 const selectedResourceIdentity = computed(() =>
 	getSelectedResourceIdentity(props.selectedResource),
 );
+// `selectedResourceIdentity` is a new array reference on every recompute
+// (e.g. every router navigation re-invokes the route's `props` function),
+// even when the underlying resource hasn't actually changed. Watchers must
+// compare this by value, not by reference, so derive a primitive key.
+const selectedResourceKey = computed(() =>
+	selectedResourceIdentity.value.join("|"),
+);
 const lastNotifiedUpdateKey = ref<string | undefined>(undefined);
 const currentUpdateKey = computed(() => {
 	if (!timetableData.lastUpdate.value) {
 		return undefined;
 	}
 
-	return [
-		...selectedResourceIdentity.value,
-		timetableData.lastUpdate.value,
-	].join("|");
+	return `${selectedResourceKey.value}|${timetableData.lastUpdate.value}`;
 });
 
 const eventsServicePlugin = createEventsServicePlugin();
@@ -122,7 +126,7 @@ useQueryNotifications<IJsonEvent[]>({
 
 watch(
 	() => [
-		selectedResourceIdentity.value,
+		selectedResourceKey.value,
 		currentUpdateKey.value,
 		evtsQuery.error.value,
 		evtsQuery.isSuccess.value,
@@ -187,7 +191,7 @@ watch(
 	{ immediate: true },
 );
 
-watch(selectedResourceIdentity, () => {
+watch(selectedResourceKey, () => {
 	timetableViewStore.replaceEvents([]);
 	lastNotifiedUpdateKey.value = undefined;
 });

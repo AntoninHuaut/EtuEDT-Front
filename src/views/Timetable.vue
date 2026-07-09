@@ -6,21 +6,20 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, watchEffect } from "vue";
+import { computed, watchEffect } from "vue";
 import TimetableNavigator from "@/components/Timetable/TimetableNavigator.vue";
 import TimetableViewer from "@/components/Timetable/TimetableViewer.vue";
-import { useDateHelper } from "@/hooks/useDateHelper";
+import { useCalendarQuerySync } from "@/hooks/useCalendarQuerySync";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useTimetable } from "@/hooks/useTimetable";
-import { useTimetableViewStore } from "@/store";
 import type { IResourceSelection } from "@/types/AppType";
 
 const props = defineProps<{
 	selectedResource: IResourceSelection;
 }>();
 
-const dateHelper = useDateHelper();
-const timetableViewStore = useTimetableViewStore();
+const { initCalendarFromQuery } = useCalendarQuerySync();
+initCalendarFromQuery();
 
 const timetableData = useTimetable({
 	selectedResource: computed(() => props.selectedResource),
@@ -34,8 +33,4 @@ watchEffect(() =>
 			: timetableData.nameTT.value,
 	),
 );
-
-onMounted(() => {
-	timetableViewStore.setCalDate(dateHelper.getCurrentWeekday());
-});
 </script>

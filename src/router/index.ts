@@ -1,6 +1,6 @@
-import { useAppStore } from "@/store";
 import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
+import { useAppStore } from "@/store";
 import { resolveResourceGuard } from "./guards";
 import { resolveResourceRouteSelection } from "./resourceRoute";
 import { ROUTE_NAME } from "./routeNames";

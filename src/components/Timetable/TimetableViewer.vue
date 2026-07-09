@@ -147,7 +147,7 @@ watch(
 			console.error("Failed to map timetable events", error);
 			timetableViewStore.replaceEvents([]);
 			errorNotif({
-				message: "Impossible d'afficher les seances de cet emploi du temps.",
+				message: "Impossible d'afficher les events de cet emploi du temps.",
 			});
 			return;
 		}

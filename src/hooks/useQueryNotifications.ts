@@ -11,10 +11,10 @@ function getApiErrorMessage(error: Error): string {
 		case 404:
 			return "Ressource introuvable";
 		case 429:
-			return "Trop de requetes, veuillez patienter";
+			return "Trop de requêtes, veuillez patienter";
 		default:
 			if (error.status >= 500) {
-				return "Le serveur rencontre actuellement un probleme";
+				return "Le serveur rencontre actuellement un problème";
 			}
 
 			return error.message;

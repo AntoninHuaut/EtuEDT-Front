@@ -32,7 +32,7 @@ export function mapTimetableEvents(
 
 	if (hasInvalidEventDate) {
 		errorNotif({
-			message: "Certaines seances n'ont pas pu etre affichees.",
+			message: "Certains events n'ont pas pu etre affichés.",
 		});
 	}
 

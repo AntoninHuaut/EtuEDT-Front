@@ -50,7 +50,7 @@ function genericNotif({
 	autoClose?: number;
 	position?: ToastPosition;
 	type: ToastType;
-	width?: string | number;
+	width?: number;
 }): number {
 	const requestedWidth =
 		typeof width === "number" ? width : Number.parseInt(width, 10);

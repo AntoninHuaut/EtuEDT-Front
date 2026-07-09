@@ -40,7 +40,7 @@ export function successNotif(params: NotifParams): number {
 	});
 }
 
-export function genericNotif({
+function genericNotif({
 	autoClose = 3000,
 	message,
 	position = "top-center",
@@ -50,9 +50,15 @@ export function genericNotif({
 	autoClose?: number;
 	position?: ToastPosition;
 	type: ToastType;
-	width?: string | number;
+	width?: number;
 }): number {
-	width = Math.min(width, document.documentElement.clientWidth);
+	const requestedWidth =
+		typeof width === "number" ? width : Number.parseInt(width, 10);
+	const viewportWidth =
+		typeof document !== "undefined"
+			? document.documentElement.clientWidth
+			: requestedWidth;
+	width = Math.min(requestedWidth || 450, viewportWidth || 450);
 	toast(message, {
 		type,
 		autoClose,

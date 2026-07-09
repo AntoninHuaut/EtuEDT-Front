@@ -28,14 +28,19 @@
 </style>
 
 <script lang="ts" setup>
-import { computed, useAttrs } from "vue";
+import { computed, type PropType, useAttrs } from "vue";
 import { useDisplay } from "vuetify";
 
 const { smAndDown } = useDisplay();
 
 const props = defineProps({
 	text: String,
-	onClick: Function,
+	onClick: {
+		type: Function as PropType<
+			(() => unknown) | ((event: MouseEvent) => unknown)
+		>,
+		required: false,
+	},
 	tooltip: {
 		type: String,
 		required: true,

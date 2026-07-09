@@ -43,11 +43,12 @@ import { useQuery } from "@tanstack/vue-query";
 import { computed, ref } from "vue";
 import { useDisplay } from "vuetify";
 import { groupListRequest } from "@/api/api_requests";
+import { queryKeys } from "@/hooks/queries/queryKeys";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { useAppStore } from "@/store";
 import type { IGroup } from "@/types/APIType";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import SelectHeader from "../shared/SelectHeader.vue";
 import SelectionLoadingBlock from "../shared/SelectionLoadingBlock.vue";
 import UniversityTitle from "../shared/UniversityTitle.vue";
@@ -58,9 +59,12 @@ const { goToRooms, selectGroup: selectGroupInStore } = useResourceSelection();
 const selectingGroupId = ref<number | undefined>();
 
 const query = useQuery<IGroup[]>({
-	queryKey: ["groupList", appStore.numUniv],
+	queryKey: queryKeys.groupList(appStore.numUniv),
 	queryFn: ({ signal }) =>
-		wrapFetch({ ...groupListRequest(appStore.numUniv ?? 0), signal }),
+		wrapFetchTyped<IGroup[]>({
+			...groupListRequest(appStore.numUniv ?? 0),
+			signal,
+		}).then((data) => data ?? []),
 	enabled: computed(() => appStore.numUniv !== undefined),
 });
 

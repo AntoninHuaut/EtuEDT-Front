@@ -28,10 +28,17 @@ export function getTimetableName(
 		return item.label ?? "?";
 	}
 
-	const timetable = item as ITimetable;
-	if (timetable.year < 0) {
-		return timetable.label ?? "?";
+	if (!isTimetable(item)) {
+		return item.label ?? "?";
 	}
 
-	return `${timetable.year}A ${timetable.label}`;
+	if (item.year < 0) {
+		return item.label ?? "?";
+	}
+
+	return `${item.year}A ${item.label}`;
+}
+
+function isTimetable(item: ITimetable | IRoom): item is ITimetable {
+	return "year" in item;
 }

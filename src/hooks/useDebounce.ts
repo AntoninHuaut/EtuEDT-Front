@@ -33,5 +33,3 @@ export function useDebounce<T>(source: Ref<T>, delay = 250) {
 		isDebouncing,
 	};
 }
-
-export default useDebounce;

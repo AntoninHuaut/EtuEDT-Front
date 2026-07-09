@@ -1,5 +1,6 @@
 <template>
-  <v-row class="align-center timetable-bar" :class="{ 'timetable-bar--stacked': smAndDown }" no-gutters>
+  <div ref="swipeZone">
+    <v-row class="align-center timetable-bar" :class="{ 'timetable-bar--stacked': smAndDown }" no-gutters>
     <v-col cols="12" sm="8" class="d-flex align-center flex-wrap" :class="{ 'justify-center': smAndDown }">
       <v-tooltip text="💡 [Espace]" open-delay="350">
         <template #activator="{ props }">
@@ -67,24 +68,48 @@
         </template>
       </v-tooltip>
     </v-col>
-  </v-row>
+    </v-row>
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { onKeyStroke, useSwipe } from "@vueuse/core";
-import { watch } from "vue";
+import { computed, ref } from "vue";
 import { useDisplay } from "vuetify";
 import { useDateHelper } from "@/hooks/useDateHelper";
 import { useTimetable } from "@/hooks/useTimetable";
 import { useTimetableViewStore } from "@/store";
+import type { IResourceSelection } from "@/types/AppType";
 import { getLocale } from "@/utils/locale";
 
-const timetableData = useTimetable();
+const props = defineProps<{
+	selectedResource: IResourceSelection;
+}>();
+
+const timetableData = useTimetable({
+	selectedResource: computed(() => props.selectedResource),
+});
 const timetableViewStore = useTimetableViewStore();
 const dateHelper = useDateHelper();
 const browserLocale = getLocale();
 const { xs, smAndDown } = useDisplay();
-const { isSwiping, direction } = useSwipe(document.body);
+const swipeZone = ref<HTMLElement | null>(null);
+const interactiveTagNameSet = new Set([
+	"BUTTON",
+	"INPUT",
+	"SELECT",
+	"TEXTAREA",
+]);
+const { direction } = useSwipe(swipeZone, {
+	threshold: 80,
+	onSwipeEnd: () => {
+		if (direction.value === "left") {
+			setDate(null, "next");
+		} else if (direction.value === "right") {
+			setDate(null, "prev");
+		}
+	},
+});
 
 function getBtnSize() {
 	return xs.value ? "small" : undefined;
@@ -140,14 +165,44 @@ function setView(view: "day" | "week" | "month-grid") {
 	timetableViewStore.setViewMode(view);
 }
 
-watch(isSwiping, (isSwiping) => {
-	if (isSwiping) {
-		if (direction.value === "left") setDate(null, "next");
-		else if (direction.value === "right") setDate(null, "prev");
+function isInteractiveTarget(target: EventTarget | null): boolean {
+	if (!(target instanceof HTMLElement)) {
+		return false;
 	}
-});
 
-onKeyStroke(["w", "W"], (_e) => {
+	if (target.isContentEditable) {
+		return true;
+	}
+
+	if (interactiveTagNameSet.has(target.tagName)) {
+		return true;
+	}
+
+	return (
+		target.closest("[contenteditable='true']") !== null ||
+		target.closest("[role='textbox']") !== null
+	);
+}
+
+function shouldHandleHotkey(event: KeyboardEvent): boolean {
+	if (event.defaultPrevented) {
+		return false;
+	}
+
+	if (event.altKey || event.ctrlKey || event.metaKey) {
+		return false;
+	}
+
+	return !isInteractiveTarget(event.target);
+}
+
+onKeyStroke(["w", "W"], (event) => {
+	if (!shouldHandleHotkey(event)) {
+		return;
+	}
+
+	event.preventDefault();
+
 	switch (timetableViewStore.viewMode) {
 		case "day":
 			setView("week");
@@ -161,9 +216,29 @@ onKeyStroke(["w", "W"], (_e) => {
 	}
 });
 
-onKeyStroke("ArrowLeft", (e) => setDate(e, "prev"));
-onKeyStroke("ArrowRight", (e) => setDate(e, "next"));
-onKeyStroke(" ", (e) => setDate(e, "today"));
+onKeyStroke("ArrowLeft", (event) => {
+	if (!shouldHandleHotkey(event)) {
+		return;
+	}
+
+	setDate(event, "prev");
+});
+
+onKeyStroke("ArrowRight", (event) => {
+	if (!shouldHandleHotkey(event)) {
+		return;
+	}
+
+	setDate(event, "next");
+});
+
+onKeyStroke(" ", (event) => {
+	if (!shouldHandleHotkey(event)) {
+		return;
+	}
+
+	setDate(event, "today");
+});
 </script>
 
 <style scoped>

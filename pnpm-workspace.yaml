@@ -1,0 +1,8 @@
+packages:
+  - '.'
+allowBuilds:
+  '@parcel/watcher': false
+  vue-demi: false
+minimumReleaseAgeExclude:
+  - preact@10.29.7
+  - vite@8.1.4

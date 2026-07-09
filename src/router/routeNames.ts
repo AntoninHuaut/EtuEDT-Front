@@ -6,5 +6,3 @@ export const ROUTE_NAME = {
 	ABOUT: "About",
 	NOT_FOUND: "NotFound",
 } as const;
-
-export type RouteName = (typeof ROUTE_NAME)[keyof typeof ROUTE_NAME];

@@ -22,16 +22,3 @@ export interface ITimetableSelection {
 }
 
 export type IResourceSelection = IRoomSelection | ITimetableSelection;
-
-export interface IRoomSelectionWithNames extends IRoomSelection {
-	universityName: string;
-}
-
-export interface ITimetableSelectionWithNames extends ITimetableSelection {
-	universityName: string;
-	groupName: string;
-}
-
-export type IResourceSelectionWithNames =
-	| IRoomSelectionWithNames
-	| ITimetableSelectionWithNames;

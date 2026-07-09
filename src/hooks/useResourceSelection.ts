@@ -9,9 +9,7 @@ export const useResourceSelection = () => {
 	const router = useRouter();
 
 	async function navigateToResource() {
-		await router.push(
-			getResourceRouteLocation(appStore.selectedResourceWithNames),
-		);
+		await router.push(getResourceRouteLocation(appStore.selectedResource));
 	}
 
 	function selectGroup(groupId: number, groupName: string) {

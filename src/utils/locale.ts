@@ -1,6 +1,10 @@
 const DEFAULT_LOCALE = "en-GB";
 
 export function getLocale(defaultLocale = DEFAULT_LOCALE): string {
+	if (typeof window === "undefined") {
+		return defaultLocale;
+	}
+
 	const languages = window.navigator.languages ?? [];
 	const candidate =
 		languages.find((locale) => locale.includes("-")) ?? defaultLocale;

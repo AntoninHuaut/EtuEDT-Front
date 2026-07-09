@@ -12,7 +12,7 @@ import type {
 } from "@/types/AppType";
 import { ROUTE_NAME } from "./routeNames";
 
-function getQueryStringValue(
+export function getQueryStringValue(
 	value: LocationQueryValue | LocationQueryValue[] | undefined,
 ): string | undefined {
 	if (Array.isArray(value)) {

@@ -24,7 +24,7 @@
              cols="6"
              sm="4"
              md="4"
-             lg="3"
+             lg="4"
              xl="3"
              class="pa-1 d-flex room-grid-col">
         <CampusGridButton
@@ -62,6 +62,7 @@ import UniversityTitle from "../shared/UniversityTitle.vue";
 import CampusGridButton from "@/components/Home/buttons/CampusGridButton.vue";
 import {useSelectionColors} from "@/hooks/useSelectionColors";
 import {wrapFetchTyped} from "@/utils/wrapFetch";
+import {queryKeys} from "@/hooks/queries/queryKeys";
 
 const {colors: colorList} = useSelectionColors();
 
@@ -71,7 +72,7 @@ const {goToFreeRooms, goToRooms, selectCampus: selectCampusInStore} = useResourc
 const selectingGroupId = ref<number | undefined>();
 
 const campusesQuery = useQuery<ICampus[]>({
-  queryKey: ["campusList", appStore.numUniv],
+  queryKey: queryKeys.campusList(appStore.numUniv),
   queryFn: ({signal}) =>
       wrapFetchTyped<ICampus[]>({
         ...campusesListRequest(appStore.numUniv ?? 0),

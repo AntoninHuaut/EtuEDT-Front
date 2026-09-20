@@ -40,7 +40,7 @@ export const useResourceSelection = () => {
 	}
 
 	async function goToCampuses() {
-		selectCampus(undefined);
+		selectCampus(-1);
 		await router.push({ name: ROUTE_NAME.HOME });
 	}
 

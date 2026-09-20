@@ -70,7 +70,7 @@ const {colors: colorList} = useSelectionColors();
 const {searchQuery, debouncedQuery, isDebouncing} = useSearch();
 
 const campusFreeRoomsQuery = useQuery<IRoom[]>({
-  queryKey: queryKeys.campusFreeRoomsList(appStore.numUniv),
+  queryKey: queryKeys.campusFreeRoomsList(appStore.numUniv, appStore.selectedCampusId),
   queryFn: ({signal}) =>
       wrapFetchTyped<IRoom[]>({
         ...freeRoomsRequest(appStore.numUniv ?? 0, appStore.selectedCampusId ?? 0),

@@ -24,10 +24,10 @@
         v-model="searchQuery"
         label="Rechercher une salle..."
         :is-debouncing="isDebouncing"
-        class="w-75"
+        class="w-50 w-lg-75"
     />
 
-    <div class="px-3 px-sm-5 px-md-6 w-25">
+    <div class="px-3 px-sm-5 px-md-6 w-50 w-lg-25">
       <v-select
           v-if="campusesQuery.isSuccess.value && campusesQuery.data.value && campusesQuery.data.value.length > 0"
           v-model="appStore.selectedCampusId"
@@ -82,11 +82,9 @@ import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { matchesSearchQuery, useSearch } from "@/hooks/useSearch";
 import { useSelectionColors } from "@/hooks/useSelectionColors";
-import type { IRoom } from "@/types/APIType";
+import type { IRoom, ICampus } from "@/types/APIType";
 import { wrapFetchTyped } from "@/utils/wrapFetch";
 import { useAppStore } from "@/store/";
-import {ICampus, IRoom} from "@/types/APIType";
-import { wrapFetch } from "@/utils/wrapFetch";
 import RoomGridButton from "../buttons/RoomGridButton.vue";
 import SearchBarWithDebounce from "../shared/SearchBarWithDebounce.vue";
 import SelectHeader from "../shared/SelectHeader.vue";
@@ -109,12 +107,12 @@ const roomsQuery = useQuery<IRoom[]>({
 });
 
 const campusesQuery = useQuery<ICampus[]>({
-  queryKey: ["campusList", appStore.numUniv],
+  queryKey: queryKeys.campusList(appStore.numUniv),
   queryFn: ({ signal }) =>
-      wrapFetch({
+      wrapFetchTyped<ICampus[]>({
         ...campusesListRequest(appStore.numUniv ?? 0),
         signal,
-      }),
+      }).then((data) => data ?? []),
   enabled: computed(() => appStore.numUniv !== undefined),
 });
 

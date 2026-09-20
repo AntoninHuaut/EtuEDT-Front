@@ -56,12 +56,12 @@ import {useQueryNotifications} from "@/hooks/useQueryNotifications";
 import {useResourceSelection} from "@/hooks/useResourceSelection";
 import {useAppStore} from "@/store";
 import {ICampus, IGroup} from "@/types/APIType";
-import {wrapFetch} from "@/utils/wrapFetch";
 import SelectHeader from "../shared/SelectHeader.vue";
 import SelectionLoadingBlock from "../shared/SelectionLoadingBlock.vue";
 import UniversityTitle from "../shared/UniversityTitle.vue";
 import CampusGridButton from "@/components/Home/buttons/CampusGridButton.vue";
 import {useSelectionColors} from "@/hooks/useSelectionColors";
+import {wrapFetchTyped} from "@/utils/wrapFetch";
 
 const {colors: colorList} = useSelectionColors();
 
@@ -73,10 +73,10 @@ const selectingGroupId = ref<number | undefined>();
 const campusesQuery = useQuery<ICampus[]>({
   queryKey: ["campusList", appStore.numUniv],
   queryFn: ({signal}) =>
-      wrapFetch({
+      wrapFetchTyped<ICampus[]>({
         ...campusesListRequest(appStore.numUniv ?? 0),
         signal,
-      }),
+      }).then((data) => data ?? []),
   enabled: computed(() => appStore.numUniv !== undefined),
 });
 

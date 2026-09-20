@@ -53,6 +53,10 @@ export const queryKeys = {
 		["groupList", universityId] as const,
 	roomList: (universityId: number | undefined) =>
 		["roomList", universityId] as const,
+	campusList: (universityId: number | undefined) =>
+		["campusList", universityId] as const,
+	campusFreeRoomsList: (universityId: number | undefined) =>
+		["campusFreeRoomsList", universityId] as const,
 	timetableList: (
 		universityId: number | undefined,
 		groupId: number | undefined,

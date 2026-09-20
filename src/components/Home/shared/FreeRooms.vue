@@ -54,7 +54,7 @@ import {useQueryNotifications} from "@/hooks/useQueryNotifications";
 import {useResourceSelection} from "@/hooks/useResourceSelection";
 import {useAppStore} from "@/store";
 import {ICampus, IGroup, IRoom} from "@/types/APIType";
-import {wrapFetch} from "@/utils/wrapFetch";
+import {wrapFetchTyped} from "@/utils/wrapFetch";
 import SelectHeader from "../shared/SelectHeader.vue";
 import SelectionLoadingBlock from "../shared/SelectionLoadingBlock.vue";
 import UniversityTitle from "../shared/UniversityTitle.vue";
@@ -62,6 +62,7 @@ import RoomGridButton from "@/components/Home/buttons/RoomGridButton.vue";
 import {useSelectionColors} from "@/hooks/useSelectionColors";
 import SearchBarWithDebounce from "@/components/Home/shared/SearchBarWithDebounce.vue";
 import {matchesSearchQuery, useSearch} from "@/hooks/useSearch";
+import {queryKeys} from "@/hooks/queries/queryKeys";
 
 const appStore = useAppStore();
 const {goToGroups} = useResourceSelection();
@@ -69,12 +70,12 @@ const {colors: colorList} = useSelectionColors();
 const {searchQuery, debouncedQuery, isDebouncing} = useSearch();
 
 const campusFreeRoomsQuery = useQuery<IRoom[]>({
-  queryKey: ["campusFreeRoomsList", appStore.numUniv],
+  queryKey: queryKeys.campusFreeRoomsList(appStore.numUniv),
   queryFn: ({signal}) =>
-      wrapFetch({
+      wrapFetchTyped<IRoom[]>({
         ...freeRoomsRequest(appStore.numUniv ?? 0, appStore.selectedCampusId ?? 0),
         signal,
-      }),
+      }).then((data) => data ?? []),
   enabled: computed(() => appStore.numUniv !== undefined),
 });
 const filteredFreeRooms = computed(() => {

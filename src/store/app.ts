@@ -16,6 +16,9 @@ export const useAppStore = defineStore("app", () => {
 		"resourceType",
 		"timetable",
 	);
+	const selectedCampusId = useLocalStorage<number | undefined>("selectedCampusId", -1);
+	const selectedCampusName = useLocalStorage<string | undefined>("selectedCampusName", undefined);
+
 
 	const selectedResource = computed<IResourceSelection | undefined>(() => {
 		if (numUniv.value === undefined || selectedResourceId.value === undefined) {
@@ -90,5 +93,7 @@ export const useAppStore = defineStore("app", () => {
 		selectUniversity,
 		selectGroup,
 		setSelectedResource,
+		selectedCampusId,
+		selectedCampusName
 	};
 });

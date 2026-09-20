@@ -21,26 +21,52 @@ import { createEventModalPlugin } from "@schedule-x/event-modal";
 import { createEventsServicePlugin } from "@schedule-x/events-service";
 import "@schedule-x/theme-default/dist/index.css";
 import { ScheduleXCalendar } from "@schedule-x/vue";
-import { useQuery } from "@tanstack/vue-query";
-import { computed, shallowRef, watch, watchEffect } from "vue";
+import { computed, ref, shallowRef, watch, watchEffect } from "vue";
 import { useDisplay, useTheme } from "vuetify";
 
-import { buildResourceEventsRequest } from "@/api/resourceRequestFactory";
+import { getSelectedResourceIdentity } from "@/hooks/queries/queryKeys";
+import { mapTimetableEvents } from "@/hooks/timetable/useMappedTimetableEvents";
+import { useTimetableEventsQuery } from "@/hooks/timetable/useTimetableEventsQuery";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useTimetable } from "@/hooks/useTimetable";
-import { useAppStore, useTimetableViewStore } from "@/store";
+import { useTimetableViewStore } from "@/store";
 import type { IJsonEvent } from "@/types/APIType";
-import { errorNoDataFetchNotif, infoNotif } from "@/utils/notification";
-import { wrapFetch } from "@/utils/wrapFetch";
+import type { IResourceSelection } from "@/types/AppType";
+import { getLocale } from "@/utils/locale";
+import { errorNotif, infoNotif } from "@/utils/notification";
 
-import { getCalendarsList, getColorByLessonTitle } from "./helper";
+import { getCalendarsList } from "./helper";
 
-const appStore = useAppStore();
+const props = defineProps<{
+	selectedResource: IResourceSelection;
+}>();
+
 const theme = useTheme();
 const { xs } = useDisplay();
-const timetableData = useTimetable();
+const timetableData = useTimetable({
+	selectedResource: computed(() => props.selectedResource),
+});
 const timetableViewStore = useTimetableViewStore();
 const browserTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const browserLocale = getLocale();
+const selectedResourceIdentity = computed(() =>
+	getSelectedResourceIdentity(props.selectedResource),
+);
+// `selectedResourceIdentity` is a new array reference on every recompute
+// (e.g. every router navigation re-invokes the route's `props` function),
+// even when the underlying resource hasn't actually changed. Watchers must
+// compare this by value, not by reference, so derive a primitive key.
+const selectedResourceKey = computed(() =>
+	selectedResourceIdentity.value.join("|"),
+);
+const lastNotifiedUpdateKey = ref<string | undefined>(undefined);
+const currentUpdateKey = computed(() => {
+	if (!timetableData.lastUpdate.value) {
+		return undefined;
+	}
+
+	return `${selectedResourceKey.value}|${timetableData.lastUpdate.value}`;
+});
 
 const eventsServicePlugin = createEventsServicePlugin();
 const calendarControls = createCalendarControlsPlugin();
@@ -57,7 +83,7 @@ const calendarApp = shallowRef(
 		calendars: getCalendarsList(),
 		events: [],
 		defaultView: timetableViewStore.viewMode,
-		locale: navigator.language,
+		locale: browserLocale,
 		timezone: browserTimeZone,
 		dayBoundaries: {
 			start: "08:00",
@@ -85,27 +111,8 @@ watchEffect(() => calendarControls.setDate(timetableViewStore.calDate));
 watchEffect(() => calendarControls.setView(timetableViewStore.viewMode));
 watchEffect(() => eventsServicePlugin.set(timetableViewStore.events));
 
-const evtsQuery = useQuery<IJsonEvent[]>({
-	queryKey: computed(() => [
-		"timetableEvents",
-		appStore.numUniv,
-		appStore.groupId,
-		appStore.adeResources,
-		appStore.resourceType,
-	]),
-	queryFn: ({ signal }) => {
-		const context = appStore.getSelectedResourceContext();
-
-		if (!context) {
-			throw new Error("Missing timetable context");
-		}
-
-		return wrapFetch({
-			...buildResourceEventsRequest(context),
-			signal,
-		});
-	},
-	enabled: computed(() => appStore.canLoadSelectedResource),
+const evtsQuery = useTimetableEventsQuery({
+	selectedResource: computed(() => props.selectedResource),
 });
 
 const isInitialLoadingEvents = computed(() => evtsQuery.isLoading.value);
@@ -119,36 +126,57 @@ useQueryNotifications<IJsonEvent[]>({
 
 watch(
 	() => [
+		selectedResourceKey.value,
+		currentUpdateKey.value,
 		evtsQuery.error.value,
 		evtsQuery.isSuccess.value,
 		evtsQuery.data.value,
 	],
 	() => {
-		if (evtsQuery.error.value) return;
+		if (evtsQuery.error.value) {
+			timetableViewStore.replaceEvents([]);
+			return;
+		}
 		if (!evtsQuery.isSuccess.value) return;
-		if (!evtsQuery.data.value) return errorNoDataFetchNotif();
+		if (!evtsQuery.data.value) {
+			timetableViewStore.replaceEvents([]);
+			return;
+		}
 
-		timetableViewStore.events.length = 0;
-		timetableViewStore.events.push(
-			...evtsQuery.data.value.map((event, index) => ({
-				...event,
-				id: index,
-				start: toCalendarDateTime(event.start),
-				end: toCalendarDateTime(event.end),
-				people: event.teacher.split(","),
-				calendarId: getColorByLessonTitle(event.title),
-			})),
-		);
+		try {
+			timetableViewStore.replaceEvents(
+				mapTimetableEvents(evtsQuery.data.value, browserTimeZone),
+			);
+		} catch (error) {
+			console.error("Failed to map timetable events", error);
+			timetableViewStore.replaceEvents([]);
+			errorNotif({
+				message: "Impossible d'afficher les events de cet emploi du temps.",
+			});
+			return;
+		}
 
 		if (timetableData.lastUpdate.value) {
+			const updateKey = currentUpdateKey.value;
+			if (!updateKey) {
+				return;
+			}
+			if (lastNotifiedUpdateKey.value === updateKey) {
+				return;
+			}
+
+			lastNotifiedUpdateKey.value = updateKey;
 			const dateTime = toCalendarDateTime(timetableData.lastUpdate.value);
-			const datePart = dateTime.toLocaleString(navigator.language, {
+			if (!dateTime) {
+				return;
+			}
+			const datePart = dateTime.toLocaleString(browserLocale, {
 				year: "numeric",
 				month: "numeric",
 				day: "numeric",
 			});
 			const timePart = dateTime
-				.toLocaleString(navigator.language, {
+				.toLocaleString(browserLocale, {
 					hour: "numeric",
 					minute: "numeric",
 					hourCycle: "h23",
@@ -163,8 +191,18 @@ watch(
 	{ immediate: true },
 );
 
-function toCalendarDateTime(value: string): Temporal.ZonedDateTime {
-	return Temporal.Instant.from(value).toZonedDateTimeISO(browserTimeZone);
+watch(selectedResourceKey, () => {
+	timetableViewStore.replaceEvents([]);
+	lastNotifiedUpdateKey.value = undefined;
+});
+
+function toCalendarDateTime(value: string): Temporal.ZonedDateTime | undefined {
+	try {
+		return Temporal.Instant.from(value).toZonedDateTimeISO(browserTimeZone);
+	} catch {
+		console.error("Invalid lastUpdate datetime", value);
+		return undefined;
+	}
 }
 </script>
 

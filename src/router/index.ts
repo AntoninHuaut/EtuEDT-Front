@@ -1,42 +1,69 @@
+import type { RouteRecordRaw } from "vue-router";
 import { createRouter, createWebHistory } from "vue-router";
 import { useAppStore } from "@/store";
+import { resolveResourceGuard } from "./guards";
+import { resolveResourceRouteSelection } from "./resourceRoute";
+import { ROUTE_NAME } from "./routeNames";
+import { getStoreFallbackSelection } from "./storeFallbackSelection";
 
-const routes = [
+const routes: RouteRecordRaw[] = [
 	{
 		path: "/",
 		component: () => import("@/layouts/default/Default.vue"),
 		children: [
 			{
 				path: "",
-				name: "Home",
+				name: ROUTE_NAME.HOME,
 				component: () => import("@/views/Home.vue"),
 			},
 			{
 				path: "sync",
-				name: "Sync",
+				name: ROUTE_NAME.SYNC,
 				component: () => import("@/views/Sync.vue"),
 			},
 			{
-				path: "edt",
-				name: "Timetable",
+				path: "timetable",
+				name: ROUTE_NAME.TIMETABLE_GROUP,
 				component: () => import("@/views/Timetable.vue"),
-				beforeEnter: () => {
+				props: (route) => {
 					const appStore = useAppStore();
-					if (!appStore.canLoadSelectedResource) {
-						return { name: "Home" };
-					}
-
-					return true;
+					const fallbackSelection = getStoreFallbackSelection(
+						appStore,
+						"timetable",
+					);
+					return {
+						selectedResource: resolveResourceRouteSelection(
+							route.query,
+							"timetable",
+							fallbackSelection,
+						),
+					};
+				},
+			},
+			{
+				path: "room",
+				name: ROUTE_NAME.TIMETABLE_ROOM,
+				component: () => import("@/views/Timetable.vue"),
+				props: (route) => {
+					const appStore = useAppStore();
+					const fallbackSelection = getStoreFallbackSelection(appStore, "room");
+					return {
+						selectedResource: resolveResourceRouteSelection(
+							route.query,
+							"room",
+							fallbackSelection,
+						),
+					};
 				},
 			},
 			{
 				path: "about",
-				name: "About",
+				name: ROUTE_NAME.ABOUT,
 				component: () => import("@/views/About.vue"),
 			},
 			{
 				path: "/:pathMatch(.*)*",
-				name: "NotFound",
+				name: ROUTE_NAME.NOT_FOUND,
 				component: () => import("@/views/NotFound.vue"),
 			},
 		],
@@ -46,6 +73,18 @@ const routes = [
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes,
+});
+
+router.beforeEach((to) => {
+	if (to.name === ROUTE_NAME.TIMETABLE_GROUP) {
+		return resolveResourceGuard(to.query, "timetable");
+	}
+
+	if (to.name === ROUTE_NAME.TIMETABLE_ROOM) {
+		return resolveResourceGuard(to.query, "room");
+	}
+
+	return true;
 });
 
 export default router;

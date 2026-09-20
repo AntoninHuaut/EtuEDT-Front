@@ -2,7 +2,7 @@ import { HttpMethod } from "./requests";
 
 export const BASE_API_URL =
 	import.meta.env.VITE_API_BASE_URL ?? "https://edtapi.antoninhuaut.fr";
-export const API_URL_V3 = `${BASE_API_URL}/v3`;
+const API_URL_V3 = `${BASE_API_URL}/v3`;
 
 export const univListRequest = () => {
 	return {

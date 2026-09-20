@@ -1,33 +1,30 @@
 <template>
   <v-container class="pa-2" fluid>
-    <TimetableNavigator />
-    <TimetableViewer />
+    <TimetableNavigator :selected-resource="selectedResource" />
+    <TimetableViewer :selected-resource="selectedResource" />
   </v-container>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, watchEffect } from "vue";
+import { computed, watchEffect } from "vue";
 import TimetableNavigator from "@/components/Timetable/TimetableNavigator.vue";
 import TimetableViewer from "@/components/Timetable/TimetableViewer.vue";
-import { useDateHelper } from "@/hooks/useDateHelper";
+import { useCalendarQuerySync } from "@/hooks/useCalendarQuerySync";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useTimetable } from "@/hooks/useTimetable";
-import { useAppStore, useTimetableViewStore } from "@/store/";
+import type { IResourceSelection } from "@/types/AppType";
 
-const appStore = useAppStore();
-const dateHelper = useDateHelper();
-const timetableViewStore = useTimetableViewStore();
+const props = defineProps<{
+	selectedResource: IResourceSelection;
+}>();
 
-const timetableData = useTimetable();
-const { setPageTitle } = usePageTitle();
+const { initCalendarFromQuery } = useCalendarQuerySync();
+initCalendarFromQuery();
 
-watchEffect(() => {
-	appStore.setTimetableStatus({
-		adeUrl: timetableData.adeUrl.value,
-		isLoading: timetableData.isLoading.value,
-		isError: !!timetableData.error.value,
-	});
+const timetableData = useTimetable({
+	selectedResource: computed(() => props.selectedResource),
 });
+const { setPageTitle } = usePageTitle();
 
 watchEffect(() =>
 	setPageTitle(
@@ -36,8 +33,4 @@ watchEffect(() =>
 			: timetableData.nameTT.value,
 	),
 );
-
-onMounted(() => {
-	timetableViewStore.setCalDate(dateHelper.getCurrentWeekday());
-});
 </script>

@@ -30,11 +30,13 @@ import {
 } from "vue-router";
 import { useDisplay } from "vuetify";
 import { univListRequest } from "@/api/api_requests";
+import { queryKeys } from "@/hooks/queries/queryKeys";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
-import { useAppStore } from "@/store/";
+import { ROUTE_NAME } from "@/router/routeNames";
+import { useAppStore } from "@/store";
 import type { IUniv } from "@/types/APIType";
 import { genericError } from "@/utils/notification";
-import { wrapFetch } from "@/utils/wrapFetch";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import SelectHeader from "../shared/SelectHeader.vue";
 
 const { smAndDown } = useDisplay();
@@ -43,8 +45,11 @@ const selectingUniv = ref<number | undefined>();
 const router = useRouter();
 
 const univQuery = useQuery<IUniv[]>({
-	queryKey: ["univList"],
-	queryFn: ({ signal }) => wrapFetch({ ...univListRequest(), signal }),
+	queryKey: queryKeys.univList(),
+	queryFn: ({ signal }) =>
+		wrapFetchTyped<IUniv[]>({ ...univListRequest(), signal }).then(
+			(data) => data ?? [],
+		),
 });
 
 const isFetchingUnivs = computed(
@@ -64,7 +69,7 @@ async function selectUniv(univ: IUniv) {
 	selectingUniv.value = univ.id;
 	appStore.selectUniversity(univ.id, univ.name);
 	try {
-		const navRes = await router.push({ name: "Home" });
+		const navRes = await router.push({ name: ROUTE_NAME.HOME });
 		if (isNavigationFailure(navRes, NavigationFailureType.duplicated)) {
 			// Do nothing if it's a duplicated navigation
 		} else if (isNavigationFailure(navRes)) {

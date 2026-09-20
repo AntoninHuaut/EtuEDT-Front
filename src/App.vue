@@ -13,7 +13,7 @@ import "@fontsource/roboto/900.css";
 import { usePreferredDark } from "@vueuse/core";
 import { watchEffect } from "vue";
 import { useTheme } from "vuetify";
-import { useThemeStore } from "@/store/";
+import { useThemeStore } from "@/store";
 import { ETheme } from "@/types/AppType";
 
 const themeStore = useThemeStore();
@@ -21,7 +21,7 @@ const vuetifyTheme = useTheme();
 const preferredDark = usePreferredDark();
 watchEffect(() => setTheme(themeStore.theme));
 
-function setTheme(currentTheme: string | undefined) {
+function setTheme(currentTheme: ETheme | undefined) {
 	if (
 		currentTheme === ETheme.DARK ||
 		(preferredDark.value && currentTheme === ETheme.SYSTEM)

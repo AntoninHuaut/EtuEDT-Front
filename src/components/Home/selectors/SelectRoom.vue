@@ -76,11 +76,14 @@
 <script lang="ts" setup>
 import { useQuery } from "@tanstack/vue-query";
 import { computed } from "vue";
+import { queryKeys } from "@/hooks/queries/queryKeys";
 import {campusesListRequest, roomListRequest} from "@/api/api_requests";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { matchesSearchQuery, useSearch } from "@/hooks/useSearch";
 import { useSelectionColors } from "@/hooks/useSelectionColors";
+import type { IRoom } from "@/types/APIType";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import { useAppStore } from "@/store/";
 import {ICampus, IRoom} from "@/types/APIType";
 import { wrapFetch } from "@/utils/wrapFetch";
@@ -96,12 +99,12 @@ const { searchQuery, debouncedQuery, isDebouncing } = useSearch();
 const { colors: colorList } = useSelectionColors();
 
 const roomsQuery = useQuery<IRoom[]>({
-	queryKey: ["roomList", appStore.numUniv],
+	queryKey: queryKeys.roomList(appStore.numUniv),
 	queryFn: ({ signal }) =>
-		wrapFetch({
+		wrapFetchTyped<IRoom[]>({
 			...roomListRequest(appStore.numUniv ?? 0),
 			signal,
-		}),
+		}).then((data) => data ?? []),
 	enabled: computed(() => appStore.numUniv !== undefined),
 });
 

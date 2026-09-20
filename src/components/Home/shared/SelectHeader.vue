@@ -6,6 +6,7 @@
 		</p>
 		<v-spacer v-if="!xs" />
 		<v-btn
+      v-for="action in action"
 			v-if="action"
 			class="ml-4"
 			:prepend-icon="action.prependIcon"
@@ -32,7 +33,7 @@ defineProps<{
 		color: string;
 		onClick: () => void | Promise<void>;
 		text: string;
-	};
+	}[];
 }>();
 
 const { xs } = useDisplay();

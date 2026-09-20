@@ -21,6 +21,10 @@ export const useResourceSelection = () => {
 		appStore.selectGroup(groupId, groupName);
 	}
 
+	function selectCampus(campusId: number, campusName: string) {
+		appStore.selectCampus(campusId, campusName);
+	}
+
 	async function selectResource(
 		resourceType: ResourceType,
 		adeResources: number,
@@ -39,10 +43,23 @@ export const useResourceSelection = () => {
 		await router.push({ name: "Home" });
 	}
 
+	async function goToCampuses() {
+		appStore.selectCampus(undefined);
+		await router.push({ name: "Home" });
+	}
+
+	async function goToFreeRooms() {
+		appStore.setResourceSelection("freerooms");
+		await router.push({ name: "Home" });
+	}
+
 	return {
 		selectGroup,
 		selectResource,
+		selectCampus,
 		goToGroups,
 		goToRooms,
+		goToCampuses,
+		goToFreeRooms,
 	};
 };

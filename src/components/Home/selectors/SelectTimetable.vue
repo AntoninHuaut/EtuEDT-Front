@@ -2,13 +2,13 @@
     <SelectHeader
         title="Choix de l'emploi du temps"
         :show-back="true"
-        :action="{
+        :action="[{
             prependIcon: 'mdi-door-open',
             variant: 'tonal',
             color: 'primary',
             onClick: goToRooms,
             text: 'Salles',
-        }"
+        }]"
     />
 
     <v-divider class="mt-3 mb-3"></v-divider>

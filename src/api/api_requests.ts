@@ -32,6 +32,21 @@ export const roomListRequest = (univId: number) => {
 	};
 };
 
+export const campusesListRequest = (univId: number) => {
+	return {
+		url: `${API_URL_V3}/univs/${univId}/campuses`,
+		options: { method: HttpMethod.GET },
+	};
+};
+
+export const freeRoomsRequest = (univId: number, campusId: number) => {
+	return {
+		url: `${API_URL_V3}/univs/${univId}/free-rooms?campusId=${campusId}`,
+		options: { method: HttpMethod.GET },
+	};
+};
+
+
 export const timetableDetailsRequest = (
 	univId: number,
 	groupId: number,

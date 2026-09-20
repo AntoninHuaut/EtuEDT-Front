@@ -6,16 +6,16 @@
 		</p>
 		<v-spacer v-if="!xs" />
 		<v-btn
-      v-for="action in action"
+      v-for="act in action"
 			v-if="action"
 			class="ml-4"
-			:prepend-icon="action.prependIcon"
-			:variant="action.variant"
-			:color="action.color"
+			:prepend-icon="act.prependIcon"
+			:variant="act.variant"
+			:color="act.color"
 			:size="xs ? 'small' : undefined"
-			@click="action.onClick"
+			@click="act.onClick"
 		>
-			{{ action.text }}
+			{{ act.text }}
 		</v-btn>
 	</div>
 </template>

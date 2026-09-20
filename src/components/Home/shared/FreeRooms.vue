@@ -34,7 +34,7 @@
              xl="3"
              class="pa-1 d-flex room-grid-col">
         <RoomGridButton :room="campus"
-                        :colorHex="[5429, 5446].includes(campus.adeResources) ? '#ff1111' : colorList[i % colorList.length]"
+                        :colorHex="colorList[i % colorList.length]"
                         :class="{ 'best-room': [5429, 5446].includes(campus.adeResources) }"/>
       </v-col>
 
@@ -106,12 +106,6 @@ const isInitialLoading = computed(() => campusFreeRoomsQuery.isLoading.value);
 <style scoped>
 /* The objectively best room of C3 */
 .best-room {
-  box-shadow: 0 0 2px #fff,
-  inset 0 0 4px #fff,
-  0 0 8px #f00,
-  inset 0 0 16px #f00,
-  0 0 16px #f00,
-  inset 0 0 32px #f00,
-  0 0 32px #f00;
+  border: 2px solid #cab358;
 }
 </style>

@@ -18,7 +18,7 @@ export function getYearTitle(yearId: number): string {
  */
 export function getTimetableName(
 	item: ITimetable | IRoom | undefined,
-	resourceType: "timetable" | "room",
+	resourceType: "timetable" | "room" | "campus" | "freerooms",
 ): string {
 	if (!item) {
 		return "?";

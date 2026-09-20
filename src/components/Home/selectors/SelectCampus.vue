@@ -21,11 +21,11 @@
     <v-row class="justify-center pa-2 px-3 px-sm-5 px-md-6 align-stretch room-grid-row">
 
       <v-col v-for="(campus, i) in campusesList" :key="campus.id"
-             cols="4"
+             cols="6"
              sm="4"
              md="4"
-             lg="4"
-             xl="4"
+             lg="3"
+             xl="3"
              class="pa-1 d-flex room-grid-col">
         <CampusGridButton
             :size="smAndDown ? 'large' : 'x-large'"

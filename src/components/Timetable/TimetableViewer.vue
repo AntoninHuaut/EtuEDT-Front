@@ -195,10 +195,8 @@ function toCalendarDateTime(value: string): Temporal.ZonedDateTime {
     height: 1.2em;
     width: 1.2em;
 }
-.sx__current-time-indicator,
-.sx__time-grid-current-time-indicator,
-.sx__time-grid-day-selection {
-  z-index: 10 !important;
+.sx__current-time-indicator {
+  z-index: 1;
   pointer-events: none;
 }
 </style>

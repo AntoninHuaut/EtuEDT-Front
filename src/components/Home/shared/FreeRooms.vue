@@ -46,60 +46,73 @@
 </template>
 
 <script lang="ts" setup>
-import {useQuery} from "@tanstack/vue-query";
-import {computed, ref} from "vue";
-import {useDisplay} from "vuetify";
-import {campusesListRequest, freeRoomsRequest, groupListRequest} from "@/api/api_requests";
-import {useQueryNotifications} from "@/hooks/useQueryNotifications";
-import {useResourceSelection} from "@/hooks/useResourceSelection";
-import {useAppStore} from "@/store";
-import {ICampus, IGroup, IRoom} from "@/types/APIType";
-import {wrapFetchTyped} from "@/utils/wrapFetch";
+import { useQuery } from "@tanstack/vue-query";
+import { computed, ref } from "vue";
+import { useDisplay } from "vuetify";
+import {
+	campusesListRequest,
+	freeRoomsRequest,
+	groupListRequest,
+} from "@/api/api_requests";
+import RoomGridButton from "@/components/Home/buttons/RoomGridButton.vue";
+import SearchBarWithDebounce from "@/components/Home/shared/SearchBarWithDebounce.vue";
+import { queryKeys } from "@/hooks/queries/queryKeys";
+import { useQueryNotifications } from "@/hooks/useQueryNotifications";
+import { useResourceSelection } from "@/hooks/useResourceSelection";
+import { matchesSearchQuery, useSearch } from "@/hooks/useSearch";
+import { useSelectionColors } from "@/hooks/useSelectionColors";
+import { useAppStore } from "@/store";
+import { ICampus, IGroup, IRoom } from "@/types/APIType";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import SelectHeader from "../shared/SelectHeader.vue";
 import SelectionLoadingBlock from "../shared/SelectionLoadingBlock.vue";
 import UniversityTitle from "../shared/UniversityTitle.vue";
-import RoomGridButton from "@/components/Home/buttons/RoomGridButton.vue";
-import {useSelectionColors} from "@/hooks/useSelectionColors";
-import SearchBarWithDebounce from "@/components/Home/shared/SearchBarWithDebounce.vue";
-import {matchesSearchQuery, useSearch} from "@/hooks/useSearch";
-import {queryKeys} from "@/hooks/queries/queryKeys";
 
 const appStore = useAppStore();
-const {goToGroups} = useResourceSelection();
-const {colors: colorList} = useSelectionColors();
-const {searchQuery, debouncedQuery, isDebouncing} = useSearch();
+const { goToGroups } = useResourceSelection();
+const { colors: colorList } = useSelectionColors();
+const { searchQuery, debouncedQuery, isDebouncing } = useSearch();
 
 const campusFreeRoomsQuery = useQuery<IRoom[]>({
-  queryKey: queryKeys.campusFreeRoomsList(appStore.numUniv, appStore.selectedCampusId),
-  queryFn: ({signal}) =>
-      wrapFetchTyped<IRoom[]>({
-        ...freeRoomsRequest(appStore.numUniv ?? 0, appStore.selectedCampusId ?? 0),
-        signal,
-      }).then((data) => data ?? []),
-  enabled: computed(() => appStore.numUniv !== undefined),
+	queryKey: queryKeys.campusFreeRoomsList(
+		appStore.numUniv,
+		appStore.selectedCampusId,
+	),
+	queryFn: ({ signal }) =>
+		wrapFetchTyped<IRoom[]>({
+			...freeRoomsRequest(
+				appStore.numUniv ?? 0,
+				appStore.selectedCampusId ?? 0,
+			),
+			signal,
+		}).then((data) => data ?? []),
+	enabled: computed(() => appStore.numUniv !== undefined),
 });
 const filteredFreeRooms = computed(() => {
-  if (!(debouncedQuery.value.trim().length >= 3) && (appStore.selectedCampusId === -1)) {
-    return [];
-  }
+	if (
+		!(debouncedQuery.value.trim().length >= 3) &&
+		appStore.selectedCampusId === -1
+	) {
+		return [];
+	}
 
-  let rooms = campusFreeRoomsQuery.data.value ?? [];
+	let rooms = campusFreeRoomsQuery.data.value ?? [];
 
-  if (appStore.selectedCampusId !== -1) {
-    rooms = rooms.filter(room => room.campusId === appStore.selectedCampusId);
-  }
+	if (appStore.selectedCampusId !== -1) {
+		rooms = rooms.filter((room) => room.campusId === appStore.selectedCampusId);
+	}
 
-  return rooms.filter((room) =>
-      matchesSearchQuery(room.label, debouncedQuery.value),
-  );
+	return rooms.filter((room) =>
+		matchesSearchQuery(room.label, debouncedQuery.value),
+	);
 });
 const selectedUnivName = computed(() => appStore.univName ?? "");
 
 useQueryNotifications<IRoom[]>({
-  contextName: "Campus free room List",
-  getError: () => campusFreeRoomsQuery.error.value,
-  getIsSuccess: () => campusFreeRoomsQuery.isSuccess.value,
-  getData: () => campusFreeRoomsQuery.data.value,
+	contextName: "Campus free room List",
+	getError: () => campusFreeRoomsQuery.error.value,
+	getIsSuccess: () => campusFreeRoomsQuery.isSuccess.value,
+	getData: () => campusFreeRoomsQuery.data.value,
 });
 
 const isInitialLoading = computed(() => campusFreeRoomsQuery.isLoading.value);

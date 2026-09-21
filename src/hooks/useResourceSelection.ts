@@ -44,13 +44,14 @@ export const useResourceSelection = () => {
 		await router.push({ name: ROUTE_NAME.HOME });
 	}
 
-	function selectCampus(nextCampusId: number | undefined, nextCampusName?: string) {
+	function selectCampus(
+		nextCampusId: number | undefined,
+		nextCampusName?: string,
+	) {
 		appStore.selectedCampusId = nextCampusId;
 		appStore.selectedCampusName = nextCampusName;
 		appStore.resourceType = "campus";
 	}
-
-
 
 	return {
 		selectGroup,
@@ -59,6 +60,6 @@ export const useResourceSelection = () => {
 		goToRooms,
 		selectCampus,
 		goToFreeRooms,
-		goToCampuses
+		goToCampuses,
 	};
 };

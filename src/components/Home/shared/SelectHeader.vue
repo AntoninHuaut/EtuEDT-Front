@@ -24,22 +24,22 @@
 </template>
 
 <script lang="ts" setup>
-import {useDisplay} from "vuetify";
+import { useDisplay } from "vuetify";
 import BackSelectUniv from "./BackSelectUnivButton.vue";
 
 defineProps<{
-  title: string;
-  showBack: boolean;
-  action?: {
-    prependIcon: string;
-    variant?: "text" | "flat" | "elevated" | "outlined" | "plain" | "tonal";
-    color: string;
-    onClick: () => void | Promise<void>;
-    text: string;
-  }[];
+	title: string;
+	showBack: boolean;
+	action?: {
+		prependIcon: string;
+		variant?: "text" | "flat" | "elevated" | "outlined" | "plain" | "tonal";
+		color: string;
+		onClick: () => void | Promise<void>;
+		text: string;
+	}[];
 }>();
 
-const {xs} = useDisplay();
+const { xs } = useDisplay();
 </script>
 <style scoped>
 .gap-2 {

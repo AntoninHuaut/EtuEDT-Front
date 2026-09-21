@@ -48,37 +48,41 @@
 </template>
 
 <script lang="ts" setup>
-import {useQuery} from "@tanstack/vue-query";
-import {computed, ref} from "vue";
-import {useDisplay} from "vuetify";
-import {campusesListRequest, groupListRequest} from "@/api/api_requests";
-import {useQueryNotifications} from "@/hooks/useQueryNotifications";
-import {useResourceSelection} from "@/hooks/useResourceSelection";
-import {useAppStore} from "@/store";
-import {ICampus, IGroup} from "@/types/APIType";
+import { useQuery } from "@tanstack/vue-query";
+import { computed, ref } from "vue";
+import { useDisplay } from "vuetify";
+import { campusesListRequest, groupListRequest } from "@/api/api_requests";
+import CampusGridButton from "@/components/Home/buttons/CampusGridButton.vue";
+import { queryKeys } from "@/hooks/queries/queryKeys";
+import { useQueryNotifications } from "@/hooks/useQueryNotifications";
+import { useResourceSelection } from "@/hooks/useResourceSelection";
+import { useSelectionColors } from "@/hooks/useSelectionColors";
+import { useAppStore } from "@/store";
+import { ICampus, IGroup } from "@/types/APIType";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import SelectHeader from "../shared/SelectHeader.vue";
 import SelectionLoadingBlock from "../shared/SelectionLoadingBlock.vue";
 import UniversityTitle from "../shared/UniversityTitle.vue";
-import CampusGridButton from "@/components/Home/buttons/CampusGridButton.vue";
-import {useSelectionColors} from "@/hooks/useSelectionColors";
-import {wrapFetchTyped} from "@/utils/wrapFetch";
-import {queryKeys} from "@/hooks/queries/queryKeys";
 
-const {colors: colorList} = useSelectionColors();
+const { colors: colorList } = useSelectionColors();
 
-const {smAndDown} = useDisplay();
+const { smAndDown } = useDisplay();
 const appStore = useAppStore();
-const {goToFreeRooms, goToRooms, selectCampus: selectCampusInStore} = useResourceSelection();
+const {
+	goToFreeRooms,
+	goToRooms,
+	selectCampus: selectCampusInStore,
+} = useResourceSelection();
 const selectingGroupId = ref<number | undefined>();
 
 const campusesQuery = useQuery<ICampus[]>({
-  queryKey: queryKeys.campusList(appStore.numUniv),
-  queryFn: ({signal}) =>
-      wrapFetchTyped<ICampus[]>({
-        ...campusesListRequest(appStore.numUniv ?? 0),
-        signal,
-      }).then((data) => data ?? []),
-  enabled: computed(() => appStore.numUniv !== undefined),
+	queryKey: queryKeys.campusList(appStore.numUniv),
+	queryFn: ({ signal }) =>
+		wrapFetchTyped<ICampus[]>({
+			...campusesListRequest(appStore.numUniv ?? 0),
+			signal,
+		}).then((data) => data ?? []),
+	enabled: computed(() => appStore.numUniv !== undefined),
 });
 
 const campusesList = computed(() => campusesQuery.data.value ?? []);
@@ -86,17 +90,17 @@ const campusesList = computed(() => campusesQuery.data.value ?? []);
 const selectedUnivName = computed(() => appStore.univName ?? "");
 
 useQueryNotifications<IGroup[]>({
-  contextName: "Campuses List",
-  getError: () => campusesQuery.error.value,
-  getIsSuccess: () => campusesQuery.isSuccess.value,
-  getData: () => campusesQuery.data.value,
+	contextName: "Campuses List",
+	getError: () => campusesQuery.error.value,
+	getIsSuccess: () => campusesQuery.isSuccess.value,
+	getData: () => campusesQuery.data.value,
 });
 
 function selectCampus(id: number) {
-  selectingGroupId.value = id;
-  const selectedCampus = campusesList.value.find((group) => group.id === id);
-  selectCampusInStore(id, selectedCampus?.name ?? "");
-  goToFreeRooms();
+	selectingGroupId.value = id;
+	const selectedCampus = campusesList.value.find((group) => group.id === id);
+	selectCampusInStore(id, selectedCampus?.name ?? "");
+	goToFreeRooms();
 }
 
 const isInitialLoading = computed(() => campusesQuery.isLoading.value);

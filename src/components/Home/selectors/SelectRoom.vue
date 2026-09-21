@@ -76,15 +76,15 @@
 <script lang="ts" setup>
 import { useQuery } from "@tanstack/vue-query";
 import { computed } from "vue";
+import { campusesListRequest, roomListRequest } from "@/api/api_requests";
 import { queryKeys } from "@/hooks/queries/queryKeys";
-import {campusesListRequest, roomListRequest} from "@/api/api_requests";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
 import { matchesSearchQuery, useSearch } from "@/hooks/useSearch";
 import { useSelectionColors } from "@/hooks/useSelectionColors";
-import type { IRoom, ICampus } from "@/types/APIType";
-import { wrapFetchTyped } from "@/utils/wrapFetch";
 import { useAppStore } from "@/store/";
+import type { ICampus, IRoom } from "@/types/APIType";
+import { wrapFetchTyped } from "@/utils/wrapFetch";
 import RoomGridButton from "../buttons/RoomGridButton.vue";
 import SearchBarWithDebounce from "../shared/SearchBarWithDebounce.vue";
 import SelectHeader from "../shared/SelectHeader.vue";
@@ -107,37 +107,40 @@ const roomsQuery = useQuery<IRoom[]>({
 });
 
 const campusesQuery = useQuery<ICampus[]>({
-  queryKey: queryKeys.campusList(appStore.numUniv),
-  queryFn: ({ signal }) =>
-      wrapFetchTyped<ICampus[]>({
-        ...campusesListRequest(appStore.numUniv ?? 0),
-        signal,
-      }).then((data) => data ?? []),
-  enabled: computed(() => appStore.numUniv !== undefined),
+	queryKey: queryKeys.campusList(appStore.numUniv),
+	queryFn: ({ signal }) =>
+		wrapFetchTyped<ICampus[]>({
+			...campusesListRequest(appStore.numUniv ?? 0),
+			signal,
+		}).then((data) => data ?? []),
+	enabled: computed(() => appStore.numUniv !== undefined),
 });
 
 const campusOptions = computed(() => {
-  const options = [{ id: -1, name: 'Tous les campus' }];
-  if (campusesQuery.data.value) {
-    return [...options, ...campusesQuery.data.value];
-  }
-  return options;
+	const options = [{ id: -1, name: "Tous les campus" }];
+	if (campusesQuery.data.value) {
+		return [...options, ...campusesQuery.data.value];
+	}
+	return options;
 });
 
 const filteredRooms = computed(() => {
-	if (!(debouncedQuery.value.trim().length >= 3) && (appStore.selectedCampusId === -1)) {
+	if (
+		!(debouncedQuery.value.trim().length >= 3) &&
+		appStore.selectedCampusId === -1
+	) {
 		return [];
 	}
 
-  let rooms = roomsQuery.data.value ?? [];
+	let rooms = roomsQuery.data.value ?? [];
 
-  if (appStore.selectedCampusId !== -1) {
-    rooms = rooms.filter(room => room.campusId === appStore.selectedCampusId);
-  }
+	if (appStore.selectedCampusId !== -1) {
+		rooms = rooms.filter((room) => room.campusId === appStore.selectedCampusId);
+	}
 
-  return rooms.filter((room) =>
-      matchesSearchQuery(room.label, debouncedQuery.value),
-  );
+	return rooms.filter((room) =>
+		matchesSearchQuery(room.label, debouncedQuery.value),
+	);
 });
 
 useQueryNotifications<IRoom[]>({

@@ -16,7 +16,7 @@
 import { computed } from "vue";
 import { useDisplay } from "vuetify";
 import { useSelectResourceAction } from "@/hooks/useSelectResourceAction";
-import type {ICampus, IRoom} from "@/types/APIType";
+import type { ICampus, IRoom } from "@/types/APIType";
 
 const props = defineProps<{
 	campus: ICampus;

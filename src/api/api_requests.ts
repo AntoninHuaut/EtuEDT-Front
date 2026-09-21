@@ -46,7 +46,6 @@ export const freeRoomsRequest = (univId: number, campusId: number) => {
 	};
 };
 
-
 export const timetableDetailsRequest = (
 	univId: number,
 	groupId: number,

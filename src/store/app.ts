@@ -16,9 +16,14 @@ export const useAppStore = defineStore("app", () => {
 		"resourceType",
 		"timetable",
 	);
-	const selectedCampusId = useLocalStorage<number | undefined>("selectedCampusId", -1);
-	const selectedCampusName = useLocalStorage<string | undefined>("selectedCampusName", undefined);
-
+	const selectedCampusId = useLocalStorage<number | undefined>(
+		"selectedCampusId",
+		-1,
+	);
+	const selectedCampusName = useLocalStorage<string | undefined>(
+		"selectedCampusName",
+		undefined,
+	);
 
 	const selectedResource = computed<IResourceSelection | undefined>(() => {
 		if (numUniv.value === undefined || selectedResourceId.value === undefined) {
@@ -51,6 +56,8 @@ export const useAppStore = defineStore("app", () => {
 		groupId.value = undefined;
 		groupName.value = undefined;
 		selectedResourceId.value = undefined;
+		selectedCampusName.value = undefined;
+		selectedCampusId.value = undefined;
 		resourceType.value = "timetable";
 	}
 
@@ -60,6 +67,8 @@ export const useAppStore = defineStore("app", () => {
 		groupId.value = undefined;
 		groupName.value = undefined;
 		selectedResourceId.value = undefined;
+		selectedCampusName.value = undefined;
+		selectedCampusId.value = undefined;
 		resourceType.value = "timetable";
 	}
 
@@ -94,6 +103,6 @@ export const useAppStore = defineStore("app", () => {
 		selectGroup,
 		setSelectedResource,
 		selectedCampusId,
-		selectedCampusName
+		selectedCampusName,
 	};
 });

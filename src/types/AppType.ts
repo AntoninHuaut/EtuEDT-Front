@@ -6,7 +6,7 @@ export enum ETheme {
 
 export type TViewMode = "day" | "week" | "month-grid";
 
-export type ResourceType = "timetable" | "room";
+export type ResourceType = "timetable" | "room" | "campus" | "freerooms";
 
 export interface IRoomSelection {
 	numUniv: number;
@@ -16,9 +16,16 @@ export interface IRoomSelection {
 
 export interface ITimetableSelection {
 	numUniv: number;
-	groupId: number;
 	adeResources: number;
+	groupId: number;
 	resourceType: "timetable";
+}
+
+export interface ICampusSelection {
+	numUniv: number;
+	adeResources: number;
+	resourceType: "campus";
+	campusId: number;
 }
 
 export type IResourceSelection = IRoomSelection | ITimetableSelection;

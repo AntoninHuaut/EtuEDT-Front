@@ -13,6 +13,12 @@ export interface IRoom {
 	label: string;
 	adeUrl?: string;
 	lastUpdate: string;
+	campusId?: number;
+}
+
+export interface ICampus {
+	id: number;
+	name: string;
 }
 
 export interface IGroup {

@@ -46,7 +46,7 @@ export function getColorByLessonTitle(lessonTitle: string): string {
 		return "blue";
 	}
 
-	for (const get of ["TD", "TP", "CM", "CC", "CTP"]) {
+	for (const get of ["TD", "TP", "CM", "CC", "CTP", "TDP"]) {
 		lessonTitle = lessonTitle.replace(/ /g, "").replace(get, "");
 	}
 

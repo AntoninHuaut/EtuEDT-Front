@@ -1,8 +1,9 @@
 {
 	"name": "etuedt-vue3",
+	"type": "module",
 	"version": "1.0.0",
 	"private": true,
-	"packageManager": "pnpm@11.10.0",
+	"packageManager": "pnpm@12.15.0+sha512.b3951d6d6ff4a9f13dc7cf56cd28d2b8eb37dbcc9c68e52e1e1191873ea9f82a017287ab50baadc5ccc494f036c67c0e47eb13608c2fa36f47711b61ea128e61",
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
 		"dev": "vite",
@@ -25,9 +26,9 @@
 		"@schedule-x/theme-default": "^4.9.1",
 		"@schedule-x/vue": "^4.1.0",
 		"@tanstack/vue-query": "^5.104.5",
-		"@vueuse/core": "^14.3.0",
+		"@vueuse/core": "^15.0.0",
 		"pinia": "^4.1.0",
-		"preact": "^10.29.7",
+		"preact": "^11.0.2",
 		"temporal-polyfill": "^1.0.6",
 		"vue": "^3.5.44",
 		"vue-router": "^5.4.0",
@@ -35,7 +36,7 @@
 		"vuetify": "^4.3.0"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.6.2",
+		"@biomejs/biome": "2.6.3",
 		"@types/node": "^26.6.5",
 		"@vitejs/plugin-vue": "^6.0.10",
 		"sass": "^1.106.1",

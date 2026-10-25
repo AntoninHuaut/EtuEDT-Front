@@ -25,7 +25,7 @@
 		"@schedule-x/theme-default": "^4.9.1",
 		"@schedule-x/vue": "^4.1.0",
 		"@tanstack/vue-query": "^5.104.5",
-		"@vueuse/core": "^14.3.0",
+		"@vueuse/core": "^15.0.0",
 		"pinia": "^3.0.4",
 		"preact": "^10.29.7",
 		"temporal-polyfill": "^1.0.6",

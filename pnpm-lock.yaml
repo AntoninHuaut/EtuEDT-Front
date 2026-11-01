@@ -228,25 +228,25 @@ importers:
         specifier: 2.6.4
         version: 2.6.4
       '@types/node':
-        specifier: ^26.6.6
+        specifier: 26.6.6
         version: 26.6.6
       '@vitejs/plugin-vue':
-        specifier: ^6.0.10
+        specifier: 6.0.10
         version: 6.0.10(vite@8.3.5(@types/node@26.6.6)(sass@1.107.1))(vue@3.5.44(typescript@6.0.3))
       sass:
-        specifier: ^1.107.1
+        specifier: 1.107.1
         version: 1.107.1
       typescript:
-        specifier: ^6.0.3
+        specifier: 6.0.3
         version: 6.0.3
       vite:
-        specifier: ^8.3.5
+        specifier: 8.3.5
         version: 8.3.5(@types/node@26.6.6)(sass@1.107.1)
       vite-plugin-vuetify:
-        specifier: ^2.1.3
+        specifier: 2.1.3
         version: 2.1.3(vite@8.3.5(@types/node@26.6.6)(sass@1.107.1))(vue@3.5.44(typescript@6.0.3))(vuetify@4.3.1)
       vue-tsc:
-        specifier: ^3.3.14
+        specifier: 3.3.14
         version: 3.3.14(typescript@6.0.3)
 
 packages:

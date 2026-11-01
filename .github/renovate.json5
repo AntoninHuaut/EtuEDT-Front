@@ -1,0 +1,43 @@
+// Renovate keeps the pnpm dependencies, the packageManager pin and the
+// workflow's actions current. It replaces Dependabot, which split minors into
+// production and development groups and left digests and pnpm itself out.
+//
+// Routine bumps (minor, patch, digest) arrive together in one PR a week.
+// Majors stay one PR each: a Vue, Vuetify or Vite major usually needs code
+// changes and is tested and reverted on its own.
+{
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  extends: ["config:recommended"],
+  timezone: "Europe/Paris",
+  schedule: ["* 7-12 * * 6"],
+  labels: ["dependencies"],
+  semanticCommits: "enabled",
+  semanticCommitType: "chore",
+  semanticCommitScope: "deps",
+  // Move the ranges in package.json along with the lockfile, as Dependabot
+  // did, so package.json still says which version is installed.
+  rangeStrategy: "bump",
+  // pnpm refuses versions younger than its minimumReleaseAge (one day by
+  // default, see the exclusions in pnpm-workspace.yaml). Proposing them
+  // anyway makes the lockfile update fail.
+  minimumReleaseAge: "1 day",
+  packageRules: [
+    {
+      groupName: "routine updates",
+      groupSlug: "routine",
+      matchUpdateTypes: ["minor", "patch", "digest"],
+    },
+  ],
+  customManagers: [
+    {
+      // biome.json names its schema by version; left alone it drifts from
+      // the installed @biomejs/biome (it already reads 2.5.3 against 2.6.3).
+      // Same depName, so it lands in the same PR as the package bump.
+      customType: "regex",
+      managerFilePatterns: ["/^biome\\.jsonc?$/"],
+      matchStrings: ["biomejs\\.dev/schemas/(?<currentValue>[^/]+)/schema\\.json"],
+      depNameTemplate: "@biomejs/biome",
+      datasourceTemplate: "npm",
+    },
+  ],
+}

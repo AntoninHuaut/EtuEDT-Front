@@ -7,7 +7,11 @@
 // changes and is tested and reverted on its own.
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended"],
+  // best-practices adds, on top of config:recommended: actions and Docker
+  // images pinned to digests, devDependencies pinned, a 3-day strict
+  // minimumReleaseAge on npm, weekly lock file maintenance, config
+  // migration PRs and abandoned-package warnings on the dashboard.
+  extends: ["config:best-practices"],
   timezone: "Europe/Paris",
   schedule: ["* 7-12 * * 6"],
   labels: ["dependencies"],
@@ -17,11 +21,12 @@
   // Move the ranges in package.json along with the lockfile, as Dependabot
   // did, so package.json still says which version is installed.
   rangeStrategy: "bump",
-  // pnpm waits a day before resolving a new version (minimumReleaseAge,
-  // 1440 minutes by default; see the exclusions in pnpm-workspace.yaml).
-  // Renovate waits as long, or its range bumps would force pnpm to fall
-  // back to the version that delay exists to keep out.
-  minimumReleaseAge: "1 day",
+  // Lock file maintenance refreshes transitive dependencies, which nothing
+  // else bumps. It runs in the same Saturday window, not the preset's
+  // Monday; pnpm applies its own one-day minimumReleaseAge to it.
+  lockFileMaintenance: {
+    schedule: ["* 7-12 * * 6"],
+  },
   packageRules: [
     {
       groupName: "routine updates",

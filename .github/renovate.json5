@@ -17,9 +17,10 @@
   // Move the ranges in package.json along with the lockfile, as Dependabot
   // did, so package.json still says which version is installed.
   rangeStrategy: "bump",
-  // pnpm refuses versions younger than its minimumReleaseAge (one day by
-  // default, see the exclusions in pnpm-workspace.yaml). Proposing them
-  // anyway makes the lockfile update fail.
+  // pnpm waits a day before resolving a new version (minimumReleaseAge,
+  // 1440 minutes by default; see the exclusions in pnpm-workspace.yaml).
+  // Renovate waits as long, or its range bumps would force pnpm to fall
+  // back to the version that delay exists to keep out.
   minimumReleaseAge: "1 day",
   packageRules: [
     {

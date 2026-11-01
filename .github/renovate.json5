@@ -18,6 +18,10 @@
   semanticCommits: "enabled",
   semanticCommitType: "chore",
   semanticCommitScope: "deps",
+  // Security PRs already skip the Saturday schedule and the release-age
+  // wait. OSV adds a second advisory source next to GitHub's, which often
+  // lists a fix first. Still flagged experimental upstream (#20542).
+  osvVulnerabilityAlerts: true,
   // Move the ranges in package.json along with the lockfile, as Dependabot
   // did, so package.json still says which version is installed.
   rangeStrategy: "bump",

@@ -3,7 +3,7 @@
 	"type": "module",
 	"version": "1.0.0",
 	"private": true,
-	"packageManager": "pnpm@12.16.1+sha512.091d1dee7927575661b25dab3c2ae31cafc1c54d6b71ed6a6600cf0c1cb10434a447eae14015f1b23e2e6bedeed79df94a932e2164d2832280dce3fb32f656d1",
+	"packageManager": "pnpm@12.17.0+sha512.b8d223ebec04b580a89ed206daa71d1bccb6a1ee1d52efa95cc3b0db75271561df8f0d8e2c43add39c5ec08018af7a8a95108e7090f95a29f88727b7a40fd53d",
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
 		"dev": "vite",
@@ -25,15 +25,15 @@
 		"@schedule-x/events-service": "^4.9.1",
 		"@schedule-x/theme-default": "^4.9.1",
 		"@schedule-x/vue": "^4.1.0",
-		"@tanstack/vue-query": "^5.105.0",
+		"@tanstack/vue-query": "^5.105.3",
 		"@vueuse/core": "^15.0.0",
 		"pinia": "^4.1.0",
 		"preact": "^11.1.1",
-		"temporal-polyfill": "^1.0.6",
+		"temporal-polyfill": "^1.0.7",
 		"vue": "^3.5.44",
 		"vue-router": "^5.4.0",
 		"vue3-toastify": "^0.2.9",
-		"vuetify": "^4.3.1"
+		"vuetify": "^4.3.2"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.6.4",

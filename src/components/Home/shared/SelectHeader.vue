@@ -7,18 +7,20 @@
       </p>
     </div>
     <div>
+      <span v-for="act in action" :key="act.text" class="d-inline-flex" :title="act.disabled ? act.disabledReason : undefined">
       <v-btn
-          v-for="act in action"
-          v-if="action"
           class="ml-4"
           :prepend-icon="act.prependIcon"
           :variant="act.variant"
           :color="act.color"
           :size="xs ? 'small' : undefined"
-          @click="act.onClick"
+          :disabled="act.disabled"
+          :aria-label="act.disabled ? `${act.text} : ${act.disabledReason}` : act.text"
+          @click="!act.disabled && act.onClick()"
       >
         {{ act.text }}
       </v-btn>
+      </span>
     </div>
   </div>
 </template>
@@ -36,6 +38,8 @@ defineProps<{
 		color: string;
 		onClick: () => void | Promise<void>;
 		text: string;
+		disabled?: boolean;
+		disabledReason?: string;
 	}[];
 }>();
 

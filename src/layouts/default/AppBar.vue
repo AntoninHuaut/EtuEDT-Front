@@ -18,8 +18,9 @@
 			v-if="isTimetableRoute"
 			icon="mdi-link"
 			:on-click="copyTimetableLink"
-			tooltip="Obtenir le lien de l'emploi du temps" />
-      <AppBarButton to="/sync" icon="mdi-sync" tooltip="Synchroniser (ICS)" />
+			:disabled="!featureAvailability.canCopyLink"
+			:tooltip="featureAvailability.canCopyLink ? 'Obtenir le lien de l’emploi du temps' : unavailableFeatureMessage" />
+      <AppBarButton to="/sync" icon="mdi-sync" :disabled="!featureAvailability.canSyncCalendar" :tooltip="featureAvailability.canSyncCalendar ? 'Synchroniser (ICS)' : unavailableFeatureMessage" />
       <AppThemeButton />
       <AppBarButton :to="`${BASE_API_URL}/docs`" icon="mdi-book-open-variant" tooltip="Documentation API" />
       <AppBarButton to="/about" icon="mdi-github" tooltip="À propos" />
@@ -36,15 +37,21 @@ import { useDisplay } from "vuetify";
 import { BASE_API_URL } from "@/api/api_requests";
 import AppBarButton from "@/components/layout/app-bar/AppBarButton.vue";
 import AppThemeButton from "@/components/layout/app-bar/AppThemeButton.vue";
+import {
+	featuresForUniversity,
+	unavailableFeatureMessage,
+} from "@/config/features";
 import { useTimetable } from "@/hooks/useTimetable";
 import { getResourceRouteSelectionFromQuery } from "@/router/resourceRoute";
 import { ROUTE_NAME } from "@/router/routeNames";
+import { useAppStore } from "@/store";
 import type { ResourceType } from "@/types/AppType";
 import { errorNotif, successNotif } from "@/utils/notification";
 
 const { smAndDown, smAndUp } = useDisplay();
 const route = useRoute();
 const router = useRouter();
+const appStore = useAppStore();
 
 const isTimetableRoute = computed(
 	() =>
@@ -75,6 +82,12 @@ const selectedResource = computed(() => {
 	);
 });
 
+const featureAvailability = computed(() =>
+	featuresForUniversity(
+		isTimetableRoute.value ? selectedResource.value?.numUniv : appStore.numUniv,
+	),
+);
+
 const timetableData = useTimetable({
 	selectedResource,
 	enabled: isTimetableRoute,
@@ -83,6 +96,7 @@ const timetableData = useTimetable({
 const goToHome = async () => await router.push({ name: ROUTE_NAME.HOME });
 
 const copyTimetableLink = async () => {
+	if (!featureAvailability.value.canCopyLink) return;
 	if (!selectedResource.value) {
 		if (route.name === ROUTE_NAME.TIMETABLE_GROUP) {
 			errorNotif({

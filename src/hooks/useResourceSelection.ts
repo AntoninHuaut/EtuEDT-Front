@@ -1,4 +1,5 @@
 import { useRouter } from "vue-router";
+import { featuresForUniversity } from "@/config/features";
 import { getResourceRouteLocation } from "@/router/resourceRoute";
 import { ROUTE_NAME } from "@/router/routeNames";
 import { useAppStore } from "@/store";
@@ -35,11 +36,13 @@ export const useResourceSelection = () => {
 	}
 
 	async function goToFreeRooms() {
+		if (!featuresForUniversity(appStore.numUniv).canFindFreeRooms) return;
 		appStore.resourceType = "freerooms";
 		await router.push({ name: "Home" });
 	}
 
 	async function goToCampuses() {
+		if (!featuresForUniversity(appStore.numUniv).canFindFreeRooms) return;
 		selectCampus(-1);
 		await router.push({ name: ROUTE_NAME.HOME });
 	}

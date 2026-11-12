@@ -1,6 +1,7 @@
 <template>
   <v-card elevation="5" :width="Math.min(width, 830)" class="mt-3 mx-auto">
-    <v-card-item class="mx-1 my-3">
+    <v-card-text v-if="!canSync" role="status">{{ unavailableFeatureMessage }}</v-card-text>
+    <v-card-item v-if="canSync" class="mx-1 my-3">
       <v-card-title class="text-primary mb-2 text-wrap">Synchronisation avec des services tiers</v-card-title>
       <v-card-subtitle class="text-wrap">
         L'application vous permet de synchroniser automatiquement votre emploi du temps avec un service tier, si celui-ci
@@ -8,7 +9,7 @@
       </v-card-subtitle>
     </v-card-item>
 
-    <v-card-text>
+    <v-card-text v-if="canSync">
       <p class="text-title-small mb-1">Exemple avec Google et Outlook :</p>
       <div>
         <ol>
@@ -46,9 +47,19 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue";
 import { useDisplay } from "vuetify";
+import {
+	featuresForUniversity,
+	unavailableFeatureMessage,
+} from "@/config/features";
+import { useAppStore } from "@/store";
 
 const { width } = useDisplay();
+const appStore = useAppStore();
+const canSync = computed(
+	() => featuresForUniversity(appStore.numUniv).canSyncCalendar,
+);
 </script>
 
 <style scoped>

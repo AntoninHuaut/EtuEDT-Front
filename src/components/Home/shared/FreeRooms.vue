@@ -56,6 +56,7 @@ import {
 } from "@/api/api_requests";
 import RoomGridButton from "@/components/Home/buttons/RoomGridButton.vue";
 import SearchBarWithDebounce from "@/components/Home/shared/SearchBarWithDebounce.vue";
+import { featuresForUniversity } from "@/config/features";
 import { queryKeys } from "@/hooks/queries/queryKeys";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
@@ -86,9 +87,12 @@ const campusFreeRoomsQuery = useQuery<IRoom[]>({
 			),
 			signal,
 		}).then((data) => data ?? []),
-	enabled: computed(() => appStore.numUniv !== undefined),
+	enabled: computed(
+		() => featuresForUniversity(appStore.numUniv).canFindFreeRooms,
+	),
 });
 const filteredFreeRooms = computed(() => {
+	if (!featuresForUniversity(appStore.numUniv).canFindFreeRooms) return [];
 	if (
 		!(debouncedQuery.value.trim().length >= 3) &&
 		appStore.selectedCampusId === -1

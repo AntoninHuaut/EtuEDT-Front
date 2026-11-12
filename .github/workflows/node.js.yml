@@ -4,35 +4,38 @@
 name: Node.js CI
 
 on:
-    push:
-        branches: ['master']
-    pull_request:
-        branches: ['master']
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
 
 permissions:
-    contents: read
+  contents: read
 
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        strategy:
-            matrix:
-                node-version: [22.x, 24.x]
-                # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22.x, 24.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
-        steps:
-            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
-              with:
-                  node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ matrix.node-version }}
 
-            - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6
-              with:
-                  run_install: |
-                      - recursive: true
-                        args: [--frozen-lockfile, --strict-peer-dependencies]
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6
+        with:
+          run_install: |
+            - recursive: true
+              args: [--frozen-lockfile, --strict-peer-dependencies]
 
-            - name: Build project
-              run: pnpm build
+      - name: Test feature policy
+        run: pnpm test
+
+      - name: Build project
+        run: pnpm build

@@ -1,17 +1,21 @@
 <template>
 	<v-tooltip :text="tooltip">
 		<template #activator="{ props: tooltipProps }">
+			<span v-bind="tooltipProps" :tabindex="disabled ? 0 : undefined" class="d-inline-flex">
 			<v-btn
-				v-bind="{ ...buttonAttrs, ...tooltipProps }"
+				v-bind="buttonAttrs"
+				:disabled="disabled"
+				:aria-label="tooltip"
 				:class="{ 'app-bar-button--sm': smAndDown }"
 				:active="false"
 				:size="smAndDown ? 'small' : undefined"
-				@click="onClick"
+				@click="handleClick"
 				elevation="0"
 				variant="text"
 				color="inherit"
 				:text="props.text"
 			/>
+			</span>
 		</template>
 	</v-tooltip>
 </template>
@@ -31,9 +35,12 @@
 import { computed, type PropType, useAttrs } from "vue";
 import { useDisplay } from "vuetify";
 
+defineOptions({ inheritAttrs: false });
+
 const { smAndDown } = useDisplay();
 
 const props = defineProps({
+	disabled: Boolean,
 	text: String,
 	onClick: {
 		type: Function as PropType<
@@ -57,6 +64,12 @@ const isExternal = computed(() => {
 
 const buttonAttrs = computed(() => {
 	const base = { ...attrs };
+	if (props.disabled) {
+		delete base.to;
+		delete base.href;
+		delete base.target;
+		return base;
+	}
 	if (isExternal.value) {
 		base.href = base.to ?? base.href;
 		base.target = "_blank";
@@ -65,4 +78,12 @@ const buttonAttrs = computed(() => {
 	}
 	return base;
 });
+
+function handleClick(event: MouseEvent) {
+	if (props.disabled) {
+		event.preventDefault();
+		return;
+	}
+	props.onClick?.(event);
+}
 </script>

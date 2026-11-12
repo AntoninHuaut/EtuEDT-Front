@@ -8,6 +8,8 @@
       color: 'primary',
       onClick: goToCampuses,
       text: 'Trouver une salle libre',
+      disabled: !canFindFreeRooms,
+      disabledReason: unavailableFeatureMessage,
     },{
       prependIcon: 'mdi-account-group',
       variant: 'tonal',
@@ -77,6 +79,10 @@
 import { useQuery } from "@tanstack/vue-query";
 import { computed } from "vue";
 import { campusesListRequest, roomListRequest } from "@/api/api_requests";
+import {
+	featuresForUniversity,
+	unavailableFeatureMessage,
+} from "@/config/features";
 import { queryKeys } from "@/hooks/queries/queryKeys";
 import { useQueryNotifications } from "@/hooks/useQueryNotifications";
 import { useResourceSelection } from "@/hooks/useResourceSelection";
@@ -92,6 +98,9 @@ import SelectionLoadingBlock from "../shared/SelectionLoadingBlock.vue";
 import UniversityTitle from "../shared/UniversityTitle.vue";
 
 const appStore = useAppStore();
+const canFindFreeRooms = computed(
+	() => featuresForUniversity(appStore.numUniv).canFindFreeRooms,
+);
 const { goToGroups, goToCampuses } = useResourceSelection();
 const { searchQuery, debouncedQuery, isDebouncing } = useSearch();
 const { colors: colorList } = useSelectionColors();

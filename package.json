@@ -3,7 +3,7 @@
 	"type": "module",
 	"version": "1.0.0",
 	"private": true,
-	"packageManager": "pnpm@12.17.0+sha512.b8d223ebec04b580a89ed206daa71d1bccb6a1ee1d52efa95cc3b0db75271561df8f0d8e2c43add39c5ec08018af7a8a95108e7090f95a29f88727b7a40fd53d",
+	"packageManager": "pnpm@12.18.0+sha512.9d7882d5dc82147ecfc4e062aa34834e0ad0296710a1837a1115ae012127d36b7109e321ac1598a1dd0a65597681b1e99917e12ed0d749eae91187943363beb3",
 	"scripts": {
 		"preinstall": "npx only-allow pnpm",
 		"dev": "vite",
@@ -25,23 +25,23 @@
 		"@schedule-x/events-service": "^4.9.1",
 		"@schedule-x/theme-default": "^4.9.1",
 		"@schedule-x/vue": "^4.1.0",
-		"@tanstack/vue-query": "^5.105.3",
+		"@tanstack/vue-query": "^5.107.1",
 		"@vueuse/core": "^15.0.0",
 		"pinia": "^4.1.0",
-		"preact": "^11.1.1",
-		"temporal-polyfill": "^1.0.7",
-		"vue": "^3.5.44",
-		"vue-router": "^5.4.0",
+		"preact": "^11.2.0",
+		"temporal-polyfill": "^1.0.8",
+		"vue": "^3.5.45",
+		"vue-router": "^5.5.0",
 		"vue3-toastify": "^0.2.9",
-		"vuetify": "^4.3.2"
+		"vuetify": "^4.3.3"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.6.4",
+		"@biomejs/biome": "2.6.6",
 		"@types/node": "26.6.6",
 		"@vitejs/plugin-vue": "6.0.10",
-		"sass": "1.107.1",
+		"sass": "1.108.2",
 		"typescript": "6.0.3",
-		"vite": "8.3.5",
+		"vite": "8.3.8",
 		"vite-plugin-vuetify": "2.1.3",
 		"vue-tsc": "3.3.14"
 	}

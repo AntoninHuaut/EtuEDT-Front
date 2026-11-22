@@ -1,5 +1,16 @@
 <template>
-  <v-container fluid class="full-height">
+  <aside class="maintenance-notice px-4 py-2 text-center text-body-2">
+    <strong>EtuEDT est très peu maintenu.</strong>
+    D’autres étudiants ont créé
+    <a
+      href="https://leqgetudiant.fr/"
+      target="_blank"
+      rel="noopener"
+      data-umami-event="home-le-qg-etudiant-click"
+    >Le QG Étudiant</a>
+    pour consulter votre emploi du temps avec plus de fonctionnalités.
+  </aside>
+  <v-container fluid>
     <v-row class="text-center">
       <v-col class="mx-auto" :cols="mdAndDown ? '12' : '6'">
         <component :is="currentComponent" />
@@ -33,3 +44,14 @@ function getCurrentComponent() {
 
 const currentComponent = computed(() => getCurrentComponent());
 </script>
+
+<style scoped>
+.maintenance-notice {
+  background-color: rgba(var(--v-theme-primary), 0.1);
+}
+
+.maintenance-notice a {
+  color: inherit;
+  font-weight: 600;
+}
+</style>
